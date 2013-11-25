@@ -18,8 +18,8 @@ void yyerror(const char* format, ...);
 
 			/* numbers */
 [0-9]+		{
-					yylval.value = atoi(yytext);
-					return NUMBER;
+				yylval.value = atoi(yytext);
+				return NUMBER;
 			}
 			
 			/* operators */
