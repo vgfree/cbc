@@ -8,7 +8,8 @@
 
 #define CBC_LOG_FILENAME "cbc_output.log"
 
-// error format function
+// error output format functions
+void fyyerror(FILE* fd, const char* format, va_list* args);
 void yyerror(const char* format, ...);
 
 %}
@@ -40,30 +41,30 @@ int yywrap(void)
 }
 
 // -----------------------------------------------------------------------------
+// write error to file
+// -----------------------------------------------------------------------------
+void fyyerror(FILE* fd, const char* format, va_list* args)
+{
+	vfprintf(fd, format, *args);
+	fprintf(fd, "\n");
+}
+
+// -----------------------------------------------------------------------------
 // andvanced error output
 // -----------------------------------------------------------------------------
 void yyerror(const char* format, ...)
 {
 	va_list arglist;
 	va_start(arglist, format);
-
-	// add line feed to message
-	char* message	= (char*) malloc(strlen(format) + 2);
-	*message		= '\0';
-	strcpy(message, format);
-	strcat(message, "\n");
 #ifdef _CBC_DEBUG
-	// actual print
-	vprintf(message, arglist);
+	// actual output to stderr
+	fyyerror(stderr, format, &arglist);
 #endif // _CBC_DEBUG
 #ifndef _CBC_NOLOG
 	// log to file
 	FILE* log_file = fopen(CBC_LOG_FILENAME, "a+");
-	vfprintf(log_file, message, arglist);
+	fyyerror(log_file, format, &arglist);
 	fclose(log_file);
 #endif // _CBC_NOLOG
-	// free memory
-	free(message);
-
 	va_end(arglist);
 }
