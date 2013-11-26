@@ -50,7 +50,7 @@ void fyyerror(FILE* fd, const char* format, va_list* args)
 }
 
 // -----------------------------------------------------------------------------
-// andvanced error output
+// general error output
 // -----------------------------------------------------------------------------
 void yyerror(const char* format, ...)
 {
