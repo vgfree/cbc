@@ -12,12 +12,13 @@ SRC		:= $(TYACC) $(TLEX)
 OBJ		:= $(SRC:%.c=%.o)
 CFLAGS	:= 
 LDFLAGS	:= 
+UNITTEST:= test.sh
 
 # default target is debug
 default: debug
 
 # debug
-debug: CFLAGS := -g -D _CBC_DEBUG
+debug: CFLAGS := -g -D _CBC_DEBUG -D _CBC_NOLOG
 debug: build
 
 # release
@@ -38,6 +39,10 @@ $(TYACC): $(SRC_YAC)
 # build lex/flex output
 $(TLEX): $(SRC_LEX)
 	flex -o $@ $^
+
+# run unit-test
+test: $(UNITTEST)
+	./$<
 
 clean:
 	rm $(TARGET) $(TYACC) $(HYACC) $(TLEX) $(OBJ)
