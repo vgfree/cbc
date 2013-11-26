@@ -23,7 +23,7 @@ void yyerror(const char* format, ...);
 			}
 			
 			/* operators */
-[-+,]		{ return *yytext; }
+[-+*/,()]	{ return *yytext; }
 
 			/* whitespaces */
 [ \t\n]+	{ ; }	// ignore

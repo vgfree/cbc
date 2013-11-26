@@ -11,6 +11,7 @@
 
 %token <value> NUMBER
 %left '+' '-'
+%left '*' '/'
 
 %type <value> stmt expr
 
@@ -29,6 +30,10 @@ expr:
 	NUMBER				{ $$ = $1; }
 	| expr '+' expr		{ $$ = $1 + $3; }
 	| expr '-' expr		{ $$ = $1 - $3; }
+	| expr '*' expr		{ $$ = $1 * $3; }
+	| expr '/' expr		{ $$ = $1 / $3; }
+	| '(' expr ')'		{ $$ = $2; }
+	| '-' expr			{ $$ = - $2; }
 	;
 
 %%	/* ROUTINES ------------------------------------------------------------- */
