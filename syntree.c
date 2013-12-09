@@ -40,10 +40,16 @@ void syntree_free(syntree* node)
 	if (!node)
 		return;
 	
-	// free child-nodes
-	syntree_free(node->l);
-	syntree_free(node->r);
-	// free node itself
+	// nodes of type SNT_CONSTVAL have no child-nodes.
+	// DO NOT FREE CHILD-NODE POINTERS IN THIS CASE!
+	if (node->type != SNT_CONSTVAL)
+	{
+		// free child-nodes
+		syntree_free(node->l);
+		syntree_free(node->r);
+	}
+	
+	// always free node itself at the end
 	free(node);
 }
 
