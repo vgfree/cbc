@@ -3,8 +3,12 @@
  ******************************************************************************/
 
 #include <stdlib.h>
+#include <stdio.h>
 #include "syntree.h"
 
+// -----------------------------------------------------------------------------
+// create a syntax-tree node
+// -----------------------------------------------------------------------------
 syntree* syntree_create(enum syn_nodetype_t type, syntree* left_node,
 						syntree* right_node)
 {
@@ -16,6 +20,9 @@ syntree* syntree_create(enum syn_nodetype_t type, syntree* left_node,
 	return node;
 }
 
+// -----------------------------------------------------------------------------
+// create a syntax-tree value-node
+// -----------------------------------------------------------------------------
 syntree* constval_create(int value)
 {
 	constval* node	= malloc(sizeof(constval));
@@ -25,6 +32,9 @@ syntree* constval_create(int value)
 	return (syntree*) node;
 }
 
+// -----------------------------------------------------------------------------
+// free a syntax-tree
+// -----------------------------------------------------------------------------
 void syntree_free(syntree* node)
 {
 	if (!node)
@@ -35,4 +45,33 @@ void syntree_free(syntree* node)
 	syntree_free(node->r);
 	// free node itself
 	free(node);
+}
+
+// -----------------------------------------------------------------------------
+// free a syntax-tree
+// -----------------------------------------------------------------------------
+int eval(syntree* node)
+{
+	int result;
+	
+	switch (node->type)
+	{
+		case SNT_CONSTVAL:
+			result = ((constval*) node)->value;
+			break;
+		
+		case '+': result = eval(node->l) + eval(node->r); break;
+		case '-': result = eval(node->l) - eval(node->r); break;
+		case '*': result = eval(node->l) * eval(node->r); break;
+		case '/': result = eval(node->l) / eval(node->r); break;
+		
+		case SNT_SIGNED_MINUS:
+			result = - eval(node->l);
+			break;
+		
+		default:
+			printf("error: syntax-tree node-type not recognized: %d\n", node->type);
+	}
+	
+	return result;
 }

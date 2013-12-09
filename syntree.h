@@ -8,7 +8,8 @@
 // syntax-node types
 enum syn_nodetype_t
 {
-	SNT_CONSTVAL = 256
+	SNT_CONSTVAL = 256,
+	SNT_SIGNED_MINUS
 };
 
 // syntax-tree node
@@ -37,5 +38,6 @@ syntree* syntree_create(enum syn_nodetype_t type, syntree* left_node,
 						syntree* right_node);
 syntree* constval_create(int value);
 void syntree_free(syntree* node);
+int eval(syntree* node);
 
 #endif // SYNTREE_H

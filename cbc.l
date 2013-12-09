@@ -4,6 +4,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
+// include syntree.h BEFORE any other parser-specific header-files!
+// otherwise the build would fail due to unknown type-names.
+#include "syntree.h"
 #include "cbc_parse.h"
 
 #define CBC_LOG_FILENAME "cbc_output.log"
