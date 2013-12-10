@@ -45,6 +45,9 @@
 			/* operators */
 [-+*/,()]	{ return *yytext; }
 			
+			/* comments */
+"//".*		{ ; }	// ignore
+			
 			/* whitespaces */
 [ \t\n]+	{ ; }	// ignore
 			
