@@ -8,7 +8,7 @@ SRC_LEX	:= cbc.l
 TLEX	:= $(TARGET)_lex.c
 TYACC	:= $(TARGET)_parse.c
 HYACC	:= $(TYACC:%.c=%.h)
-SRC		:= $(TYACC) $(TLEX) syntree.c
+SRC		:= $(TYACC) $(TLEX) syntree.c errors.c
 OBJ		:= $(SRC:%.c=%.o)
 CFLAGS	:= 
 LDFLAGS	:= 

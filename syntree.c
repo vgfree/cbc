@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "syntree.h"
+#include "errors.h"
 
 // -----------------------------------------------------------------------------
 // create a syntax-tree node
@@ -69,14 +70,22 @@ int eval(syntree* node)
 		case '+': result = eval(node->l) + eval(node->r); break;
 		case '-': result = eval(node->l) - eval(node->r); break;
 		case '*': result = eval(node->l) * eval(node->r); break;
-		case '/': result = eval(node->l) / eval(node->r); break;
+		case '/':
+			result	= 0;
+			int rhs	= eval(node->r);
+			// check for division by zero first!
+			if (rhs != 0)
+				result = eval(node->l) / rhs;
+			else
+				yyerror("division by zero is not allowed!");
+			break;
 		
 		case SNT_SIGNED_MINUS:
 			result = - eval(node->l);
 			break;
 		
 		default:
-			printf("error: syntax-tree node-type not recognized: %d\n", node->type);
+			yyerror("syntax-tree node-type not recognized: %d", node->type);
 	}
 	
 	return result;
