@@ -1,4 +1,7 @@
 	/* DEFINITIONS ---------------------------------------------------------- */
+
+%option yylineno
+
 %{
 
 #include <stdio.h>
@@ -48,6 +51,7 @@ int yywrap(void)
 // -----------------------------------------------------------------------------
 void fyyerror(FILE* fd, const char* format, va_list* args)
 {
+	fprintf(fd, "%d: error: ", yylineno);
 	vfprintf(fd, format, *args);
 	fprintf(fd, "\n");
 }
