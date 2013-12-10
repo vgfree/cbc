@@ -54,7 +54,7 @@ void syntree_free(syntree* node)
 }
 
 // -----------------------------------------------------------------------------
-// free a syntax-tree
+// evaluate a complete syntax tree and return its result
 // -----------------------------------------------------------------------------
 int eval(syntree* node)
 {
