@@ -13,7 +13,10 @@
 syntree* syntree_create(enum syn_nodetype_t type, syntree* left_node,
 						syntree* right_node)
 {
-	syntree* node	= malloc(sizeof(syntree));
+	syntree* node = malloc(sizeof(syntree));
+	if (!node)
+		yyerror("out of memory");
+	
 	node->type		= type;
 	node->l			= left_node;
 	node->r			= right_node;
@@ -26,7 +29,10 @@ syntree* syntree_create(enum syn_nodetype_t type, syntree* left_node,
 // -----------------------------------------------------------------------------
 syntree* constval_create(int value)
 {
-	constval* node	= malloc(sizeof(constval));
+	constval* node = malloc(sizeof(constval));
+	if (!node)
+		yyerror("out of memory");
+	
 	node->type		= SNT_CONSTVAL;
 	node->value		= value;
 	
