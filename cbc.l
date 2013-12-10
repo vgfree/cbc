@@ -45,6 +45,9 @@
 			/* operators */
 [-+*/,()]	{ return *yytext; }
 			
+			/* end of file */
+<<EOF>>		{ return ENDOFFILE; }
+			
 			/* comments */
 "//".*		{ ; }	// ignore
 			

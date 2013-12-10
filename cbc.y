@@ -13,6 +13,7 @@
 	int value;
 };
 
+%token 			ENDOFFILE
 %token <value>	NUMBER
 %token <sym>	IDENTIFIER
 %left '+' '-'
@@ -27,6 +28,7 @@ prog:
 							printf("%d\n", eval($2));
 							syntree_free($2);
 						}
+	| prog ENDOFFILE	{ YYACCEPT; }
 	|					// NULL
 	;
 
