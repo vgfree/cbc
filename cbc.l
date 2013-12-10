@@ -11,6 +11,8 @@
 // include syntree.h BEFORE any other parser-specific header-files!
 // otherwise the build would fail due to unknown type-names.
 #include "syntree.h"
+// same applies for symtab.h
+#include "symtab.h"
 #include "cbc_parse.h"
 #include "errors.h"
 
@@ -26,12 +28,26 @@
 				return NUMBER;
 			}
 			
+			/* identifier */
+[_a-zA-Z][_a-zA-Z0-9]*	{
+				// check if symbol is declared
+				symbol* s = symtab_lookup(gl_symtab, yytext);
+				if (!s)
+				{
+					yyerror("undefined symbol: %s", yytext);
+					exit(1);
+				}
+				
+				yylval.sym = s;
+				return IDENTIFIER;
+			}
+			
 			/* operators */
 [-+*/,()]	{ return *yytext; }
-
+			
 			/* whitespaces */
 [ \t\n]+	{ ; }	// ignore
-
+			
 			/* anything else */
 .			{ yyerror("unknown character `%c'.", *yytext); }
 

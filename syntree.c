@@ -15,11 +15,14 @@ syntree* syntree_create(enum syn_nodetype_t type, syntree* left_node,
 {
 	syntree* node = malloc(sizeof(syntree));
 	if (!node)
-		yyerror("out of memory");
+	{
+		yyerror(ERR_BADALLOC);
+		exit(1);
+	}
 	
-	node->type		= type;
-	node->l			= left_node;
-	node->r			= right_node;
+	node->type	= type;
+	node->l		= left_node;
+	node->r		= right_node;
 	
 	return node;
 }
@@ -31,10 +34,31 @@ syntree* constval_create(int value)
 {
 	constval* node = malloc(sizeof(constval));
 	if (!node)
-		yyerror("out of memory");
+	{
+		yyerror(ERR_BADALLOC);
+		exit(1);
+	}
 	
-	node->type		= SNT_CONSTVAL;
-	node->value		= value;
+	node->type	= SNT_CONSTVAL;
+	node->value	= value;
+	
+	return (syntree*) node;
+}
+
+// -----------------------------------------------------------------------------
+// create a syntax-tree symbol-reference-node
+// -----------------------------------------------------------------------------
+syntree* symref_create(symbol* s)
+{
+	symref* node = malloc(sizeof(symref));
+	if (!node)
+	{
+		yyerror(ERR_BADALLOC);
+		exit(1);
+	}
+	
+	node->type	= SNT_SYMBOL_REF;
+	node->sym	= s;
 	
 	return (syntree*) node;
 }
@@ -44,17 +68,21 @@ syntree* constval_create(int value)
 // -----------------------------------------------------------------------------
 void syntree_free(syntree* node)
 {
-	if (!node)
-		return;
-	
-	// nodes of type SNT_CONSTVAL have no child-nodes.
-	// DO NOT FREE CHILD-NODE POINTERS IN THIS CASE!
-	if (node->type != SNT_CONSTVAL)
+	// nodes of a type below the pseudo type SNT_NOTYPE_ONE_CHILDNODE have two
+	// child-nodes. That is, free both of them.
+	if (node->type < SNT_NOTYPE_ONE_CHILDNODE)
 	{
 		// free child-nodes
 		syntree_free(node->l);
 		syntree_free(node->r);
 	}
+	// nodes of a type below the pseudo type SNT_NOTYPE_NO_CHILDNODES have at
+	// least one - the left one - child-node.
+	else if (node->type < SNT_NOTYPE_NO_CHILDNODES)
+		// free left child node
+		syntree_free(node->l);
+	// DO NOT TRY TO DELETE ANY CHILD-NODE OF A NODE A TYPE ABOVE
+	// SNT_NOTYPE_NO_CHILDNODES! SINCE THIS COULD CAUSE UNDEFINED BEHAVIOUR!
 	
 	// always free node itself at the end
 	free(node);
@@ -73,6 +101,10 @@ int eval(syntree* node)
 			result = ((constval*) node)->value;
 			break;
 		
+		case SNT_SYMBOL_REF:
+			result = ((symref*) node)->sym->value;
+			break;
+		
 		case '+': result = eval(node->l) + eval(node->r); break;
 		case '-': result = eval(node->l) - eval(node->r); break;
 		case '*': result = eval(node->l) * eval(node->r); break;
@@ -83,7 +115,10 @@ int eval(syntree* node)
 			if (rhs != 0)
 				result = eval(node->l) / rhs;
 			else
+			{
 				yyerror("division by zero is not allowed!");
+				exit(1);
+			}
 			break;
 		
 		case SNT_SIGNED_MINUS:
@@ -92,6 +127,7 @@ int eval(syntree* node)
 		
 		default:
 			yyerror("syntax-tree node-type not recognized: %d", node->type);
+			exit(1);
 	}
 	
 	return result;

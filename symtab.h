@@ -13,7 +13,7 @@
 // symbol types
 enum symbol_type_t
 {
-	SYM_CONSTANT,
+	SYM_SYMTAB,
 	SYM_VARIABLE
 };
 
@@ -30,20 +30,16 @@ typedef struct symbol_t
 	struct symbol_t* next;
 } symbol;
 
-// symbol-table structure
-typedef struct symtab_t
-{
-	// next symbol
-	struct symbol_t* next;
-} symtab;
-
 
 // interface functions
-symtab* symtab_create();
-void symtab_append(symtab* st, symbol* s);
-void symtab_free(symtab* st);
+symbol* symtab_create();
+void symtab_append(symbol* symtab, symbol* s);
+symbol* symtab_lookup(symbol* symtab, char* key);
+void symtab_free(symbol* symtab);
 symbol* symbol_create(enum symbol_type_t type, char* identifier);
-void symbol_setvalue(int value);
-void symbol_free(symbol* node);
+void symbol_free(symbol* s);
+
+// global symbol-table, has to be initialized and freed in the main-function
+symbol* gl_symtab;
 
 #endif // SYMTAB_H

@@ -3,15 +3,18 @@
 
 #include <stdio.h>
 #include "syntree.h"
+#include "symtab.h"
 
 %}
 
 %union {
 	syntree* ast;
+	symbol* sym;
 	int value;
 };
 
-%token <value> NUMBER
+%token <value>	NUMBER
+%token <sym>	IDENTIFIER
 %left '+' '-'
 %left '*' '/'
 
@@ -32,6 +35,7 @@ stmt:
 
 expr:
 	NUMBER				{ $$ = constval_create($1); }
+	| IDENTIFIER		{ $$ = symref_create($1); }
 	| expr '+' expr		{ $$ = syntree_create('+', $1, $3); }
 	| expr '-' expr		{ $$ = syntree_create('-', $1, $3); }
 	| expr '*' expr		{ $$ = syntree_create('*', $1, $3); }
@@ -44,6 +48,8 @@ expr:
 
 int main(void)
 {
+	gl_symtab = symtab_create();
 	yyparse();
+	symtab_free(gl_symtab);
 	return 0;
 }
