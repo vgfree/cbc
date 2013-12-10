@@ -77,7 +77,7 @@ check_cbc	-100	"-100"
 check_cbc	130		"3 + 5 * 11 - (80 - 14) / 33 * 2 - 50 + 3 * 7 * (66 / 11)"
 # check syntax errors
 check_cbc_text	"1: error: syntax error"										","
-check_cbc_text	"$(echo -e "0\n1: error: division by zero is not allowed!")"	"3 / 0,"
+check_cbc_text	"$(echo -e "1: error: division by zero is not allowed!\n0")"	"3 / 0,"
 
 echo "-------------------------"
 echo "EXECUTED CHECKS: $checks"
