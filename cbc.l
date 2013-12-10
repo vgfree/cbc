@@ -1,5 +1,6 @@
 	/* DEFINITIONS ---------------------------------------------------------- */
 
+
 %option yylineno
 
 %{
@@ -19,6 +20,7 @@ void fyyerror(FILE* fd, const char* format, va_list* args);
 void yyerror(const char* format, ...);
 
 %}
+
 
 %%	/* RULES ---------------------------------------------------------------- */
 
@@ -40,6 +42,7 @@ void yyerror(const char* format, ...);
 
 
 %%	/* ROUTINES ------------------------------------------------------------- */
+
 
 int yywrap(void)
 {
