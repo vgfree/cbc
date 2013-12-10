@@ -26,10 +26,22 @@ typedef struct symbol_t
 	char* identifier;
 	// symbol-value
 	int value;
+	// next symbol
+	struct symbol_t* next;
 } symbol;
+
+// symbol-table structure
+typedef struct symtab_t
+{
+	// next symbol
+	struct symbol_t* next;
+} symtab;
 
 
 // interface functions
+symtab* symtab_create();
+void symtab_append(symtab* st, symbol* s);
+void symtab_free(symtab* st);
 symbol* symbol_create(enum symbol_type_t type, char* identifier);
 void symbol_setvalue(int value);
 void symbol_free(symbol* node);
