@@ -45,6 +45,10 @@ test: $(UNITTEST)
 	./$<
 
 clean:
+ifeq ($(OS), Windows_NT)
+	rm $(TARGET).exe $(TYACC) $(HYACC) $(TLEX) $(OBJ)
+else
 	rm $(TARGET) $(TYACC) $(HYACC) $(TLEX) $(OBJ)
+endif
 
 .PHONY: clean
