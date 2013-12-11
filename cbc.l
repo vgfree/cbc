@@ -28,8 +28,15 @@
 				return NUMBER;
 			}
 			
-			/* symbol declaration */
+			/* keywords */
 "declare"	{ return DECLARE; }
+"if"		{ return IF; }
+"then"		{ return THEN; }
+"else"		{ return ELSE; }
+"endif"		{ return ENDIF; }
+"while"		{ return WHILE; }
+"do"		{ return DO; }
+"end"		{ return END; }
 			
 			/* identifier */
 [_a-zA-Z][_a-zA-Z0-9]*	{

@@ -13,13 +13,13 @@ enum syn_nodetype_t
 	// all node-types up to the following have two child-nodes
 	SNT_ASSIGNMENT = 256,
 	// the following node-types have one child-node
-	SNT_NOTYPE_ONE_CHILDNODE,
 	SNT_SIGNED_MINUS,
 	SNT_DECLARATION,
 	// the following node-types have no child-nodes
-	SNT_NOTYPE_NO_CHILDNODES,
 	SNT_CONSTVAL,
-	SNT_SYMBOL_REF
+	SNT_SYMBOL_REF,
+	SNT_FLOW_IF,
+	SNT_FLOW_WHILE
 };
 
 // syntax-tree node
@@ -51,12 +51,27 @@ typedef struct
 	symbol* sym;
 } symref;
 
+// control-flow node
+typedef struct
+{
+	// type of the node
+	enum syn_nodetype_t type;
+	// symbol
+	syntree* cond;
+	// true-branch
+	syntree* tb;
+	// false-branch
+	syntree* fb;
+} flow;
+
 
 // interface functions
 syntree* syntree_create(enum syn_nodetype_t type, syntree* left_node,
 						syntree* right_node);
 syntree* constval_create(int value);
 syntree* symref_create(symbol* s);
+syntree* flow_create(	enum syn_nodetype_t type, syntree* condition,
+						syntree* then_branch, syntree* else_branch);
 void syntree_free(syntree* node);
 int eval(syntree* node);
 

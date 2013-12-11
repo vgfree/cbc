@@ -17,6 +17,8 @@ int last_result = -1;
 
 %token			ENDOFFILE
 %token			DECLARE
+%token			IF THEN ELSE ENDIF
+%token			WHILE DO END
 %token	<value>	NUMBER
 %token	<sym>	IDENTIFIER
 
@@ -45,6 +47,16 @@ stmt:
 									$$ = syntree_create(SNT_DECLARATION,
 														symref_create($2), NULL);
 								}
+	| IF expr THEN stmt ENDIF ',' {
+									$$ = flow_create(SNT_FLOW_IF, $2, $4, NULL);
+								}
+	| IF expr THEN stmt ELSE stmt ENDIF ','	{
+									$$ = flow_create(SNT_FLOW_IF, $2, $4, $6);
+								}
+	| WHILE expr DO stmt END ',' {
+									$$ = flow_create(SNT_FLOW_WHILE, $2, $4, NULL);
+								}
+	;
 
 expr:
 	NUMBER						{ $$ = constval_create($1); }

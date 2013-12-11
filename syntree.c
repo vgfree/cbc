@@ -64,26 +64,73 @@ syntree* symref_create(symbol* s)
 }
 
 // -----------------------------------------------------------------------------
+// create a control-flow-node
+// -----------------------------------------------------------------------------
+syntree* flow_create(	enum syn_nodetype_t type, syntree* condition,
+						syntree* then_branch, syntree* else_branch)
+{
+	// check if passed type is valid for this node
+	if (type != SNT_FLOW_IF && type != SNT_FLOW_WHILE)
+	{
+		yyerror("invalid node-type for control-flow-node: %d", type);
+		exit(1);
+	}
+	
+	flow* node = malloc(sizeof(flow));
+	if (!node)
+	{
+		yyerror(ERR_BADALLOC);
+		exit(1);
+	}
+	
+	node->type	= type;
+	node->cond	= condition;
+	node->tb	= then_branch;
+	node->fb	= else_branch;
+	
+	return (syntree*) node;
+}
+
+// -----------------------------------------------------------------------------
 // free a syntax-tree
 // -----------------------------------------------------------------------------
 void syntree_free(syntree* node)
 {
-	// nodes of a type below the pseudo type SNT_NOTYPE_ONE_CHILDNODE have two
-	// child-nodes. That is, free both of them.
-	if (node->type < SNT_NOTYPE_ONE_CHILDNODE)
+	switch (node->type)
 	{
-		// free child-nodes
-		syntree_free(node->l);
-		syntree_free(node->r);
+		// two child-nodes
+		case '+':
+		case '-':
+		case '*':
+		case '/':
+		case SNT_ASSIGNMENT:
+			syntree_free(node->r);
+			// no break here to free left child-node as well
+		
+		// one child-node (left one)
+		case SNT_SIGNED_MINUS:
+		case SNT_DECLARATION:
+			syntree_free(node->l);
+		
+		// no child-nodes
+		case SNT_CONSTVAL:
+		case SNT_SYMBOL_REF:
+			break;
+		
+		// special nodes
+		case SNT_FLOW_IF:
+		case SNT_FLOW_WHILE:
+			syntree_free(((flow*) node)->cond);
+			if (((flow*) node)->tb)	// true-branch
+				syntree_free(((flow*) node)->tb);
+			if (((flow*) node)->fb)	// false-branch
+				syntree_free(((flow*) node)->fb);
+			break;
+		
+		default:
+			yyerror("syntax-tree node-type not recognized: %d", node->type);
+			exit(1);
 	}
-	// nodes of a type below the pseudo type SNT_NOTYPE_NO_CHILDNODES have at
-	// least one - the left one - child-node.
-	else if (node->type < SNT_NOTYPE_NO_CHILDNODES)
-		// free left child node
-		syntree_free(node->l);
-	// DO NOT TRY TO DELETE ANY CHILD-NODE OF A NODE A TYPE ABOVE
-	// SNT_NOTYPE_NO_CHILDNODES! SINCE THIS COULD CAUSE UNDEFINED BEHAVIOUR!
-	
 	// always free node itself at the end
 	free(node);
 }
@@ -130,7 +177,7 @@ int eval(syntree* node)
 			else
 				result = sym->value = eval(node->r);
 			break;
-			
+		
 		case SNT_DECLARATION:
 			sym = ((symref*) node->l)->sym;
 			if (sym->type == SYM_UNDEFINED)
@@ -142,6 +189,23 @@ int eval(syntree* node)
 				yyerror("cannot redeclare symbol: %s", sym->identifier);
 			
 			result = 0;
+			break;
+		
+		case SNT_FLOW_IF:
+			// evaluate condition and check its result:
+			// every non-zero value is considered as true.
+			if (eval(((flow*) node)->cond) != 0)
+				result = eval(((flow*) node)->tb);	// condition is ture:
+													// take the true-branch
+			else
+				result = eval(((flow*) node)->fb);	// condition is false:
+													// take the false-branch
+			break;
+		
+		case SNT_FLOW_WHILE:
+			// evaluate true-branch while the condition returns a non-zero value
+			while (eval(((flow*) node)->cond) != 0)
+				result = eval(((flow*) node)->tb);
 			break;
 		
 		case '+': result = eval(node->l) + eval(node->r); break;
