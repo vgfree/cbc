@@ -17,9 +17,10 @@ int last_result = -1;
 
 %token 			ENDOFFILE
 %token 			DECLARE
-%token 			ASSIGN
 %token <value>	NUMBER
 %token <sym>	IDENTIFIER
+
+%right	ASSIGN
 %left '+' '-'
 %left '*' '/'
 
