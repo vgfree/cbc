@@ -13,6 +13,7 @@
 // symbol types
 enum symbol_type_t
 {
+	SYM_UNDEFINED,
 	SYM_SYMTAB,
 	SYM_VARIABLE
 };

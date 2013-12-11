@@ -94,6 +94,7 @@ void syntree_free(syntree* node)
 int eval(syntree* node)
 {
 	int result;
+	symbol* sym;
 	
 	switch (node->type)
 	{
@@ -102,7 +103,45 @@ int eval(syntree* node)
 			break;
 		
 		case SNT_SYMBOL_REF:
-			result = ((symref*) node)->sym->value;
+			sym = ((symref*) node)->sym;
+			// check if symbol is defined
+			if (sym->type == SYM_UNDEFINED)
+			{
+				yyerror("undefined symbol: %s", sym->identifier);
+				// dummy-symbols are not contained in the symbol-table -> free
+				// them separately!
+				symbol_free(sym);
+				exit(1);
+			}
+			else
+				result = sym->value;
+			break;
+		
+		case SNT_ASSIGNMENT:
+			sym = ((symref*) node->l)->sym;
+			// check if symbol is defined
+			if (sym->type == SYM_UNDEFINED)
+			{
+				yyerror("undefined symbol: %s", sym->identifier);
+				// free dummy-symbol
+				symbol_free(sym);
+				exit(1);
+			}
+			else
+				result = sym->value = eval(node->r);
+			break;
+			
+		case SNT_DECLARATION:
+			sym = ((symref*) node->l)->sym;
+			if (sym->type == SYM_UNDEFINED)
+			{
+				sym->type = SYM_VARIABLE;
+				symtab_append(gl_symtab, sym);
+			}
+			else
+				yyerror("cannot redeclare symbol: %s", sym->identifier);
+			
+			result = 0;
 			break;
 		
 		case '+': result = eval(node->l) + eval(node->r); break;

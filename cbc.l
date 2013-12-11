@@ -28,22 +28,26 @@
 				return NUMBER;
 			}
 			
+			/* symbol declaration */
+"declare"	{ return DECLARE; }
+			
 			/* identifier */
 [_a-zA-Z][_a-zA-Z0-9]*	{
 				// check if symbol is declared
 				symbol* s = symtab_lookup(gl_symtab, yytext);
 				if (!s)
-				{
-					yyerror("undefined symbol: %s", yytext);
-					exit(1);
-				}
+					// create dummy-symbol
+					s = symbol_create(SYM_UNDEFINED, yytext);
 				
 				yylval.sym = s;
 				return IDENTIFIER;
 			}
 			
-			/* operators */
+			/* single character operators */
 [-+*/,()]	{ return *yytext; }
+			
+			/* assignment operator */
+":="		{ return ASSIGN; }
 			
 			/* end of file */
 <<EOF>>		{ return ENDOFFILE; }

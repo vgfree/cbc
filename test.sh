@@ -64,7 +64,7 @@ function check_cbc_text()
 echo "running cbc unit-test ..."
 echo "-------------------------"
 
-# checks
+# checks (basic maths-operations)
 check_cbc	5		"2 + 3"
 check_cbc	17		"50 - 33"
 check_cbc	-1		"2 - 3"
@@ -75,6 +75,9 @@ check_cbc	-7		"(3 + 4) * (3 - 8) / 5"
 check_cbc	15		"-3 * -5"
 check_cbc	-100	"-100"
 check_cbc	130		"3 + 5 * 11 - (80 - 14) / 33 * 2 - 50 + 3 * 7 * (66 / 11)"
+# checks (symbols and identifiers)
+check_cbc	12345	"declare foo, foo := 12345, foo"
+check_cbc	0		"declare bar, bar"
 # error-checks
 check_cbc_text	"1: error: syntax error"						","
 check_cbc_text	"1: error: division by zero is not allowed!"	"3 / 0,"

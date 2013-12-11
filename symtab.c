@@ -20,12 +20,21 @@ symbol* symtab_create()
 // -----------------------------------------------------------------------------
 void symtab_append(symbol* symtab, symbol* s)
 {
+	// check for a valid symbol-table
+	if (symtab->type != SYM_SYMTAB)
+	{
+		yyerror("not a valid symbol-table");
+		exit(1);
+	}
+	
 	symbol* current_symbol = symtab;
 	
 	while (current_symbol->next)
 		current_symbol = current_symbol->next;
 	
-	current_symbol->next = s;
+	// copy symbol
+	symbol* newsym			= symbol_create(s->type, s->identifier);
+	current_symbol->next	= newsym;
 }
 
 // -----------------------------------------------------------------------------
@@ -35,6 +44,13 @@ void symtab_append(symbol* symtab, symbol* s)
 // -----------------------------------------------------------------------------
 symbol* symtab_lookup(symbol* symtab, char* key)
 {
+	// check for a valid symbol-table
+	if (symtab->type != SYM_SYMTAB)
+	{
+		yyerror("not a valid symbol-table");
+		exit(1);
+	}
+	
 	symbol* result = NULL;
 	// current-symbol points to the symbol-table's head-item
 	symbol* current_symbol = symtab;
@@ -57,6 +73,13 @@ symbol* symtab_lookup(symbol* symtab, char* key)
 // -----------------------------------------------------------------------------
 void symtab_free(symbol* symtab)
 {
+	// check for a valid symbol-table
+	if (symtab->type != SYM_SYMTAB)
+	{
+		yyerror("not a valid symbol-table");
+		exit(1);
+	}
+	
 	// free all symbols in the table
 	// current-symbol initially points to the table itself
 	symbol* current_symbol = symtab;
@@ -82,6 +105,7 @@ symbol* symbol_create(enum symbol_type_t type, char* identifier)
 		exit(1);
 	}
 	
+	// copy identifier-string if available
 	if (identifier)
 		s->identifier = strdup(identifier);
 	else
