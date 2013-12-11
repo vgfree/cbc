@@ -15,18 +15,20 @@ int last_result = -1;
 	int value;
 };
 
-%token 			ENDOFFILE
-%token 			DECLARE
-%token <value>	NUMBER
-%token <sym>	IDENTIFIER
+%token			ENDOFFILE
+%token			DECLARE
+%token	<value>	NUMBER
+%token	<sym>	IDENTIFIER
 
 %right	ASSIGN
-%left '+' '-'
-%left '*' '/'
+%left	'+' '-'
+%left	'*' '/'
 
 %type <ast> stmt expr
 
+
 %%	/* RULES ---------------------------------------------------------------- */
+
 
 prog:
 	prog stmt					{
@@ -39,21 +41,32 @@ prog:
 
 stmt:
 	expr ','					{ $$ = $1; }
-	| DECLARE IDENTIFIER ','	{ $$ = syntree_create(SNT_DECLARATION, symref_create($2), NULL); }
+	| DECLARE IDENTIFIER ','	{
+									$$ = syntree_create(SNT_DECLARATION,
+														symref_create($2), NULL);
+								}
 
 expr:
 	NUMBER						{ $$ = constval_create($1); }
 	| IDENTIFIER				{ $$ = symref_create($1); }
-	| IDENTIFIER ASSIGN expr	{ $$ = syntree_create(SNT_ASSIGNMENT, symref_create($1), $3); }
+	| IDENTIFIER ASSIGN expr	{
+									$$ = syntree_create(SNT_ASSIGNMENT,
+														symref_create($1), $3);
+								}
 	| expr '+' expr				{ $$ = syntree_create('+', $1, $3); }
 	| expr '-' expr				{ $$ = syntree_create('-', $1, $3); }
 	| expr '*' expr				{ $$ = syntree_create('*', $1, $3); }
 	| expr '/' expr				{ $$ = syntree_create('/', $1, $3); }
 	| '(' expr ')'				{ $$ = $2; }
-	| '-' expr					{ $$ = syntree_create(SNT_SIGNED_MINUS, $2, NULL); }
+	| '-' expr					{
+									$$ = syntree_create(SNT_SIGNED_MINUS, $2,
+														NULL);
+								}
 	;
 
+
 %%	/* ROUTINES ------------------------------------------------------------- */
+
 
 int main(void)
 {
