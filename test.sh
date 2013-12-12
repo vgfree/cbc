@@ -78,6 +78,10 @@ check_cbc	130		"3 + 5 * 11 - (80 - 14) / 33 * 2 - 50 + 3 * 7 * (66 / 11)"
 # checks (symbols and identifiers)
 check_cbc	12345	"declare foo, foo := 12345, foo"
 check_cbc	0		"declare bar, bar"
+# checks (control-flow)
+check_cbc	0		"declare foo, foo := 10, while foo do foo := foo -1, end, foo"
+check_cbc	5		"declare foo, foo := 10, if foo then 5, else 1, endif"
+check_cbc	1		"declare foo, foo := 0, if foo then 5, else 1, endif"
 # error-checks
 check_cbc_text	"1: error: syntax error"						","
 check_cbc_text	"1: error: division by zero is not allowed!"	"3 / 0,"
