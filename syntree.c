@@ -57,7 +57,7 @@ syntree* symref_create(symbol* s)
 		exit(1);
 	}
 	
-	node->type	= SNT_SYMBOL_REF;
+	node->type	= SNT_SYMREF;
 	node->sym	= s;
 	
 	return (syntree*) node;
@@ -129,13 +129,13 @@ void syntree_free(syntree* node)
 			// no break here to free left child-node as well
 		
 		// one child-node (left one)
-		case SNT_SIGNED_MINUS:
+		case SNT_UNARYMINUS:
 		case SNT_DECLARATION:
 			syntree_free(node->l);
 		
 		// no child-nodes
 		case SNT_CONSTVAL:
-		case SNT_SYMBOL_REF:
+		case SNT_SYMREF:
 			break;
 		
 		// special nodes
@@ -176,7 +176,7 @@ int eval(syntree* node)
 			result = ((constval*) node)->value;
 			break;
 		
-		case SNT_SYMBOL_REF:
+		case SNT_SYMREF:
 			sym = ((symref*) node)->sym;
 			// check if symbol is defined
 			if (sym->type == SYM_UNDEFINED)
@@ -287,7 +287,7 @@ int eval(syntree* node)
 			}
 			break;
 		
-		case SNT_SIGNED_MINUS:
+		case SNT_UNARYMINUS:
 			result = - eval(node->l);
 			break;
 		

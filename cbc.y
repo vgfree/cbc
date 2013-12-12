@@ -75,7 +75,7 @@ expr:
 	| expr COMPARE expr			{ $$ = comparison_create($2, $1, $3); }
 	| '(' expr ')'				{ $$ = $2; }
 	| '-' expr					{
-									$$ = syntree_create(SNT_SIGNED_MINUS, $2,
+									$$ = syntree_create(SNT_UNARYMINUS, $2,
 														NULL);
 								}
 	;

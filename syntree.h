@@ -14,11 +14,11 @@ enum syn_nodetype_t
 	SNT_ASSIGNMENT = 256,
 	SNT_COMPARISON,
 	// the following node-types have one child-node
-	SNT_SIGNED_MINUS,
+	SNT_UNARYMINUS,
 	SNT_DECLARATION,
 	// the following node-types have no child-nodes
 	SNT_CONSTVAL,
-	SNT_SYMBOL_REF,
+	SNT_SYMREF,
 	SNT_FLOW_IF,
 	SNT_FLOW_WHILE
 };
