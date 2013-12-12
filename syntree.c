@@ -92,6 +92,27 @@ syntree* flow_create(	enum syn_nodetype_t type, syntree* condition,
 }
 
 // -----------------------------------------------------------------------------
+// create a comparison-node
+// -----------------------------------------------------------------------------
+syntree* comparison_create(	enum cmp_nodetype_t type, syntree* left_node,
+							syntree* right_node)
+{
+	comparison* node = malloc(sizeof(comparison));
+	if (!node)
+	{
+		yyerror(ERR_BADALLOC);
+		exit(1);
+	}
+	
+	node->type		= SNT_COMPARISON;
+	node->cmp_type	= type;
+	node->l			= left_node;
+	node->r			= right_node;
+	
+	return (syntree*) node;
+}
+
+// -----------------------------------------------------------------------------
 // free a syntax-tree
 // -----------------------------------------------------------------------------
 void syntree_free(syntree* node)
@@ -127,6 +148,11 @@ void syntree_free(syntree* node)
 				syntree_free(((flow*) node)->fb);
 			break;
 		
+		case SNT_COMPARISON:
+			syntree_free(((comparison*) node)->l);
+			syntree_free(((comparison*) node)->r);
+			break;
+		
 		default:
 			yyerror("syntax-tree node-type not recognized: %d", node->type);
 			exit(1);
@@ -142,6 +168,7 @@ int eval(syntree* node)
 {
 	int result;
 	symbol* sym;
+	comparison* cmp;
 	
 	switch (node->type)
 	{
@@ -206,6 +233,42 @@ int eval(syntree* node)
 			// evaluate true-branch while the condition returns a non-zero value
 			while (eval(((flow*) node)->cond) != 0)
 				result = eval(((flow*) node)->tb);
+			break;
+		
+		case SNT_COMPARISON:
+			cmp = ((comparison*) node);
+			// evaluate comparison
+			switch (cmp->cmp_type)
+			{
+				case CMP_EQ:
+					result = (eval(cmp->l) == eval(cmp->r));
+					break;
+				
+				case CMP_NE:
+					result = (eval(cmp->l) != eval(cmp->r));
+					break;
+				
+				case CMP_GE:
+					result = (eval(cmp->l) >= eval(cmp->r));
+					break;
+				
+				case CMP_LE:
+					result = (eval(cmp->l) <= eval(cmp->r));
+					break;
+				
+				case CMP_GT:
+					result = (eval(cmp->l) > eval(cmp->r));
+					break;
+				
+				case CMP_LT:
+					result = (eval(cmp->l) < eval(cmp->r));
+					break;
+				
+				default:
+					result = 0;	// false
+					yyerror("unknown comparison-type: %d",
+							((comparison*) node)->cmp_type);
+			}
 			break;
 		
 		case '+': result = eval(node->l) + eval(node->r); break;

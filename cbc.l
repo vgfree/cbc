@@ -53,6 +53,14 @@
 			/* single character operators */
 [-+*/,()]	{ return *yytext; }
 			
+			/* comparison operators */
+"="			{ yylval.cmp = CMP_EQ; return COMPARE; }
+"<>"		{ yylval.cmp = CMP_NE; return COMPARE; }
+">="		{ yylval.cmp = CMP_GE; return COMPARE; }
+"<="		{ yylval.cmp = CMP_LE; return COMPARE; }
+">"			{ yylval.cmp = CMP_GT; return COMPARE; }
+"<"			{ yylval.cmp = CMP_LT; return COMPARE; }
+			
 			/* assignment operator */
 ":="		{ return ASSIGN; }
 			

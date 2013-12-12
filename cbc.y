@@ -13,6 +13,7 @@ int last_result = -1;
 	syntree* ast;
 	symbol* sym;
 	int value;
+	enum cmp_nodetype_t cmp;
 };
 
 %token			ENDOFFILE
@@ -25,6 +26,8 @@ int last_result = -1;
 %right	ASSIGN
 %left	'+' '-'
 %left	'*' '/'
+
+%nonassoc	<cmp>	COMPARE
 
 %type <ast> stmt expr
 
@@ -69,6 +72,7 @@ expr:
 	| expr '-' expr				{ $$ = syntree_create('-', $1, $3); }
 	| expr '*' expr				{ $$ = syntree_create('*', $1, $3); }
 	| expr '/' expr				{ $$ = syntree_create('/', $1, $3); }
+	| expr COMPARE expr			{ $$ = comparison_create($2, $1, $3); }
 	| '(' expr ')'				{ $$ = $2; }
 	| '-' expr					{
 									$$ = syntree_create(SNT_SIGNED_MINUS, $2,
