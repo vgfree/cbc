@@ -18,7 +18,6 @@ syntree* result_tree;
 };
 
 %token			ENDOFFILE
-%token			DECLARE
 %token			IF THEN ELSE ENDIF
 %token			WHILE DO END
 %token	<value>	NUMBER
@@ -30,7 +29,7 @@ syntree* result_tree;
 
 %nonassoc	<cmp>	COMPARE
 
-%type <ast> stmtlist stmt identifier expr
+%type <ast> decllist decl stmtlist stmt identifier expr
 
 
 %%	/* RULES ---------------------------------------------------------------- */
@@ -43,8 +42,30 @@ prog:
 								}
 	;
 
+decllist:
+	decl						{ $$ = $1; }
+	| decl ',' decllist			{
+									$$ = syntree_create(SNT_STATEMENTLIST,
+														$1, $3);
+								}
+	;
+
+decl:
+	identifier					{
+									$$ = syntree_create(SNT_DECLARATION, $1,
+														NULL);
+								}
+	;
+
 stmtlist:
-	stmt ',' stmtlist			{
+	'|' decllist '|' stmtlist	{
+									if ($4 == NULL)
+										$$ = $2;
+									else
+										$$ = syntree_create(SNT_STATEMENTLIST,
+															$2, $4);
+								}
+	| stmt ',' stmtlist			{
 									if ($3 == NULL)
 										$$ = $1;
 									else
@@ -56,10 +77,6 @@ stmtlist:
 
 stmt:
 	expr						{ $$ = $1; }
-	| DECLARE identifier		{
-									$$ = syntree_create(SNT_DECLARATION, $2,
-														NULL);
-								}
 	| IF expr THEN stmtlist ENDIF {
 									$$ = flow_create(SNT_FLOW_IF, $2, $4, NULL);
 								}

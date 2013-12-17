@@ -29,7 +29,6 @@
 			}
 			
 			/* keywords */
-"declare"	{ return DECLARE; }
 "if"		{ return IF; }
 "then"		{ return THEN; }
 "else"		{ return ELSE; }
@@ -45,7 +44,7 @@
 			}
 			
 			/* single character operators */
-[-+*/,()]	{ return *yytext; }
+[-+*/,()|]	{ return *yytext; }
 			
 			/* comparison operators */
 "="			{ yylval.cmp = CMP_EQ; return COMPARE; }
