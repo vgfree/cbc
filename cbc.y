@@ -5,6 +5,8 @@
 #include "syntree.h"
 #include "symtab.h"
 
+syntree* result_tree;
+
 %}
 
 %union {
@@ -35,8 +37,7 @@
 
 prog:
 	stmtlist ENDOFFILE			{
-									printf("%d", eval($1));
-									syntree_free($1);
+									result_tree = $1;
 									YYACCEPT;
 								}
 	;
@@ -104,6 +105,13 @@ int main(void)
 {
 	gl_symtab = symtab_create();
 	yyparse();
+	
+	if (result_tree)
+	{
+		printf("%d", eval(result_tree));
+		syntree_free(result_tree);
+	}
+	
 	symtab_free(gl_symtab);
 	return 0;
 }
