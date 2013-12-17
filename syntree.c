@@ -197,7 +197,6 @@ void symref_setsymbolfromtable(symref* node)
 int eval(syntree* node)
 {
 	int result;
-	comparison* cmp;
 	
 	switch (node->type)
 	{
@@ -252,7 +251,8 @@ int eval(syntree* node)
 			break;
 		
 		case SNT_COMPARISON:
-			cmp = ((comparison*) node);
+		{
+			comparison* cmp = ((comparison*) node);
 			// evaluate comparison
 			switch (cmp->cmp_type)
 			{
@@ -286,6 +286,7 @@ int eval(syntree* node)
 							((comparison*) node)->cmp_type);
 			}
 			break;
+		}
 		
 		case SNT_STATEMENTLIST:
 			eval(node->l);
