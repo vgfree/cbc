@@ -2,6 +2,7 @@
 %{
 
 #include <stdio.h>
+#include <stdlib.h>
 #include "syntree.h"
 #include "symtab.h"
 
@@ -101,8 +102,22 @@ expr:
 %%	/* ROUTINES ------------------------------------------------------------- */
 
 
-int main(void)
+int main(int argc, char* argv[])
 {
+	extern FILE* yyin;
+	
+	if (argc > 1)
+	{
+		FILE* input = fopen(argv[1], "r");
+		if (!input)
+		{
+			printf("error: unable to open file `%s'!\n", argv[1]);
+			exit(1);
+		}
+		
+		yyin = input;
+	}
+	
 	gl_symtab = symtab_create();
 	yyparse();
 	
