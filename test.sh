@@ -25,6 +25,7 @@ function check_equals()
 		return 1
 	fi
 }
+
 function check_equals_text()
 {
 	# increase check-count
@@ -64,13 +65,14 @@ function check_cbc_file()
 function check_cbc_text()
 {
 	cbc_result=`echo "$2" | ./cbc 2>&1`
-	check_equals_text "$1" "$cbc_result"
+	# compare strings, skip the line-number
+	check_equals_text "$1" "${cbc_result:3}"
 }
 
 ################################################################################
 
 
-#print header
+# print header
 echo "running cbc unit-test ..."
 echo "-------------------------"
 
@@ -106,9 +108,9 @@ check_cbc	5		"declare foo, foo := 5, if foo <= 5 then 5, else 1, endif"
 check_cbc	5		"declare foo, foo := 1, if foo <= 5 then 5, else 1, endif"
 check_cbc_file	118	"1400\t// line 1\n- 630\t// line 2\n- 13\t// line 3\n- 75\t// line 4\n- 50\t// line 5\n- 10\t// line 6\n- 35\t// line 7\n- 100\t// line 8\n- 100\t// line 9\n- 200\t// line 10\n- (60 + 4 + 5) // line 11\n,\t// line 12"
 # error-checks
-check_cbc_text	"1: error: syntax error"						","
-check_cbc_text	"1: error: division by zero is not allowed!"	"3 / 0,"
-check_cbc_text	"1: error: undefined symbol: foo"				"foo,"
+check_cbc_text	"error: syntax error"						","
+check_cbc_text	"error: division by zero is not allowed!"	"3 / 0,"
+check_cbc_text	"error: undefined symbol: foo"				"foo,"
 
 echo "-------------------------"
 echo "EXECUTED CHECKS: $checks"
