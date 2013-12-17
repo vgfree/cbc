@@ -13,6 +13,7 @@ enum syn_nodetype_t
 	// all node-types up to the following have two child-nodes
 	SNT_ASSIGNMENT = 256,
 	SNT_COMPARISON,
+	SNT_STATEMENTLIST,
 	// the following node-types have one child-node
 	SNT_UNARYMINUS,
 	SNT_DECLARATION,

@@ -125,6 +125,7 @@ void syntree_free(syntree* node)
 		case '*':
 		case '/':
 		case SNT_ASSIGNMENT:
+		case SNT_STATEMENTLIST:
 			syntree_free(node->r);
 			// no break here to free left child-node as well
 		
@@ -162,12 +163,40 @@ void syntree_free(syntree* node)
 }
 
 // -----------------------------------------------------------------------------
+// this function replaces the 'sym'-member in the passed symref-struct with the
+// "actual" reference to the symbol in the symbol-table, if it exists.
+// furthermore, the old dummy symbol will be freed since it isn't necessary
+// anymore.
+// if there is no such a symbol in the symbol-table, everything stays as it is.
+// -----------------------------------------------------------------------------
+void symref_setsymbolfromtable(symref* node)
+{
+	symbol* sym = node->sym;
+	// check if symbol is already defined
+	if (sym->type != SYM_UNDEFINED)
+		return;	// symbol is "defined", that means it is contained in the
+				// symbol-table -> nothing has to be done.
+	
+	symbol* dummy	= sym;	// remember dummy-symbol
+	sym				= symtab_lookup(gl_symtab, sym->identifier);
+	// if there is no such a symbol -> error
+	if (!sym)
+	{
+		yyerror("undefined symbol: %s", dummy->identifier);
+		exit(1);
+	}
+	// replace dummy-symbol with the actual symbol in the symbol-table
+	node->sym = sym;
+	// free dummy-symbol
+	symbol_free(dummy);
+}
+
+// -----------------------------------------------------------------------------
 // evaluate a complete syntax tree and return its result
 // -----------------------------------------------------------------------------
 int eval(syntree* node)
 {
 	int result;
-	symbol* sym;
 	comparison* cmp;
 	
 	switch (node->type)
@@ -177,46 +206,33 @@ int eval(syntree* node)
 			break;
 		
 		case SNT_SYMREF:
-			sym = ((symref*) node)->sym;
-			// check if symbol is defined
-			if (sym->type == SYM_UNDEFINED)
-			{
-				yyerror("undefined symbol: %s", sym->identifier);
-				// dummy-symbols are not contained in the symbol-table -> free
-				// them separately!
-				symbol_free(sym);
-				exit(1);
-			}
-			else
-				result = sym->value;
+			symref_setsymbolfromtable((symref*) node);
+			result = ((symref*) node)->sym->value;
 			break;
 		
 		case SNT_ASSIGNMENT:
-			sym = ((symref*) node->l)->sym;
-			// check if symbol is defined
-			if (sym->type == SYM_UNDEFINED)
-			{
-				yyerror("undefined symbol: %s", sym->identifier);
-				// free dummy-symbol
-				symbol_free(sym);
-				exit(1);
-			}
-			else
-				result = sym->value = eval(node->r);
+			symref_setsymbolfromtable((symref*) node->l);
+			result = ((symref*) node->l)->sym->value = eval(node->r);
 			break;
 		
 		case SNT_DECLARATION:
-			sym = ((symref*) node->l)->sym;
-			if (sym->type == SYM_UNDEFINED)
+		{
+			symbol* sym = ((symref*) node->l)->sym;
+			// check if symbol already exists in symbol-table
+			symbol* found = symtab_lookup(gl_symtab, sym->identifier);
+			if (found)
+				yyerror("cannot redeclare symbol: %s", sym->identifier);
+			else
 			{
 				sym->type = SYM_VARIABLE;
 				symtab_append(gl_symtab, sym);
+				// symbol was duplicated -> free old one
+				symbol_free(sym);
 			}
-			else
-				yyerror("cannot redeclare symbol: %s", sym->identifier);
 			
 			result = 0;
 			break;
+		}
 		
 		case SNT_FLOW_IF:
 			// evaluate condition and check its result:
@@ -269,6 +285,11 @@ int eval(syntree* node)
 					yyerror("unknown comparison-type: %d",
 							((comparison*) node)->cmp_type);
 			}
+			break;
+		
+		case SNT_STATEMENTLIST:
+			eval(node->l);
+			result = eval(node->r);
 			break;
 		
 		case '+': result = eval(node->l) + eval(node->r); break;

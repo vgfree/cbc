@@ -5,13 +5,11 @@
 #include "syntree.h"
 #include "symtab.h"
 
-int last_result = -1;
-
 %}
 
 %union {
 	syntree* ast;
-	symbol* sym;
+	char* id;
 	int value;
 	enum cmp_nodetype_t cmp;
 };
@@ -21,7 +19,7 @@ int last_result = -1;
 %token			IF THEN ELSE ENDIF
 %token			WHILE DO END
 %token	<value>	NUMBER
-%token	<sym>	IDENTIFIER
+%token	<id>	IDENTIFIER
 
 %right	ASSIGN
 %left	'+' '-'
@@ -29,45 +27,63 @@ int last_result = -1;
 
 %nonassoc	<cmp>	COMPARE
 
-%type <ast> stmt expr
+%type <ast> stmtlist stmt identifier expr
 
 
 %%	/* RULES ---------------------------------------------------------------- */
 
 
 prog:
-	prog stmt					{
-									last_result = eval($2);
-									syntree_free($2);
+	stmtlist ENDOFFILE			{
+									printf("%d", eval($1));
+									syntree_free($1);
+									YYACCEPT;
 								}
-	| prog ENDOFFILE			{ printf("%d", last_result); YYACCEPT; }
-	|							// NULL
+	;
+
+stmtlist:
+	stmt ',' stmtlist			{
+									if ($3 == NULL)
+										$$ = $1;
+									else
+										$$ = syntree_create(SNT_STATEMENTLIST,
+															$1, $3);
+								}
+	|							{ $$ = NULL; }
 	;
 
 stmt:
-	expr ','					{ $$ = $1; }
-	| DECLARE IDENTIFIER ','	{
-									$$ = syntree_create(SNT_DECLARATION,
-														symref_create($2), NULL);
+	expr						{ $$ = $1; }
+	| DECLARE identifier		{
+									$$ = syntree_create(SNT_DECLARATION, $2,
+														NULL);
 								}
-	| IF expr THEN stmt ENDIF ',' {
+	| IF expr THEN stmtlist ENDIF {
 									$$ = flow_create(SNT_FLOW_IF, $2, $4, NULL);
 								}
-	| IF expr THEN stmt ELSE stmt ENDIF ','	{
+	| IF expr THEN stmtlist ELSE stmtlist ENDIF {
 									$$ = flow_create(SNT_FLOW_IF, $2, $4, $6);
 								}
-	| WHILE expr DO stmt END ',' {
-									$$ = flow_create(SNT_FLOW_WHILE, $2, $4, NULL);
+	| WHILE expr DO stmtlist END {
+									$$ = flow_create(	SNT_FLOW_WHILE, $2, $4,
+														NULL);
+								}
+	;
+
+identifier:
+	IDENTIFIER					{
+									$$ = symref_create(
+											symbol_create(SYM_UNDEFINED, $1));
+									// string was copied in symbol creation
+									// -> free string
+									free($1);
 								}
 	;
 
 expr:
 	NUMBER						{ $$ = constval_create($1); }
-	| IDENTIFIER				{ $$ = symref_create($1); }
-	| IDENTIFIER ASSIGN expr	{
-									$$ = syntree_create(SNT_ASSIGNMENT,
-														symref_create($1), $3);
-								}
+	| identifier				{ $$ = $1; }
+	| identifier ASSIGN expr	{ $$ = syntree_create(SNT_ASSIGNMENT, $1, $3); }
 	| expr '+' expr				{ $$ = syntree_create('+', $1, $3); }
 	| expr '-' expr				{ $$ = syntree_create('-', $1, $3); }
 	| expr '*' expr				{ $$ = syntree_create('*', $1, $3); }

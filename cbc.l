@@ -40,13 +40,7 @@
 			
 			/* identifier */
 [_a-zA-Z][_a-zA-Z0-9]*	{
-				// check if symbol is declared
-				symbol* s = symtab_lookup(gl_symtab, yytext);
-				if (!s)
-					// create dummy-symbol
-					s = symbol_create(SYM_UNDEFINED, yytext);
-				
-				yylval.sym = s;
+				yylval.id = strdup(yytext);
 				return IDENTIFIER;
 			}
 			
