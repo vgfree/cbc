@@ -8,11 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
-// include syntree.h BEFORE any other parser-specific header-files!
-// otherwise the build would fail due to unknown type-names.
 #include "syntree.h"
-// same applies for symtab.h
-#include "symtab.h"
 #include "cbc_parse.h"
 #include "errors.h"
 

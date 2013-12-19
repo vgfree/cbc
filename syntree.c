@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "syntree.h"
+#include "symref.h"
 #include "errors.h"
 
 // -----------------------------------------------------------------------------
@@ -41,24 +42,6 @@ syntree* constval_create(int value)
 	
 	node->type	= SNT_CONSTVAL;
 	node->value	= value;
-	
-	return (syntree*) node;
-}
-
-// -----------------------------------------------------------------------------
-// create a syntax-tree symbol-reference-node
-// -----------------------------------------------------------------------------
-syntree* symref_create(symbol* s)
-{
-	symref* node = malloc(sizeof(symref));
-	if (!node)
-	{
-		yyerror(ERR_BADALLOC);
-		exit(1);
-	}
-	
-	node->type	= SNT_SYMREF;
-	node->sym	= s;
 	
 	return (syntree*) node;
 }

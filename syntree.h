@@ -5,8 +5,6 @@
 #ifndef SYNTREE_H
 #define SYNTREE_H
 
-#include "symtab.h"
-
 // syntax-node types
 enum syn_nodetype_t
 {
@@ -55,21 +53,12 @@ typedef struct
 	int value;
 } constval;
 
-// symbol-reference node
-typedef struct
-{
-	// type of the node
-	enum syn_nodetype_t type;
-	// symbol
-	symbol* sym;
-} symref;
-
 // control-flow node
 typedef struct
 {
 	// type of the node
 	enum syn_nodetype_t type;
-	// symbol
+	// condition
 	syntree* cond;
 	// true-branch
 	syntree* tb;
@@ -95,7 +84,6 @@ typedef struct
 syntree* syntree_create(enum syn_nodetype_t type, syntree* left_node,
 						syntree* right_node);
 syntree* constval_create(int value);
-syntree* symref_create(symbol* s);
 syntree* flow_create(	enum syn_nodetype_t type, syntree* condition,
 						syntree* then_branch, syntree* else_branch);
 syntree* comparison_create(	enum cmp_nodetype_t type, syntree* left_node,

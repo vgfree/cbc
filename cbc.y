@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include "syntree.h"
 #include "symtab.h"
+#include "symref.h"
 
 syntree* result_tree;
 
