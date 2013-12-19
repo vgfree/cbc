@@ -30,7 +30,7 @@ syntree* result_tree;
 
 %nonassoc	<cmp>	COMPARE
 
-%type <ast> decllist decl stmtlist stmt identifier expr
+%type <ast> decllist decl stmtlist stmt id expr
 
 
 %%	/* RULES ---------------------------------------------------------------- */
@@ -52,7 +52,7 @@ decllist:
 	;
 
 decl:
-	identifier					{
+	id							{
 									$$ = syntree_create(SNT_DECLARATION, $1,
 														NULL);
 								}
@@ -90,7 +90,7 @@ stmt:
 								}
 	;
 
-identifier:
+id:
 	IDENTIFIER					{
 									$$ = symref_create(
 											symbol_create(SYM_UNDEFINED, $1));
@@ -102,8 +102,8 @@ identifier:
 
 expr:
 	NUMBER						{ $$ = constval_create($1); }
-	| identifier				{ $$ = $1; }
-	| identifier ASSIGN expr	{ $$ = syntree_create(SNT_ASSIGNMENT, $1, $3); }
+	| id						{ $$ = $1; }
+	| id ASSIGN expr			{ $$ = syntree_create(SNT_ASSIGNMENT, $1, $3); }
 	| expr '+' expr				{ $$ = syntree_create('+', $1, $3); }
 	| expr '-' expr				{ $$ = syntree_create('-', $1, $3); }
 	| expr '*' expr				{ $$ = syntree_create('*', $1, $3); }
