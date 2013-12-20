@@ -32,6 +32,7 @@
 "while"		{ return WHILE; }
 "do"		{ return DO; }
 "end"		{ return END; }
+"function"	{ return FUNCTION; }
 			
 			/* identifier */
 [_a-zA-Z][_a-zA-Z0-9]*	{

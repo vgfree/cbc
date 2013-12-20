@@ -17,8 +17,11 @@ symbol* symtab_create()
 
 // -----------------------------------------------------------------------------
 // add a symbol to the symbol-table
+// this procedure distinguishes between variable-symbols and function-symbols.
+// whereas the function-symbols have an optional statement-list, that contains
+// the function-code.
 // -----------------------------------------------------------------------------
-void symtab_append(symbol* symtab, symbol* s)
+void symtab_append(symbol* symtab, symbol* s, syntree* stmtlist)
 {
 	// check for a valid symbol-table
 	if (symtab->type != SYM_SYMTAB)
@@ -34,6 +37,13 @@ void symtab_append(symbol* symtab, symbol* s)
 	
 	// copy symbol
 	symbol* newsym			= symbol_create(s->type, s->identifier);
+	
+	// set function-body, if symbol represents a function
+	if (s->type == SYM_FUNCTION)
+		newsym->function	= stmtlist;
+	else
+		newsym->function	= NULL;
+	
 	current_symbol->next	= newsym;
 }
 

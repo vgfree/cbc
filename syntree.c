@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include "syntree.h"
 #include "symref.h"
+#include "fncall.h"
 #include "errors.h"
 
 // -----------------------------------------------------------------------------
@@ -109,6 +110,7 @@ void syntree_free(syntree* node)
 		case '/':
 		case SNT_ASSIGNMENT:
 		case SNT_STATEMENTLIST:
+		case SNT_FUNC_DECL:
 			syntree_free(node->r);
 			// no break here to free left child-node as well
 		
@@ -120,6 +122,7 @@ void syntree_free(syntree* node)
 		// no child-nodes
 		case SNT_CONSTVAL:
 		case SNT_SYMREF:
+		case SNT_FUNC_CALL:
 			break;
 		
 		// special nodes
@@ -136,7 +139,7 @@ void syntree_free(syntree* node)
 			syntree_free(((comparison*) node)->l);
 			syntree_free(((comparison*) node)->r);
 			break;
-		
+			
 		default:
 			yyerror("syntax-tree node-type not recognized: %d", node->type);
 			exit(1);
@@ -207,7 +210,7 @@ int eval(syntree* node)
 			else
 			{
 				sym->type = SYM_VARIABLE;
-				symtab_append(gl_symtab, sym);
+				symtab_append(gl_symtab, sym, NULL);
 				// symbol was duplicated -> free old one
 				symbol_free(sym);
 			}
@@ -215,6 +218,30 @@ int eval(syntree* node)
 			result = 0;
 			break;
 		}
+		
+		case SNT_FUNC_DECL:
+		{
+			symbol* sym = ((symref*) node->l)->sym;
+			// check if symbol already exists in symbol-table
+			symbol* found = symtab_lookup(gl_symtab, sym->identifier);
+			if (found)
+				yyerror("cannot redeclare symbol: %s", sym->identifier);
+			else
+			{
+				sym->type = SYM_FUNCTION;
+				symtab_append(gl_symtab, sym, node->r);
+				// symbol was duplicated -> free old one
+				symbol_free(sym);
+			}
+			
+			result = 0;
+			break;
+		}
+		
+		case SNT_FUNC_CALL:
+			symref_setsymbolfromtable((symref*) node);
+			result = eval(((fncall*) node)->sym->function);
+			break;
 		
 		case SNT_FLOW_IF:
 			// evaluate condition and check its result:

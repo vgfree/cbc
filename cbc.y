@@ -6,6 +6,7 @@
 #include "syntree.h"
 #include "symtab.h"
 #include "symref.h"
+#include "fncall.h"
 
 syntree* result_tree;
 
@@ -19,6 +20,7 @@ syntree* result_tree;
 };
 
 %token			ENDOFFILE
+%token			FUNCTION
 %token			IF THEN ELSE ENDIF
 %token			WHILE DO END
 %token	<value>	NUMBER
@@ -88,6 +90,14 @@ stmt:
 									$$ = flow_create(	SNT_FLOW_WHILE, $2, $4,
 														NULL);
 								}
+	| FUNCTION id '(' ')' stmtlist END	{
+									// IMPORTANT NOTE:
+									// since the stmtlist is passed as right
+									// child node to the SNT_FUNC_DECL node,
+									// the stmtlist will be automatically freed
+									// when the syntax-tree is freed.
+									$$ = syntree_create(SNT_FUNC_DECL, $2, $5);
+								}
 	;
 
 id:
@@ -103,6 +113,13 @@ id:
 expr:
 	NUMBER						{ $$ = constval_create($1); }
 	| id						{ $$ = $1; }
+	| IDENTIFIER '(' ')'		{
+									$$ = fncall_create(
+											symbol_create(SYM_UNDEFINED, $1));
+									// string was copied in symbol creation
+									// -> free string
+									free($1);
+								}
 	| id ASSIGN expr			{ $$ = syntree_create(SNT_ASSIGNMENT, $1, $3); }
 	| expr '+' expr				{ $$ = syntree_create('+', $1, $3); }
 	| expr '-' expr				{ $$ = syntree_create('-', $1, $3); }
