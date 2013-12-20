@@ -19,5 +19,6 @@ typedef struct
 
 // interface functions
 syntree* symref_create(symbol* s);
+void symref_setsymbolfromtable(symref* node);
 
 #endif // SYMREF_H
