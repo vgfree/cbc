@@ -82,8 +82,17 @@ void cbvalue_assign(cbvalue* source, cbvalue* destination)
 	
 	switch (destination->type)
 	{
-		case VT_NUMERIC: destination->value = source->value; break;
-		case VT_STRING: destination->string = source->string; break;
+		case VT_NUMERIC:
+			destination->value = source->value;
+			break;
+		
+		case VT_STRING:
+			// free old string
+			if (destination->string)
+				free(destination->string);
+			// assign new one
+			destination->string = source->string;
+			break;
 	}
 }
 
