@@ -120,7 +120,7 @@ char* cbvalue_tostring(cbvalue* val)
 			break;
 		
 		case VT_UNDEFINED:
-			result_buf = NULL;
+			sprintf(result_buf, "<null>");
 			break;
 		
 		default:
