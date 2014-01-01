@@ -4,6 +4,9 @@ checks=0
 failures=0
 successes=0
 
+# constants
+noval="<no value returned>"
+
 ################################################################################
 
 function check_equals()
@@ -65,6 +68,12 @@ function check_cbc_file()
 function check_cbc_text()
 {
 	cbc_result=`echo "$2" | ./cbc 2>&1`
+	check_equals_text "$1" "$cbc_result"
+}
+
+function check_cbc_error()
+{
+	cbc_result=`echo "$2" | ./cbc 2>&1`
 	# compare strings, skip the line-number
 	check_equals_text "$1" "${cbc_result:3}"
 }
@@ -89,7 +98,8 @@ check_cbc	-100	"-100"
 check_cbc	130		"3 + 5 * 11 - (80 - 14) / 33 * 2 - 50 + 3 * 7 * (66 / 11)"
 # checks (symbols and identifiers)
 check_cbc	12345	"| foo | foo := 12345, foo"
-check_cbc	0		"| bar | bar"
+check_cbc_text		"$noval"	"| bar | bar,"
+check_cbc_text		"$noval"	"| bar |"
 # checks (control-flow)
 check_cbc	0		"| foo | foo := 10, while foo do foo := foo -1, end, foo"
 check_cbc	5		"| foo | foo := 10, if foo then 5, else 1, endif"
@@ -110,9 +120,9 @@ check_cbc	5		"| foo, bar, baz | foo := 1, bar := 2, baz := 5, if foo < bar then 
 check_cbc	14		"| foo | function bar () foo := foo + 2, end, foo := 10, bar(), bar()"
 check_cbc_file	118	"1400\t// line 1\n- 630\t// line 2\n- 13\t// line 3\n- 75\t// line 4\n- 50\t// line 5\n- 10\t// line 6\n- 35\t// line 7\n- 100\t// line 8\n- 100\t// line 9\n- 200\t// line 10\n- (60 + 4 + 5) // line 11\n,\t// line 12"
 # error-checks
-check_cbc_text	"error: syntax error"						","
-check_cbc_text	"error: division by zero is not allowed!"	"3 / 0,"
-check_cbc_text	"error: undefined symbol: foo"				"foo,"
+check_cbc_error	"error: syntax error"						","
+check_cbc_error	"error: division by zero is not allowed!"	"3 / 0,"
+check_cbc_error	"error: undefined symbol: foo"				"foo,"
 
 echo "-------------------------"
 echo "EXECUTED CHECKS: $checks"
