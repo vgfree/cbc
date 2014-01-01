@@ -82,8 +82,8 @@ function check_cbc_error()
 
 
 # print header
-echo "running cbc unit-test ..."
-echo "-------------------------"
+echo "running cbc test-script ..."
+echo "---------------------------"
 
 # checks (basic maths-operations)
 check_cbc	5		"2 + 3"
@@ -124,7 +124,7 @@ check_cbc_error	"error: syntax error"						","
 check_cbc_error	"error: division by zero is not allowed!"	"3 / 0,"
 check_cbc_error	"error: undefined symbol: foo"				"foo,"
 
-echo "-------------------------"
+echo "---------------------------"
 echo "EXECUTED CHECKS: $checks"
 echo "SUCCESSFUL:      $successes"
 echo "FAILED:          $failures"
