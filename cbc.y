@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include "cbvalues.h"
 #include "syntree.h"
 #include "symtab.h"
 #include "symref.h"
@@ -16,7 +17,7 @@ syntree* result_tree;
 	syntree* ast;
 	char* id;
 	int value;
-	enum cmp_nodetype_t cmp;
+	enum comparisontype_t cmp;
 };
 
 %token			ENDOFFILE

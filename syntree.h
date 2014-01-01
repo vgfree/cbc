@@ -5,6 +5,8 @@
 #ifndef SYNTREE_H
 #define SYNTREE_H
 
+#include "cbvalues.h"
+
 // syntax-node types
 enum syn_nodetype_t
 {
@@ -22,17 +24,6 @@ enum syn_nodetype_t
 	SNT_SYMREF,
 	SNT_FLOW_IF,
 	SNT_FLOW_WHILE
-};
-
-// comparison-node types
-enum cmp_nodetype_t
-{
-	CMP_EQ,	// equal
-	CMP_NE,	// not equal
-	CMP_GE,	// greater or equal
-	CMP_LE,	// lower or equal
-	CMP_GT,	// greater than
-	CMP_LT,	// lower than
 };
 
 // syntax-tree node
@@ -74,7 +65,7 @@ typedef struct
 	// type of the node
 	enum syn_nodetype_t type;
 	// comparison-type
-	enum cmp_nodetype_t cmp_type;
+	enum comparisontype_t cmp_type;
 	// left tree-node
 	struct syntree_t* l;
 	// right tree-node
@@ -88,7 +79,7 @@ syntree* syntree_create(enum syn_nodetype_t type, syntree* left_node,
 syntree* constval_create(int value);
 syntree* flow_create(	enum syn_nodetype_t type, syntree* condition,
 						syntree* then_branch, syntree* else_branch);
-syntree* comparison_create(	enum cmp_nodetype_t type, syntree* left_node,
+syntree* comparison_create(	enum comparisontype_t type, syntree* left_node,
 							syntree* right_node);
 void syntree_free(syntree* node);
 int eval(syntree* node);

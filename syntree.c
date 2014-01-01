@@ -78,7 +78,7 @@ syntree* flow_create(	enum syn_nodetype_t type, syntree* condition,
 // -----------------------------------------------------------------------------
 // create a comparison-node
 // -----------------------------------------------------------------------------
-syntree* comparison_create(	enum cmp_nodetype_t type, syntree* left_node,
+syntree* comparison_create(	enum comparisontype_t type, syntree* left_node,
 							syntree* right_node)
 {
 	comparison* node = malloc(sizeof(comparison));
