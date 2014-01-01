@@ -37,13 +37,13 @@ typedef struct syntree_t
 	struct syntree_t* r;
 } syntree;
 
-// constant value node
+// const-value node
 typedef struct
 {
 	// type of the node
 	enum syn_nodetype_t type;
 	// value
-	int value;
+	cbvalue* value;
 } constval;
 
 // control-flow node
@@ -82,6 +82,6 @@ syntree* flow_create(	enum syn_nodetype_t type, syntree* condition,
 syntree* comparison_create(	enum comparisontype_t type, syntree* left_node,
 							syntree* right_node);
 void syntree_free(syntree* node);
-int eval(syntree* node);
+cbvalue* eval(syntree* node);
 
 #endif // SYNTREE_H

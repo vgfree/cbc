@@ -159,11 +159,8 @@ int main(int argc, char* argv[])
 	
 	if (result_tree)
 	{
-		int result			= eval(result_tree);
-		cbvalue* cbresult	= cbnumeric_create(result);
-		char* result_string	= cbvalue_tostring(cbresult);
-		printf("%s", result_string);
-		free(result_string);
+		cbvalue* cbresult = eval(result_tree);
+		cbvalue_print(cbresult);
 		cbvalue_free(cbresult);
 		syntree_free(result_tree);
 	}

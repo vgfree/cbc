@@ -36,15 +36,22 @@ void symtab_append(symbol* symtab, symbol* s, syntree* stmtlist)
 		current_symbol = current_symbol->next;
 	
 	// copy symbol
-	symbol* newsym			= symbol_create(s->type, s->identifier);
+	symbol* newsym = symbol_create(s->type, s->identifier);
 	
-	// set function-body, if symbol represents a function
-	if (s->type == SYM_FUNCTION)
-		newsym->function	= stmtlist;
-	else
-		newsym->function	= NULL;
+	switch (s->type)
+	{
+		case SYM_VARIABLE:
+			// assign new value
+			cbvalue_assign(s->value, newsym->value);
+			break;
+		
+		case SYM_FUNCTION:
+			// set function-body, if symbol represents a function
+			newsym->function = stmtlist;
+			break;
+	}
 	
-	current_symbol->next	= newsym;
+	current_symbol->next = newsym;
 }
 
 // -----------------------------------------------------------------------------
@@ -121,11 +128,31 @@ symbol* symbol_create(enum symbol_type_t type, char* identifier)
 	else
 		s->identifier = NULL;
 	
-	s->type		= type;
-	s->value	= 0;
-	s->next		= NULL;
+	s->type = SYM_UNDEFINED;
+	s->next = NULL;
+	symbol_settype(s, type);
 	
 	return s;
+}
+
+// -----------------------------------------------------------------------------
+// set symbol-type
+// -----------------------------------------------------------------------------
+void symbol_settype(symbol* s, enum symbol_type_t type)
+{
+	if (s->type == type)
+		return;
+	
+	if (type == SYM_VARIABLE)
+		// variable-symbols and undefined symbols need a value attribute!
+		s->value = cbvalue_create();
+	else if (s->type == SYM_VARIABLE)
+		// if symbol turns from a variable to anything else, the value
+		// attribute needs to be freed explicitly
+		cbvalue_free(s->value);
+	
+	// finally, set the new type of the symbol
+	s->type = type;
 }
 
 // -----------------------------------------------------------------------------
@@ -135,6 +162,9 @@ void symbol_free(symbol* s)
 {
 	if (!s)
 		return;
+	
+	if (s->type == SYM_VARIABLE)
+		cbvalue_free(s->value);
 	
 	free(s->identifier);
 	free(s);

@@ -42,7 +42,7 @@ syntree* constval_create(int value)
 	}
 	
 	node->type	= SNT_CONSTVAL;
-	node->value	= value;
+	node->value	= cbnumeric_create(value);
 	
 	return (syntree*) node;
 }
@@ -120,7 +120,6 @@ void syntree_free(syntree* node)
 			syntree_free(node->l);
 		
 		// no child-nodes
-		case SNT_CONSTVAL:
 		case SNT_SYMREF:
 		case SNT_FUNC_CALL:
 			break;
@@ -133,6 +132,10 @@ void syntree_free(syntree* node)
 				syntree_free(((flow*) node)->tb);
 			if (((flow*) node)->fb)	// false-branch
 				syntree_free(((flow*) node)->fb);
+			break;
+		
+		case SNT_CONSTVAL:
+			cbvalue_free(((constval*) node)->value);
 			break;
 		
 		case SNT_COMPARISON:
@@ -151,24 +154,31 @@ void syntree_free(syntree* node)
 // -----------------------------------------------------------------------------
 // evaluate a complete syntax tree and return its result
 // -----------------------------------------------------------------------------
-int eval(syntree* node)
+cbvalue* eval(syntree* node)
 {
-	int result;
+	cbvalue* result = NULL;
 	
 	switch (node->type)
 	{
 		case SNT_CONSTVAL:
-			result = ((constval*) node)->value;
+			result = cbvalue_copy(((constval*) node)->value);
 			break;
 		
 		case SNT_SYMREF:
 			symref_setsymbolfromtable((symref*) node);
-			result = ((symref*) node)->sym->value;
+			
+			if (((symref*) node)->sym->type == SYM_UNDEFINED)
+				result = cbvalue_create();			// return empty value
+			else
+				result = cbvalue_copy(((symref*) node)->sym->value);
+			
 			break;
 		
 		case SNT_ASSIGNMENT:
 			symref_setsymbolfromtable((symref*) node->l);
-			result = ((symref*) node->l)->sym->value = eval(node->r);
+			cbvalue_assign_freesource(	eval(node->r),
+										((symref*) node->l)->sym->value);
+			result = cbvalue_copy(((symref*) node->l)->sym->value);
 			break;
 		
 		case SNT_DECLARATION:
@@ -177,16 +187,17 @@ int eval(syntree* node)
 			// check if symbol already exists in symbol-table
 			symbol* found = symtab_lookup(gl_symtab, sym->identifier);
 			if (found)
+				// TODO: memory-leaks here!
 				yyerror("cannot redeclare symbol: %s", sym->identifier);
 			else
 			{
-				sym->type = SYM_VARIABLE;
+				symbol_settype(sym, SYM_VARIABLE);
 				symtab_append(gl_symtab, sym, NULL);
 				// symbol was duplicated -> free old one
 				symbol_free(sym);
 			}
-			
-			result = 0;
+			// return empty value
+			result = cbvalue_create();
 			break;
 		}
 		
@@ -199,13 +210,13 @@ int eval(syntree* node)
 				yyerror("cannot redeclare symbol: %s", sym->identifier);
 			else
 			{
-				sym->type = SYM_FUNCTION;
+				symbol_settype(sym, SYM_FUNCTION);
 				symtab_append(gl_symtab, sym, node->r);
 				// symbol was duplicated -> free old one
 				symbol_free(sym);
 			}
-			
-			result = 0;
+			// return empty value
+			result = cbvalue_create();
 			break;
 		}
 		
@@ -217,83 +228,57 @@ int eval(syntree* node)
 			break;
 		
 		case SNT_FLOW_IF:
+		{
 			// evaluate condition and check its result:
 			// every non-zero value is considered as true.
-			if (eval(((flow*) node)->cond) != 0)
+			cbvalue* condition = eval(((flow*) node)->cond);
+			if (condition->value != 0)
 				result = eval(((flow*) node)->tb);	// condition is ture:
 													// take the true-branch
 			else
 				result = eval(((flow*) node)->fb);	// condition is false:
 													// take the false-branch
+			
+			cbvalue_free(condition);
 			break;
+		}
 		
 		case SNT_FLOW_WHILE:
-			// evaluate true-branch while the condition returns a non-zero value
-			while (eval(((flow*) node)->cond) != 0)
-				result = eval(((flow*) node)->tb);
-			break;
-		
-		case SNT_COMPARISON:
 		{
-			comparison* cmp = ((comparison*) node);
-			// evaluate comparison
-			switch (cmp->cmp_type)
+			cbvalue* temp;
+			// evaluate true-branch while the condition returns a non-zero value
+			while ( (temp = eval(((flow*) node)->cond))->value != 0)
 			{
-				case CMP_EQ:
-					result = (eval(cmp->l) == eval(cmp->r));
-					break;
+				cbvalue_free(temp);
+				if (result)
+					cbvalue_free(result);
 				
-				case CMP_NE:
-					result = (eval(cmp->l) != eval(cmp->r));
-					break;
-				
-				case CMP_GE:
-					result = (eval(cmp->l) >= eval(cmp->r));
-					break;
-				
-				case CMP_LE:
-					result = (eval(cmp->l) <= eval(cmp->r));
-					break;
-				
-				case CMP_GT:
-					result = (eval(cmp->l) > eval(cmp->r));
-					break;
-				
-				case CMP_LT:
-					result = (eval(cmp->l) < eval(cmp->r));
-					break;
-				
-				default:
-					result = 0;	// false
-					yyerror("unknown comparison-type: %d",
-							((comparison*) node)->cmp_type);
+				result = eval(((flow*) node)->tb);
 			}
 			break;
 		}
 		
+		case SNT_COMPARISON:
+		{
+			comparison* cmp	= ((comparison*) node);
+			result			= cbnumeric_compare(cmp->cmp_type, eval(cmp->l),
+												eval(cmp->r));
+			break;
+		}
+		
 		case SNT_STATEMENTLIST:
-			eval(node->l);
+			cbvalue_free(eval(node->l));
 			result = eval(node->r);
 			break;
 		
-		case '+': result = eval(node->l) + eval(node->r); break;
-		case '-': result = eval(node->l) - eval(node->r); break;
-		case '*': result = eval(node->l) * eval(node->r); break;
-		case '/':
-			result	= 0;
-			int rhs	= eval(node->r);
-			// check for division by zero first!
-			if (rhs != 0)
-				result = eval(node->l) / rhs;
-			else
-			{
-				yyerror("division by zero is not allowed!");
-				exit(1);
-			}
-			break;
+		case '+': result = cbnumeric_add(eval(node->l), eval(node->r)); break;
+		case '-': result = cbnumeric_sub(eval(node->l), eval(node->r)); break;
+		case '*': result = cbnumeric_mul(eval(node->l), eval(node->r)); break;
+		case '/': result = cbnumeric_div(eval(node->l), eval(node->r)); break;
 		
 		case SNT_UNARYMINUS:
-			result = - eval(node->l);
+			result = eval(node->l);
+			result->value = - result->value;
 			break;
 		
 		default:

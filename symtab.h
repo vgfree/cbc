@@ -10,6 +10,7 @@
 #ifndef SYMTAB_H
 #define SYMTAB_H
 
+#include "cbvalues.h"
 #include "syntree.h"
 
 // symbol types
@@ -36,7 +37,7 @@ typedef struct symbol_t
 	union
 	{
 		// symbol-value
-		int value;
+		cbvalue* value;
 		// function-code
 		syntree* function;
 	};
@@ -51,6 +52,7 @@ void symtab_append(symbol* symtab, symbol* s, syntree* stmtlist);
 symbol* symtab_lookup(symbol* symtab, char* key);
 void symtab_free(symbol* symtab);
 symbol* symbol_create(enum symbol_type_t type, char* identifier);
+void symbol_settype(symbol* s, enum symbol_type_t type);
 void symbol_free(symbol* s);
 
 // global symbol-table, has to be initialized and freed in the main-function

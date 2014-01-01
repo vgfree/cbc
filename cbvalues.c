@@ -7,6 +7,8 @@
 #include "cbvalues.h"
 #include "errors.h"
 
+#define NO_VALUE_AS_STRING "<no value returned>"
+
 // numerical operation-types
 enum cbnumeric_operation_t
 {
@@ -97,6 +99,16 @@ void cbvalue_assign(cbvalue* source, cbvalue* destination)
 }
 
 // -----------------------------------------------------------------------------
+// assign attributes from one codeblock-value struct to another and free the
+// source struct
+// -----------------------------------------------------------------------------
+void cbvalue_assign_freesource(cbvalue* source, cbvalue* destination)
+{
+	cbvalue_assign(source, destination);
+	cbvalue_free(source);
+}
+
+// -----------------------------------------------------------------------------
 // copy a codeblock-value struct
 // -----------------------------------------------------------------------------
 cbvalue* cbvalue_copy(cbvalue* val)
@@ -129,7 +141,8 @@ char* cbvalue_tostring(cbvalue* val)
 			break;
 		
 		case VT_UNDEFINED:
-			sprintf(result_buf, "<null>");
+			result_buf = malloc(strlen(NO_VALUE_AS_STRING) + 1);
+			sprintf(result_buf, NO_VALUE_AS_STRING);
 			break;
 		
 		default:
@@ -142,13 +155,21 @@ char* cbvalue_tostring(cbvalue* val)
 }
 
 // -----------------------------------------------------------------------------
+// print a codeblock-value
+// -----------------------------------------------------------------------------
+void cbvalue_print(cbvalue* val)
+{
+	char* string = cbvalue_tostring(val);
+	printf("%s", string);
+	free(string);
+}
+
+// -----------------------------------------------------------------------------
 // numerical operation
 // -----------------------------------------------------------------------------
 cbvalue* cbnumeric_operation(	enum cbnumeric_operation_t type, cbvalue* l,
 								cbvalue* r)
 {
-	printf("l-type: %d\n", l->type);
-	printf("r-type: %d\n", r->type);
 	if (!cbvalue_istype(VT_NUMERIC, l) || !cbvalue_istype(VT_NUMERIC, r))
 	{
 		yyerror("value has invalid type for this operation, expecting VT_NUMERIC!");
@@ -186,8 +207,6 @@ cbvalue* cbnumeric_operation(	enum cbnumeric_operation_t type, cbvalue* l,
 // -----------------------------------------------------------------------------
 cbvalue* cbnumeric_compare(enum comparisontype_t type, cbvalue* l, cbvalue* r)
 {
-	printf("l-type: %d\n", l->type);
-	printf("r-type: %d\n", r->type);
 	if (!cbvalue_istype(VT_NUMERIC, l) || !cbvalue_istype(VT_NUMERIC, r))
 	{
 		yyerror("(CMP) value has invalid type for this operation, expecting VT_NUMERIC!");

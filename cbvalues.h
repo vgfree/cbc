@@ -50,8 +50,10 @@ cbvalue* cbstring_create(cbstring string);
 void cbvalue_free(cbvalue* val);
 bool cbvalue_istype(enum valuetype_t type, cbvalue* val);
 void cbvalue_assign(cbvalue* source, cbvalue* destination);
+void cbvalue_assign_freesource(cbvalue* source, cbvalue* destination);
 cbvalue* cbvalue_copy(cbvalue* val);
 char* cbvalue_tostring(cbvalue* val);
+void cbvalue_print(cbvalue* val);
 // cbnumeric interface functions
 cbvalue* cbnumeric_compare(enum comparisontype_t type, cbvalue* l, cbvalue* r);
 cbvalue* cbnumeric_add(cbvalue* l, cbvalue* r);
