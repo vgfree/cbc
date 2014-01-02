@@ -186,7 +186,10 @@ void cbvalue_print(cbvalue* val)
 }
 
 // -----------------------------------------------------------------------------
-// compare two codeblock-values
+// compare two codeblock-values.
+// 
+// NOTE:	regardless of the value-type beeing compared, every compare-function
+//			returns a cbboolean-value.
 // -----------------------------------------------------------------------------
 cbvalue* cbvalue_compare(enum comparisontype_t type, cbvalue* l, cbvalue* r)
 {
@@ -270,16 +273,16 @@ cbvalue* cbnumeric_compare(enum comparisontype_t type, cbvalue* l, cbvalue* r)
 		exit(1);
 	}
 	
-	cbvalue* result = cbnumeric_create(0);
+	cbvalue* result = cbboolean_create(false);
 	
 	switch (type)
 	{
-		case CMP_EQ: result->value = l->value == r->value; break;
-		case CMP_NE: result->value = l->value != r->value; break;
-		case CMP_GE: result->value = l->value >= r->value; break;
-		case CMP_LE: result->value = l->value <= r->value; break;
-		case CMP_GT: result->value = l->value > r->value; break;
-		case CMP_LT: result->value = l->value < r->value; break;
+		case CMP_EQ: result->boolean = l->value == r->value; break;
+		case CMP_NE: result->boolean = l->value != r->value; break;
+		case CMP_GE: result->boolean = l->value >= r->value; break;
+		case CMP_LE: result->boolean = l->value <= r->value; break;
+		case CMP_GT: result->boolean = l->value > r->value; break;
+		case CMP_LT: result->boolean = l->value < r->value; break;
 	}
 	
 	return result;
@@ -328,14 +331,14 @@ cbvalue* cbstring_compare(enum comparisontype_t type, cbvalue* l, cbvalue* r)
 		exit(1);
 	}
 	
-	int not_flag= 0;
-	int result	= 0;
+	bool not_flag	= false;
+	bool result		= false;
 	
 	switch (type)
 	{
 		case CMP_NE:
 			// set not-flag -> invert result
-			not_flag = 1;
+			not_flag = true;
 		
 		case CMP_EQ:
 		{
@@ -350,7 +353,7 @@ cbvalue* cbstring_compare(enum comparisontype_t type, cbvalue* l, cbvalue* r)
 			break;
 	}
 	
-	cbvalue* result_val = cbnumeric_create(result);
+	cbvalue* result_val = cbboolean_create(result);
 	return result_val;
 }
 
