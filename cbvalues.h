@@ -54,11 +54,14 @@ void cbvalue_assign_freesource(cbvalue* source, cbvalue* destination);
 cbvalue* cbvalue_copy(cbvalue* val);
 char* cbvalue_tostring(cbvalue* val);
 void cbvalue_print(cbvalue* val);
+cbvalue* cbvalue_compare(enum comparisontype_t type, cbvalue* l, cbvalue* r);
 // cbnumeric interface functions
 cbvalue* cbnumeric_compare(enum comparisontype_t type, cbvalue* l, cbvalue* r);
 cbvalue* cbnumeric_add(cbvalue* l, cbvalue* r);
 cbvalue* cbnumeric_sub(cbvalue* l, cbvalue* r);
 cbvalue* cbnumeric_mul(cbvalue* l, cbvalue* r);
 cbvalue* cbnumeric_div(cbvalue* l, cbvalue* r);
+// cbnumeric interface functions
+cbvalue* cbstring_compare(enum comparisontype_t type, cbvalue* l, cbvalue* r);
 
 #endif // CBVALUES_H

@@ -281,9 +281,8 @@ cbvalue* eval(syntree* node)
 		
 		case SNT_COMPARISON:
 		{
-			comparison* cmp	= ((comparison*) node);
-			result			= cbnumeric_compare(cmp->cmp_type, eval(cmp->l),
-												eval(cmp->r));
+			comparison* cmp = ((comparison*) node);
+			result = cbvalue_compare(cmp->cmp_type, eval(cmp->l), eval(cmp->r));
 			break;
 		}
 		

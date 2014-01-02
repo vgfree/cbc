@@ -165,6 +165,38 @@ void cbvalue_print(cbvalue* val)
 }
 
 // -----------------------------------------------------------------------------
+// compare two codeblock-values
+// -----------------------------------------------------------------------------
+cbvalue* cbvalue_compare(enum comparisontype_t type, cbvalue* l, cbvalue* r)
+{
+	if (!cbvalue_istype(r->type, l))
+	{
+		yyerror("type mismatch: lhs-type %d differs from rhs-type %d", l->type,
+				r->type);
+		exit(1);
+	}
+	
+	cbvalue* result = NULL;
+	
+	switch (l->type)
+	{
+		case VT_NUMERIC:
+			result = cbnumeric_compare(type, l, r);
+			break;
+		
+		case VT_STRING:
+			result = cbstring_compare(type, l, r);
+			break;
+	}
+	
+	// free lhs and rhs
+	cbvalue_free(l);
+	cbvalue_free(r);
+	
+	return result;
+}
+
+// -----------------------------------------------------------------------------
 // numerical operation
 // -----------------------------------------------------------------------------
 cbvalue* cbnumeric_operation(	enum cbnumeric_operation_t type, cbvalue* l,
@@ -209,7 +241,7 @@ cbvalue* cbnumeric_compare(enum comparisontype_t type, cbvalue* l, cbvalue* r)
 {
 	if (!cbvalue_istype(VT_NUMERIC, l) || !cbvalue_istype(VT_NUMERIC, r))
 	{
-		yyerror("(CMP) value has invalid type for this operation, expecting VT_NUMERIC!");
+		yyerror("value has invalid type for this operation, expecting VT_NUMERIC!");
 		exit(1);
 	}
 	
@@ -224,10 +256,6 @@ cbvalue* cbnumeric_compare(enum comparisontype_t type, cbvalue* l, cbvalue* r)
 		case CMP_GT: result->value = l->value > r->value; break;
 		case CMP_LT: result->value = l->value < r->value; break;
 	}
-	
-	// free lhs and rhs
-	cbvalue_free(l);
-	cbvalue_free(r);
 	
 	return result;
 }
@@ -262,4 +290,41 @@ cbvalue* cbnumeric_mul(cbvalue* l, cbvalue* r)
 cbvalue* cbnumeric_div(cbvalue* l, cbvalue* r)
 {
 	return cbnumeric_operation(NUM_DIV, l, r);
+}
+
+// -----------------------------------------------------------------------------
+// string comparison
+// -----------------------------------------------------------------------------
+cbvalue* cbstring_compare(enum comparisontype_t type, cbvalue* l, cbvalue* r)
+{
+	if (!cbvalue_istype(VT_STRING, l) || !cbvalue_istype(VT_STRING, r))
+	{
+		yyerror("value has invalid type for this operation, expecting VT_STRING!");
+		exit(1);
+	}
+	
+	int not_flag= 0;
+	int result	= 0;
+	
+	switch (type)
+	{
+		case CMP_NE:
+			// set not-flag -> invert result
+			not_flag = 1;
+		
+		case CMP_EQ:
+		{
+			result = (strcmp(l->string, r->string) == 0);
+			result = (result ^ not_flag);
+			break;
+		}
+		
+		default:
+			yyerror("comparison-type %d not allowed for string comparison!", type);
+			exit(1);
+			break;
+	}
+	
+	cbvalue* result_val = cbnumeric_create(result);
+	return result_val;
 }
