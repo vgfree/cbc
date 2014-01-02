@@ -23,7 +23,8 @@ enum syn_nodetype_t
 	SNT_CONSTVAL,
 	SNT_SYMREF,
 	SNT_FLOW_IF,
-	SNT_FLOW_WHILE
+	SNT_FLOW_WHILE,
+	SNT_CONSTSTR
 };
 
 // syntax-tree node
@@ -77,6 +78,7 @@ typedef struct
 syntree* syntree_create(enum syn_nodetype_t type, syntree* left_node,
 						syntree* right_node);
 syntree* constval_create(int value);
+syntree* conststr_create(char* string);
 syntree* flow_create(	enum syn_nodetype_t type, syntree* condition,
 						syntree* then_branch, syntree* else_branch);
 syntree* comparison_create(	enum comparisontype_t type, syntree* left_node,

@@ -40,6 +40,20 @@
 				return IDENTIFIER;
 			}
 			
+			/* string literals */
+\'([^']|'')*\' {
+				// string literals are always in one line only.
+				// the apostrophe can be escaped by writing a double apostrophe.
+				char* str			= (char*) malloc(yyleng - 1);
+				*str				= '\0';	// terminate string
+				// omit first and last char, which are both an apostrophe
+				yytext[yyleng - 1]	= '\0';
+				strcpy(str, (yytext + 1));
+				
+				yylval.str = str;
+				return STRING;
+			}
+			
 			/* single character operators */
 [-+*/,()|]	{ return *yytext; }
 			

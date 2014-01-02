@@ -80,9 +80,7 @@ bool cbvalue_istype(enum valuetype_t type, cbvalue* val)
 // -----------------------------------------------------------------------------
 void cbvalue_assign(cbvalue* source, cbvalue* destination)
 {
-	destination->type = source->type;
-	
-	switch (destination->type)
+	switch (source->type)
 	{
 		case VT_NUMERIC:
 			destination->value = source->value;
@@ -90,12 +88,14 @@ void cbvalue_assign(cbvalue* source, cbvalue* destination)
 		
 		case VT_STRING:
 			// free old string
-			if (destination->string)
+			if (destination->type == VT_STRING && destination->string)
 				free(destination->string);
 			// assign new one
-			destination->string = source->string;
+			destination->string = strdup(source->string);
 			break;
 	}
+	
+	destination->type = source->type;
 }
 
 // -----------------------------------------------------------------------------

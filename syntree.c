@@ -4,6 +4,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include "syntree.h"
 #include "symref.h"
 #include "fncall.h"
@@ -43,6 +44,24 @@ syntree* constval_create(int value)
 	
 	node->type	= SNT_CONSTVAL;
 	node->value	= cbnumeric_create(value);
+	
+	return (syntree*) node;
+}
+
+// -----------------------------------------------------------------------------
+// create a string-node
+// -----------------------------------------------------------------------------
+syntree* conststr_create(char* string)
+{
+	constval* node = malloc(sizeof(constval));
+	if (!node)
+	{
+		yyerror(ERR_BADALLOC);
+		exit(1);
+	}
+	
+	node->type	= SNT_CONSTSTR;
+	node->value	= cbstring_create(strdup(string));
 	
 	return (syntree*) node;
 }
@@ -135,6 +154,7 @@ void syntree_free(syntree* node)
 			break;
 		
 		case SNT_CONSTVAL:
+		case SNT_CONSTSTR:
 			cbvalue_free(((constval*) node)->value);
 			break;
 		
@@ -161,6 +181,7 @@ cbvalue* eval(syntree* node)
 	switch (node->type)
 	{
 		case SNT_CONSTVAL:
+		case SNT_CONSTSTR:
 			result = cbvalue_copy(((constval*) node)->value);
 			break;
 		

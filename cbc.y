@@ -16,6 +16,7 @@ syntree* result_tree;
 %union {
 	syntree* ast;
 	char* id;
+	cbstring str;
 	int value;
 	enum comparisontype_t cmp;
 };
@@ -26,6 +27,7 @@ syntree* result_tree;
 %token			WHILE DO END
 %token	<value>	NUMBER
 %token	<id>	IDENTIFIER
+%token	<str>	STRING
 
 %right	ASSIGN
 %left	'+' '-'
@@ -113,6 +115,10 @@ id:
 
 expr:
 	NUMBER						{ $$ = constval_create($1); }
+	| STRING					{
+									$$ = conststr_create($1);
+									free($1);
+								}
 	| id						{ $$ = $1; }
 	| IDENTIFIER '(' ')'		{
 									$$ = fncall_create(
