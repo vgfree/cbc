@@ -7,11 +7,15 @@
 
 #include <stdbool.h>
 
+#define CB_BOOLEAN_TRUE_STR		"True"
+#define CB_BOOLEAN_FALSE_STR	"False"
+
 // value-types
 enum valuetype_t
 {
 	VT_UNDEFINED,
 	VT_NUMERIC,
+	VT_BOOLEAN,
 	VT_STRING
 };
 
@@ -29,6 +33,7 @@ enum comparisontype_t
 // definition of types
 typedef int		cbnumeric;
 typedef char*	cbstring;
+typedef bool	cbboolean;
 
 // codeblock-value structure
 typedef struct
@@ -39,6 +44,7 @@ typedef struct
 	union
 	{
 		cbnumeric value;
+		cbboolean boolean;
 		cbstring string;
 	};
 } cbvalue;
@@ -46,6 +52,7 @@ typedef struct
 // interface functions
 cbvalue* cbvalue_create();
 cbvalue* cbnumeric_create(cbnumeric value);
+cbvalue* cbboolean_create(cbboolean boolean);
 cbvalue* cbstring_create(cbstring string);
 void cbvalue_free(cbvalue* val);
 bool cbvalue_istype(enum valuetype_t type, cbvalue* val);
@@ -61,7 +68,9 @@ cbvalue* cbnumeric_add(cbvalue* l, cbvalue* r);
 cbvalue* cbnumeric_sub(cbvalue* l, cbvalue* r);
 cbvalue* cbnumeric_mul(cbvalue* l, cbvalue* r);
 cbvalue* cbnumeric_div(cbvalue* l, cbvalue* r);
-// cbnumeric interface functions
+// cbstring interface functions
 cbvalue* cbstring_compare(enum comparisontype_t type, cbvalue* l, cbvalue* r);
+// cbboolean interface functions
+cbvalue* cbboolean_compare(enum comparisontype_t type, cbvalue* l, cbvalue* r);
 
 #endif // CBVALUES_H

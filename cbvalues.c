@@ -34,13 +34,23 @@ cbvalue* cbvalue_create()
 }
 
 // -----------------------------------------------------------------------------
-// create a numeric-value
+// create a numeric value
 // -----------------------------------------------------------------------------
 cbvalue* cbnumeric_create(cbnumeric value)
 {
 	cbvalue* val= cbvalue_create();
 	val->type	= VT_NUMERIC;
 	val->value	= value;
+}
+
+// -----------------------------------------------------------------------------
+// create a boolean value
+// -----------------------------------------------------------------------------
+cbvalue* cbboolean_create(cbboolean boolean)
+{
+	cbvalue* val= cbvalue_create();
+	val->type	= VT_BOOLEAN;
+	val->boolean= boolean;
 }
 
 // -----------------------------------------------------------------------------
@@ -84,6 +94,10 @@ void cbvalue_assign(cbvalue* source, cbvalue* destination)
 	{
 		case VT_NUMERIC:
 			destination->value = source->value;
+			break;
+		
+		case VT_BOOLEAN:
+			destination->boolean = source->boolean;
 			break;
 		
 		case VT_STRING:
@@ -136,13 +150,20 @@ char* cbvalue_tostring(cbvalue* val)
 			sprintf(result_buf, "%d", val->value);
 			break;
 		
+		case VT_BOOLEAN:
+			if (val->boolean)
+				result_buf = strdup(CB_BOOLEAN_TRUE_STR);
+			else
+				result_buf = strdup(CB_BOOLEAN_FALSE_STR);
+			
+			break;
+		
 		case VT_STRING:
 			result_buf = strdup(val->string);
 			break;
 		
 		case VT_UNDEFINED:
-			result_buf = malloc(strlen(NO_VALUE_AS_STRING) + 1);
-			sprintf(result_buf, NO_VALUE_AS_STRING);
+			result_buf = strdup(NO_VALUE_AS_STRING);
 			break;
 		
 		default:
@@ -182,6 +203,10 @@ cbvalue* cbvalue_compare(enum comparisontype_t type, cbvalue* l, cbvalue* r)
 	{
 		case VT_NUMERIC:
 			result = cbnumeric_compare(type, l, r);
+			break;
+		
+		case VT_BOOLEAN:
+			result = cbboolean_compare(type, l, r);
 			break;
 		
 		case VT_STRING:
@@ -326,5 +351,42 @@ cbvalue* cbstring_compare(enum comparisontype_t type, cbvalue* l, cbvalue* r)
 	}
 	
 	cbvalue* result_val = cbnumeric_create(result);
+	return result_val;
+}
+
+// -----------------------------------------------------------------------------
+// boolean comparison
+// -----------------------------------------------------------------------------
+cbvalue* cbboolean_compare(enum comparisontype_t type, cbvalue* l, cbvalue* r)
+{
+	if (!cbvalue_istype(VT_BOOLEAN, l))
+	{
+		yyerror("value has invalid type for this operation, expecting VT_BOOLEAN!");
+		exit(1);
+	}
+	
+	bool not_flag	= false;
+	cbboolean result= false;
+	
+	switch (type)
+	{
+		case CMP_NE:
+			// set not-flag
+			not_flag = true;
+		
+		case CMP_EQ:
+		{
+			result = (l->boolean == r->boolean);
+			result = (result ^ not_flag); // XOR result with not-flag -> invert result
+			break;
+		}
+		
+		default:
+			yyerror("comparison-type %d not allowed for boolean comparison!", type);
+			exit(1);
+			break;
+	}
+	
+	cbvalue* result_val = cbboolean_create(result);
 	return result_val;
 }

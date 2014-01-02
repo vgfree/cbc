@@ -67,6 +67,24 @@ syntree* conststr_create(char* string)
 }
 
 // -----------------------------------------------------------------------------
+// create a boolean-node
+// -----------------------------------------------------------------------------
+syntree* constbool_create(bool boolean)
+{
+	constval* node = malloc(sizeof(constval));
+	if (!node)
+	{
+		yyerror(ERR_BADALLOC);
+		exit(1);
+	}
+	
+	node->type	= SNT_CONSTBOOL;
+	node->value	= cbboolean_create(boolean);
+	
+	return (syntree*) node;
+}
+
+// -----------------------------------------------------------------------------
 // create a control-flow-node
 // -----------------------------------------------------------------------------
 syntree* flow_create(	enum syn_nodetype_t type, syntree* condition,
@@ -155,6 +173,7 @@ void syntree_free(syntree* node)
 			break;
 		
 		case SNT_CONSTVAL:
+		case SNT_CONSTBOOL:
 		case SNT_CONSTSTR:
 			cbvalue_free(((constval*) node)->value);
 			break;
@@ -182,6 +201,7 @@ cbvalue* eval(syntree* node)
 	switch (node->type)
 	{
 		case SNT_CONSTVAL:
+		case SNT_CONSTBOOL:
 		case SNT_CONSTSTR:
 			result = cbvalue_copy(((constval*) node)->value);
 			break;

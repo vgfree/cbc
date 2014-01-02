@@ -35,6 +35,16 @@
 "function"	{ return FUNCTION; }
 "print"		{ return PRINT; }
 			
+			/* boolean values */
+"True"		{
+				yylval.boolval = true;
+				return BOOLEAN;
+			}
+"False"		{
+				yylval.boolval = false;
+				return BOOLEAN;
+			}
+			
 			/* identifier */
 [_a-zA-Z][_a-zA-Z0-9]*	{
 				yylval.id = strdup(yytext);

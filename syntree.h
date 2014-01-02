@@ -22,10 +22,11 @@ enum syn_nodetype_t
 	SNT_PRINT,
 	// the following node-types have no child-nodes
 	SNT_CONSTVAL,
+	SNT_CONSTBOOL,
+	SNT_CONSTSTR,
 	SNT_SYMREF,
 	SNT_FLOW_IF,
-	SNT_FLOW_WHILE,
-	SNT_CONSTSTR
+	SNT_FLOW_WHILE
 };
 
 // syntax-tree node
@@ -80,6 +81,7 @@ syntree* syntree_create(enum syn_nodetype_t type, syntree* left_node,
 						syntree* right_node);
 syntree* constval_create(int value);
 syntree* conststr_create(char* string);
+syntree* constbool_create(bool boolean);
 syntree* flow_create(	enum syn_nodetype_t type, syntree* condition,
 						syntree* then_branch, syntree* else_branch);
 syntree* comparison_create(	enum comparisontype_t type, syntree* left_node,

@@ -17,18 +17,20 @@ syntree* result_tree;
 	syntree* ast;
 	char* id;
 	cbstring str;
+	cbboolean boolval;
 	int value;
 	enum comparisontype_t cmp;
 };
 
-%token			ENDOFFILE
-%token			FUNCTION
-%token			PRINT
-%token			IF THEN ELSE ENDIF
-%token			WHILE DO END
-%token	<value>	NUMBER
-%token	<id>	IDENTIFIER
-%token	<str>	STRING
+%token				ENDOFFILE
+%token				FUNCTION
+%token				PRINT
+%token				IF THEN ELSE ENDIF
+%token				WHILE DO END
+%token	<value>		NUMBER
+%token	<id>		IDENTIFIER
+%token	<str>		STRING
+%token	<boolval>	BOOLEAN
 
 %right	ASSIGN
 %left	'+' '-'
@@ -117,6 +119,7 @@ id:
 
 expr:
 	NUMBER						{ $$ = constval_create($1); }
+	| BOOLEAN					{ $$ = constbool_create($1); }
 	| STRING					{
 									$$ = conststr_create($1);
 									free($1);
