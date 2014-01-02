@@ -18,7 +18,7 @@ syntree* result_tree;
 	char* id;
 	cbstring str;
 	cbboolean boolval;
-	int value;
+	cbnumeric value;
 	enum comparisontype_t cmp;
 };
 

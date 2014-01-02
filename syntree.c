@@ -33,7 +33,7 @@ syntree* syntree_create(enum syn_nodetype_t type, syntree* left_node,
 // -----------------------------------------------------------------------------
 // create a syntax-tree value-node
 // -----------------------------------------------------------------------------
-syntree* constval_create(int value)
+syntree* constval_create(cbnumeric value)
 {
 	constval* node = malloc(sizeof(constval));
 	if (!node)
@@ -51,7 +51,7 @@ syntree* constval_create(int value)
 // -----------------------------------------------------------------------------
 // create a string-node
 // -----------------------------------------------------------------------------
-syntree* conststr_create(char* string)
+syntree* conststr_create(cbstring string)
 {
 	constval* node = malloc(sizeof(constval));
 	if (!node)
@@ -69,7 +69,7 @@ syntree* conststr_create(char* string)
 // -----------------------------------------------------------------------------
 // create a boolean-node
 // -----------------------------------------------------------------------------
-syntree* constbool_create(bool boolean)
+syntree* constbool_create(cbboolean boolean)
 {
 	constval* node = malloc(sizeof(constval));
 	if (!node)

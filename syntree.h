@@ -79,9 +79,9 @@ typedef struct
 // interface functions
 syntree* syntree_create(enum syn_nodetype_t type, syntree* left_node,
 						syntree* right_node);
-syntree* constval_create(int value);
-syntree* conststr_create(char* string);
-syntree* constbool_create(bool boolean);
+syntree* constval_create(cbnumeric value);
+syntree* conststr_create(cbstring string);
+syntree* constbool_create(cbboolean boolean);
 syntree* flow_create(	enum syn_nodetype_t type, syntree* condition,
 						syntree* then_branch, syntree* else_branch);
 syntree* comparison_create(	enum comparisontype_t type, syntree* left_node,
