@@ -136,6 +136,7 @@ void syntree_free(syntree* node)
 		// one child-node (left one)
 		case SNT_UNARYMINUS:
 		case SNT_DECLARATION:
+		case SNT_PRINT:
 			syntree_free(node->l);
 		
 		// no child-nodes
@@ -236,6 +237,18 @@ cbvalue* eval(syntree* node)
 				// symbol was duplicated -> free old one
 				symbol_free(sym);
 			}
+			// return empty value
+			result = cbvalue_create();
+			break;
+		}
+		
+		case SNT_PRINT:
+		{
+			cbvalue* temp = eval(node->l);
+			cbvalue_print(temp);
+			cbvalue_free(temp);
+			// print newline
+			printf("\n");
 			// return empty value
 			result = cbvalue_create();
 			break;

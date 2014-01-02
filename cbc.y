@@ -23,6 +23,7 @@ syntree* result_tree;
 
 %token			ENDOFFILE
 %token			FUNCTION
+%token			PRINT
 %token			IF THEN ELSE ENDIF
 %token			WHILE DO END
 %token	<value>	NUMBER
@@ -101,6 +102,7 @@ stmt:
 									// when the syntax-tree is freed.
 									$$ = syntree_create(SNT_FUNC_DECL, $2, $5);
 								}
+	| PRINT expr				{ $$ = syntree_create(SNT_PRINT, $2, NULL); }
 	;
 
 id:

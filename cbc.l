@@ -33,6 +33,7 @@
 "do"		{ return DO; }
 "end"		{ return END; }
 "function"	{ return FUNCTION; }
+"print"		{ return PRINT; }
 			
 			/* identifier */
 [_a-zA-Z][_a-zA-Z0-9]*	{

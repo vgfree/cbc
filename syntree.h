@@ -19,6 +19,7 @@ enum syn_nodetype_t
 	// the following node-types have one child-node
 	SNT_UNARYMINUS,
 	SNT_DECLARATION,
+	SNT_PRINT,
 	// the following node-types have no child-nodes
 	SNT_CONSTVAL,
 	SNT_SYMREF,
