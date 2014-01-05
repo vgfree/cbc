@@ -55,6 +55,33 @@ void symtab_append(symbol* symtab, symbol* s, syntree* stmtlist)
 }
 
 // -----------------------------------------------------------------------------
+// remove a symbol from the symbol-table
+// -----------------------------------------------------------------------------
+void symtab_remove(symbol* symtab, char* identifier)
+{
+	// check for a valid symbol-table
+	if (symtab->type != SYM_SYMTAB)
+	{
+		yyerror("not a valid symbol-table");
+		exit(1);
+	}
+	
+	symbol* current_symbol = symtab;
+	// search for a symbol with the identifier
+	while (current_symbol->next)
+	{
+		symbol* temp	= current_symbol;
+		current_symbol	= current_symbol->next;
+		if (strcmp(identifier, current_symbol->identifier) == 0)
+		{
+			temp->next = current_symbol->next;
+			symbol_free(current_symbol);
+			break;
+		}
+	}
+}
+
+// -----------------------------------------------------------------------------
 // lookup an identifier in the symbol-table
 //  	if there was no symbol found, that matches the key-value, the function
 //  	returns a NULL-pointer.

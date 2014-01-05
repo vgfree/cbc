@@ -49,6 +49,7 @@ typedef struct symbol_t
 // interface functions
 symbol* symtab_create();
 void symtab_append(symbol* symtab, symbol* s, syntree* stmtlist);
+void symtab_remove(symbol* symtab, char* identifier);
 symbol* symtab_lookup(symbol* symtab, char* key);
 void symtab_free(symbol* symtab);
 symbol* symbol_create(enum symbol_type_t type, char* identifier);
