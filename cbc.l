@@ -45,7 +45,7 @@
 				return BOOLEAN;
 			}
 			
-			/* identifier */
+			/* identifiers */
 [_a-zA-Z][_a-zA-Z0-9]*	{
 				yylval.id = strdup(yytext);
 				return IDENTIFIER;
@@ -99,7 +99,7 @@
 [ \t\n]+	{ ; }	// ignore
 			
 			/* anything else */
-.			{ yyerror("unknown character `%c'.", *yytext); }
+.			{ yyerror("unexpected character `%c'.", *yytext); }
 
 
 %%	/* ROUTINES ------------------------------------------------------------- */
