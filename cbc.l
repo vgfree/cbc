@@ -55,11 +55,21 @@
 \'([^']|'')*\' {
 				// string literals are always in one line only.
 				// the apostrophe can be escaped by writing a double apostrophe.
-				char* str			= (char*) malloc(yyleng - 1);
-				*str				= '\0';	// terminate string
+				char* str	= (char*) malloc(yyleng - 1);
+				*str		= '\0';	// terminate string
 				// omit first and last char, which are both an apostrophe
 				yytext[yyleng - 1]	= '\0';
 				strcpy(str, (yytext + 1));
+				// replace all occourences of a double apostrophe with a single
+				// one
+				char* p		= str;
+				char* found	= NULL;
+				while (found = strstr(p, "''"))
+				{
+					*found	= '\0';
+					p		= found + 1;
+					strcat(str, p);
+				}
 				
 				yylval.str = str;
 				return STRING;
