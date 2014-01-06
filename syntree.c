@@ -8,6 +8,7 @@
 #include "syntree.h"
 #include "symref.h"
 #include "fncall.h"
+#include "fndecl.h"
 #include "errors.h"
 
 // -----------------------------------------------------------------------------
@@ -147,7 +148,6 @@ void syntree_free(syntree* node)
 		case '/':
 		case SNT_ASSIGNMENT:
 		case SNT_STATEMENTLIST:
-		case SNT_FUNC_DECL:
 			syntree_free(node->r);
 			// no break here to free left child-node as well
 		
@@ -159,6 +159,7 @@ void syntree_free(syntree* node)
 		
 		// no child-nodes
 		case SNT_SYMREF:
+		case SNT_FUNC_DECL:
 		case SNT_FUNC_CALL:
 			break;
 		
@@ -224,43 +225,17 @@ cbvalue* eval(syntree* node)
 			break;
 		
 		case SNT_DECLARATION:
-		{
-			symbol* sym = ((symref*) node->l)->sym;
-			// check if symbol already exists in symbol-table
-			symbol* found = symtab_lookup(gl_symtab, sym->identifier);
-			if (found)
-				// TODO: memory-leaks here!
-				yyerror("cannot redeclare symbol: %s", sym->identifier);
-			else
-			{
-				symbol_settype(sym, SYM_VARIABLE);
-				symtab_append(gl_symtab, sym, NULL);
-				// symbol was duplicated -> free old one
-				symbol_free(sym);
-			}
+			symbol_settype(((symref*) node->l)->sym, SYM_VARIABLE);
+			variable_declare(gl_symtab, ((symref*) node->l)->sym);
 			// return empty value
 			result = cbvalue_create();
 			break;
-		}
 		
 		case SNT_FUNC_DECL:
-		{
-			symbol* sym = ((symref*) node->l)->sym;
-			// check if symbol already exists in symbol-table
-			symbol* found = symtab_lookup(gl_symtab, sym->identifier);
-			if (found)
-				yyerror("cannot redeclare symbol: %s", sym->identifier);
-			else
-			{
-				symbol_settype(sym, SYM_FUNCTION);
-				symtab_append(gl_symtab, sym, node->r);
-				// symbol was duplicated -> free old one
-				symbol_free(sym);
-			}
+			function_declare(gl_symtab, ((fndecl*) node)->sym);
 			// return empty value
 			result = cbvalue_create();
 			break;
-		}
 		
 		case SNT_PRINT:
 		{
@@ -275,11 +250,49 @@ cbvalue* eval(syntree* node)
 		}
 		
 		case SNT_FUNC_CALL:
+		{
 			// symref_setsymbolfromtable can be used in this case, since both
 			// structs have the same signature
 			symref_setsymbolfromtable((symref*) node);
-			result = eval(((fncall*) node)->sym->function);
+			
+			symbol* f = ((fncall*) node)->sym;
+			// validate function-parameters
+			if (f->func->params)
+			{
+				// declare all parameters in the global symbol-table.
+				// since all parameters are already concatenated through their
+				// 'next'-member, all parameters are declared in the global
+				// symbol-table at the same time.
+				variable_declare(gl_symtab,
+										((symref*) f->func->params)->sym->next);
+			}
+			
+			// execute function
+			result = eval(f->func->body);
+			
+			// remove parameters from the global symbol-table after function-
+			// execution
+			if (f->func->params)
+			{
+				symbol* current_param = ((symref*) f->func->params)->sym->next;
+				// undeclare all parameters
+				while (current_param)
+				{
+					// current_param will be freed indirectly in symtab_remove!
+					// that is, we need to store the 'next' pointer into temp.
+					symbol* temp = current_param->next;
+					symtab_remove(gl_symtab, current_param->identifier);
+					current_param = temp;
+				}
+				// finally, free the temporary symbol-table.
+				// NOTE: do not use 'symtab_free' to free the table in this case,
+				//       since the table-items are already freed by calling
+				//       'symtab_remove'.
+				free(((symref*) f->func->params)->sym);
+			}
+			
 			break;
+		}
 		
 		case SNT_FLOW_IF:
 		{

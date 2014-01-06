@@ -8,6 +8,7 @@
 #include "symtab.h"
 #include "symref.h"
 #include "fncall.h"
+#include "fndecl.h"
 
 syntree* result_tree;
 
@@ -15,6 +16,7 @@ syntree* result_tree;
 
 %union {
 	syntree* ast;
+	struct symbol_t* sym;
 	char* id;
 	cbstring str;
 	cbboolean boolval;
@@ -38,7 +40,8 @@ syntree* result_tree;
 
 %nonassoc	<cmp>	COMPARE
 
-%type <ast> decllist decl stmtlist stmt id expr
+%type <ast> decllist decl paramlist_decl stmtlist stmt id expr
+%type <sym> params_decl
 
 
 %%	/* RULES ---------------------------------------------------------------- */
@@ -56,6 +59,31 @@ decllist:
 	| decl ',' decllist			{
 									$$ = syntree_create(SNT_STATEMENTLIST,
 														$1, $3);
+								}
+	;
+
+paramlist_decl:
+	params_decl					{ $$ = symref_create($1); }
+	|							{ $$ = NULL; }	// NULL
+
+params_decl:
+	IDENTIFIER					{
+									symbol* symtab	= symtab_create();
+									symbol* sym		= symbol_create(SYM_VARIABLE,
+																	$1);
+									// identifier was copied in symbol creation
+									// -> free identifier-string
+									free($1);
+									variable_declare(symtab, sym);
+									$$ = symtab;
+								}
+	| params_decl ',' IDENTIFIER{
+									symbol* sym = symbol_create(SYM_VARIABLE, $3);
+									// identifier was copied in symbol creation
+									// -> free identifier-string
+									free($3);
+									variable_declare($1, sym);
+									$$ = $1;
 								}
 	;
 
@@ -96,23 +124,25 @@ stmt:
 									$$ = flow_create(	SNT_FLOW_WHILE, $2, $4,
 														NULL);
 								}
-	| FUNCTION id '(' ')' stmtlist END	{
-									// IMPORTANT NOTE:
-									// since the stmtlist is passed as right
-									// child node to the SNT_FUNC_DECL node,
-									// the stmtlist will be automatically freed
-									// when the syntax-tree is freed.
-									$$ = syntree_create(SNT_FUNC_DECL, $2, $5);
+	|	FUNCTION IDENTIFIER '(' paramlist_decl ')'
+			stmtlist
+		END						{
+									symbol* f = symbol_create(SYM_UNDEFINED, $2);
+									$$ = fndecl_create(f, $6, $4);
+									// identifier was copied in symbol creation
+									// -> free identifier-string
+									free($2);
 								}
 	| PRINT expr				{ $$ = syntree_create(SNT_PRINT, $2, NULL); }
 	;
 
 id:
 	IDENTIFIER					{
+									// TODO: result should be a symbol!
 									$$ = symref_create(
 											symbol_create(SYM_UNDEFINED, $1));
-									// string was copied in symbol creation
-									// -> free string
+									// identifier was copied in symbol creation
+									// -> free identifier-string
 									free($1);
 								}
 	;
@@ -128,8 +158,8 @@ expr:
 	| IDENTIFIER '(' ')'		{
 									$$ = fncall_create(
 											symbol_create(SYM_UNDEFINED, $1));
-									// string was copied in symbol creation
-									// -> free string
+									// identifier was copied in symbol creation
+									// -> free identifier-string
 									free($1);
 								}
 	| id ASSIGN expr			{ $$ = syntree_create(SNT_ASSIGNMENT, $1, $3); }

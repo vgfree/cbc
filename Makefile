@@ -9,7 +9,7 @@ TLEX	:= $(TARGET)_lex.c
 TYACC	:= $(TARGET)_parse.c
 HYACC	:= $(TYACC:%.c=%.h)
 SRC		:=	$(TYACC) $(TLEX) syntree.c symtab.c symref.c fncall.c errors.c\
-			cbvalues.c
+			cbvalues.c fndecl.c
 OBJ		:= $(SRC:%.c=%.o)
 CFLAGS	:= 
 LDFLAGS	:= 
