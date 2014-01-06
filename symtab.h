@@ -22,6 +22,13 @@ enum symbol_type_t
 	SYM_FUNCTION
 };
 
+// function parameter declaration and body
+typedef struct
+{
+	syntree* params;
+	syntree* body;
+} function;
+
 // symbol structure:
 // a symbol either represents a variable or a function.
 // therefore the specific elements of a symbol are contained within an union.
@@ -39,7 +46,7 @@ typedef struct symbol_t
 		// symbol-value
 		cbvalue* value;
 		// function-code
-		syntree* function;
+		function* func;
 	};
 	
 	// next symbol
@@ -48,13 +55,20 @@ typedef struct symbol_t
 
 // interface functions
 symbol* symtab_create();
-void symtab_append(symbol* symtab, symbol* s, syntree* stmtlist);
+void symtab_append(symbol* symtab, symbol* s);
 void symtab_remove(symbol* symtab, char* identifier);
 symbol* symtab_lookup(symbol* symtab, char* key);
 void symtab_free(symbol* symtab);
+
 symbol* symbol_create(enum symbol_type_t type, char* identifier);
 void symbol_settype(symbol* s, enum symbol_type_t type);
 void symbol_free(symbol* s);
+
+function* function_create();
+void function_free(function* f);
+
+void function_declare(symbol* symtab, symbol* s);
+void variable_declare(symbol* symtab, symbol* s);
 
 // global symbol-table, has to be initialized and freed in the main-function
 symbol* gl_symtab;

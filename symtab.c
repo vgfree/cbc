@@ -21,7 +21,7 @@ symbol* symtab_create()
 // whereas the function-symbols have an optional statement-list, that contains
 // the function-code.
 // -----------------------------------------------------------------------------
-void symtab_append(symbol* symtab, symbol* s, syntree* stmtlist)
+void symtab_append(symbol* symtab, symbol* s)
 {
 	// check for a valid symbol-table
 	if (symtab->type != SYM_SYMTAB)
@@ -35,23 +35,7 @@ void symtab_append(symbol* symtab, symbol* s, syntree* stmtlist)
 	while (current_symbol->next)
 		current_symbol = current_symbol->next;
 	
-	// copy symbol
-	symbol* newsym = symbol_create(s->type, s->identifier);
-	
-	switch (s->type)
-	{
-		case SYM_VARIABLE:
-			// assign new value
-			cbvalue_assign(s->value, newsym->value);
-			break;
-		
-		case SYM_FUNCTION:
-			// set function-body, if symbol represents a function
-			newsym->function = stmtlist;
-			break;
-	}
-	
-	current_symbol->next = newsym;
+	current_symbol->next = s;
 }
 
 // -----------------------------------------------------------------------------
@@ -113,6 +97,29 @@ symbol* symtab_lookup(symbol* symtab, char* key)
 }
 
 // -----------------------------------------------------------------------------
+// declare symbol in the symbol-table.
+// this function requires a predefined symbol to be passed as second parameter.
+// -----------------------------------------------------------------------------
+void symtab_declare(symbol* symtab, symbol* s)
+{
+	// check for a valid symbol-table
+	if (symtab->type != SYM_SYMTAB)
+	{
+		yyerror("not a valid symbol-table");
+		exit(1);
+	}
+	
+	// check if symbol already exists in symbol-table
+	if (symtab_lookup(symtab, s->identifier))
+	{
+		yyerror("cannot redeclare symbol: %s", s->identifier);
+		exit(1);
+	}
+	else
+		symtab_append(symtab, s);
+}
+
+// -----------------------------------------------------------------------------
 // free symbol-table
 // -----------------------------------------------------------------------------
 void symtab_free(symbol* symtab)
@@ -170,6 +177,7 @@ void symbol_settype(symbol* s, enum symbol_type_t type)
 	if (s->type == type)
 		return;
 	
+	// variable specific
 	if (type == SYM_VARIABLE)
 		// variable-symbols and undefined symbols need a value attribute!
 		s->value = cbvalue_create();
@@ -177,6 +185,13 @@ void symbol_settype(symbol* s, enum symbol_type_t type)
 		// if symbol turns from a variable to anything else, the value
 		// attribute needs to be freed explicitly
 		cbvalue_free(s->value);
+	
+	// function specific
+	if (type == SYM_FUNCTION)
+		// function-symbols need a func attribute!
+		s->func = function_create();
+	else if (s->type == SYM_FUNCTION)
+		function_free(s->func);
 	
 	// finally, set the new type of the symbol
 	s->type = type;
@@ -190,9 +205,61 @@ void symbol_free(symbol* s)
 	if (!s)
 		return;
 	
-	if (s->type == SYM_VARIABLE)
-		cbvalue_free(s->value);
+	// set type to undefined, to automatically free the appropriate attributes
+	symbol_settype(s, SYM_UNDEFINED);
 	
 	free(s->identifier);
 	free(s);
+}
+
+// -----------------------------------------------------------------------------
+// create function
+// -----------------------------------------------------------------------------
+function* function_create()
+{
+	function* f	= malloc(sizeof(function));
+	f->params	= NULL;
+	f->body		= NULL;
+	
+	return f;
+}
+
+// -----------------------------------------------------------------------------
+// free function
+// -----------------------------------------------------------------------------
+void function_free(function* f)
+{
+	if (f->params)
+		syntree_free(f->params);
+	
+	syntree_free(f->body);
+	free(f);
+}
+
+// -----------------------------------------------------------------------------
+// declare a function
+// -----------------------------------------------------------------------------
+void function_declare(symbol* symtab, symbol* s)
+{
+	if(s->type != SYM_FUNCTION)
+	{
+		yyerror("wrong symbol-type, expecting SYM_FUNCTION");
+		exit(1);
+	}
+	
+	symtab_declare(symtab, s);
+}
+
+// -----------------------------------------------------------------------------
+// declare a variable
+// -----------------------------------------------------------------------------
+void variable_declare(symbol* symtab, symbol* s)
+{
+	if(s->type != SYM_VARIABLE)
+	{
+		yyerror("wrong symbol-type, expecting SYM_VARIABLE");
+		exit(1);
+	}
+	
+	symtab_declare(symtab, s);
 }
