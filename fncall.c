@@ -9,7 +9,7 @@
 // -----------------------------------------------------------------------------
 // create a function-call-node
 // -----------------------------------------------------------------------------
-syntree* fncall_create(symbol* s)
+syntree* fncall_create(symbol* s, syntree* params)
 {
 	fncall* node = malloc(sizeof(fncall));
 	if (!node)
@@ -20,6 +20,8 @@ syntree* fncall_create(symbol* s)
 	
 	node->type	= SNT_FUNC_CALL;
 	node->sym	= s;
+	node->params= params;
 	
 	return (syntree*) node;
 }
+

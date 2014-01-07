@@ -160,10 +160,15 @@ void syntree_free(syntree* node)
 		// no child-nodes
 		case SNT_SYMREF:
 		case SNT_FUNC_DECL:
-		case SNT_FUNC_CALL:
 			break;
 		
 		// special nodes
+		case SNT_LIST:
+			syntree_free(node->r);
+			if (node->l)
+				syntree_free(node->l);
+			break;
+		
 		case SNT_FLOW_IF:
 		case SNT_FLOW_WHILE:
 			syntree_free(((flow*) node)->cond);
@@ -171,6 +176,11 @@ void syntree_free(syntree* node)
 				syntree_free(((flow*) node)->tb);
 			if (((flow*) node)->fb)	// false-branch
 				syntree_free(((flow*) node)->fb);
+			break;
+		
+		case SNT_FUNC_CALL:
+			if (((fncall*) node)->params)
+				syntree_free(((fncall*) node)->params);
 			break;
 		
 		case SNT_CONSTVAL:
@@ -255,9 +265,10 @@ cbvalue* eval(syntree* node)
 			// structs have the same signature
 			symref_setsymbolfromtable((symref*) node);
 			
-			symbol* f = ((fncall*) node)->sym;
+			syntree* params	= ((fncall*) node)->params;
+			symbol* f		= ((fncall*) node)->sym;
 			// validate function-parameters
-			if (f->func->params)
+			if (f->func->params && params)
 			{
 				// declare all parameters in the global symbol-table.
 				// since all parameters are already concatenated through their
@@ -265,6 +276,26 @@ cbvalue* eval(syntree* node)
 				// symbol-table at the same time.
 				variable_declare(gl_symtab,
 										((symref*) f->func->params)->sym->next);
+				
+				// assign parameter-values to previously defined
+				// parameter-symbols
+				syntree* current_value	= params;
+				symbol* current_param	= ((symref*) f->func->params)->sym->next;
+				while (current_param && current_value)
+				{
+					cbvalue_assign_freesource(	eval(current_value->r),
+												current_param->value);
+					
+					current_param = current_param->next;
+					current_value = current_value->l;
+				}
+				// check if there is a parameter or a value pending
+				if (current_param || current_value)
+				{
+					yyerror("parameter count does not match the count passed "\
+							"values");
+					exit(1);
+				}
 			}
 			
 			// execute function

@@ -40,7 +40,7 @@ syntree* result_tree;
 
 %nonassoc	<cmp>	COMPARE
 
-%type <ast> decllist decl paramlist_decl stmtlist stmt expr
+%type <ast> decllist decl paramlist_decl stmtlist stmt exprlist expressions expr
 %type <sym> params_decl id
 
 
@@ -133,6 +133,19 @@ id:
 								}
 	;
 
+exprlist:
+	expressions					{ $$ = $1; }
+	|							{ $$ = NULL; } // NULL
+	;
+
+expressions:
+	expr						{ $$ = syntree_create(SNT_LIST, NULL, $1); }
+	| expressions ',' expr		{
+									$1->l = syntree_create(SNT_LIST, NULL, $3);
+									$$ = $1;
+								}
+	;
+
 expr:
 	NUMBER						{ $$ = constval_create($1); }
 	| BOOLEAN					{ $$ = constbool_create($1); }
@@ -141,7 +154,7 @@ expr:
 									free($1);
 								}
 	| id						{ $$ = symref_create($1); }
-	| id '(' ')'				{ $$ = fncall_create($1); }
+	| id '(' exprlist ')'		{ $$ = fncall_create($1, $3); }
 	| id ASSIGN expr			{
 									$$ = syntree_create(SNT_ASSIGNMENT,
 														symref_create($1), $3);

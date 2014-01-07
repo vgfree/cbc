@@ -16,6 +16,7 @@ enum syn_nodetype_t
 	SNT_STATEMENTLIST,
 	SNT_FUNC_DECL,
 	SNT_FUNC_CALL,
+	SNT_LIST,
 	// the following node-types have one child-node
 	SNT_UNARYMINUS,
 	SNT_DECLARATION,
