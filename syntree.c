@@ -293,7 +293,7 @@ cbvalue* eval(syntree* node)
 				if (current_param || current_value)
 				{
 					yyerror("parameter count does not match the count of "\
-							"passed values arguments");
+							"passed arguments");
 					exit(1);
 				}
 			}
