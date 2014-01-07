@@ -127,6 +127,7 @@ check_cbc_error	"error: syntax error"						","
 check_cbc_error	"error: division by zero is not allowed!"	"3 / 0,"
 check_cbc_error	"error: undefined symbol: foo"				"foo,"
 check_cbc_error	"error: undefined symbol: foo"				"function Foobar(foo) foo := foo + 100, end, Foobar(11), foo,"
+check_cbc_error	"error: expecting boolean expression"		"| foo | foo := 0, if foo then 1, else 2, endif,"
 
 echo "---------------------------"
 echo "EXECUTED CHECKS: $checks"
