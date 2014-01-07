@@ -6,6 +6,7 @@ successes=0
 
 # constants
 noval="<no value returned>"
+err_param_count_mismatch="error: parameter count does not match the count of passed arguments"
 
 ################################################################################
 
@@ -110,9 +111,11 @@ check_cbc	"1"			"| foo | foo := 1, if foo >= 5 then 5, else 1, endif,"
 check_cbc	"5"			"| foo | foo := 5, if foo <= 5 then 5, else 1, endif,"
 check_cbc	"5"			"| foo | foo := 1, if foo <= 5 then 5, else 1, endif,"
 check_cbc	"5"			"| foo, bar, baz | foo := 1, bar := 2, baz := 5, if foo < bar then baz, else 1, endif,"
+# checks (functions)
 check_cbc	"14"		"| foo | function bar () foo := foo + 2, end, foo := 10, bar(), bar(),"
 check_cbc	"2"			"function Inc(num) num := num + 1, end, Inc(1),"
 check_cbc	"15"		"function Add(num1, num2) num1 + num2, end, Add(5, 10),"
+# checks (data-types: strings, boolean expressions, etc.)
 check_cbc	"True"		"| foo, bar, baz | foo := 1, bar := 2, if foo < bar then baz := True, else baz := False, endif, baz,"
 check_cbc	"True"		"| foo | foo := 'foobarbaz', foo = 'foobarbaz',"
 check_cbc	"False"		"| foo | foo := 'foobarbaz', foo = 'foobar',"
@@ -128,6 +131,8 @@ check_cbc_error	"error: division by zero is not allowed!"	"3 / 0,"
 check_cbc_error	"error: undefined symbol: foo"				"foo,"
 check_cbc_error	"error: undefined symbol: foo"				"function Foobar(foo) foo := foo + 100, end, Foobar(11), foo,"
 check_cbc_error	"error: expecting boolean expression"		"| foo | foo := 0, if foo then 1, else 2, endif,"
+check_cbc_error	"$err_param_count_mismatch"					"function foo(bar) bar, end, foo(123, 456),"
+check_cbc_error	"$err_param_count_mismatch"					"function foo(bar, baz) bar, end, foo(123),"
 
 echo "---------------------------"
 echo "EXECUTED CHECKS: $checks"
