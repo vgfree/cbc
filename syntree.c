@@ -332,10 +332,15 @@ cbvalue* eval(syntree* node)
 		
 		case SNT_FLOW_IF:
 		{
-			// evaluate condition and check its result:
-			// every non-zero value is considered as true.
+			// evaluate condition and check its result
 			cbvalue* condition = eval(((flow*) node)->cond);
-			if (condition->value != 0)
+			if (!cbvalue_istype(VT_BOOLEAN, condition))
+			{
+				yyerror("expecting boolean expression");
+				exit(1);
+			}
+			
+			if (condition->boolean)
 				result = eval(((flow*) node)->tb);	// condition is ture:
 													// take the true-branch
 			else
@@ -348,15 +353,22 @@ cbvalue* eval(syntree* node)
 		
 		case SNT_FLOW_WHILE:
 		{
-			cbvalue* temp;
-			// evaluate true-branch while the condition returns a non-zero value
-			while ( (temp = eval(((flow*) node)->cond))->value != 0)
+			cbvalue* temp = eval(((flow*) node)->cond);
+			if (!cbvalue_istype(VT_BOOLEAN, temp))
+			{
+				yyerror("expecting boolean expression");
+				exit(1);
+			}
+			
+			// evaluate true-branch while the condition returns true
+			while (temp->boolean)
 			{
 				cbvalue_free(temp);
 				if (result)
 					cbvalue_free(result);
 				
-				result = eval(((flow*) node)->tb);
+				result	= eval(((flow*) node)->tb);
+				temp	= eval(((flow*) node)->cond);
 			}
 			break;
 		}
