@@ -292,8 +292,8 @@ cbvalue* eval(syntree* node)
 				// check if there is a parameter or a value pending
 				if (current_param || current_value)
 				{
-					yyerror("parameter count does not match the count passed "\
-							"values");
+					yyerror("parameter count does not match the count of "\
+							"passed values arguments");
 					exit(1);
 				}
 			}
@@ -319,7 +319,12 @@ cbvalue* eval(syntree* node)
 				// NOTE: do not use 'symtab_free' to free the table in this case,
 				//       since the table-items are already freed by calling
 				//       'symtab_remove'.
+				// TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+				// freeing all parameter-symbols will result in not being able
+				// to call the function a second time, since the
+				// parameter-symbols do not exist anymore!
 				free(((symref*) f->func->params)->sym);
+				// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 			}
 			
 			break;
