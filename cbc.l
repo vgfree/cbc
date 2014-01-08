@@ -5,9 +5,7 @@
 
 %{
 
-#include <stdio.h>
 #include <stdlib.h>
-#include <stdarg.h>
 #include "syntree.h"
 #include "cbc_parse.h"
 #include "errors.h"
