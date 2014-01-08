@@ -46,7 +46,7 @@
 			}
 			
 			/* identifiers */
-[_a-zA-Z][_a-zA-Z0-9]*	{
+[_a-zA-Z][_a-zA-Z0-9]* {
 				yylval.id = strdup(yytext);
 				return IDENTIFIER;
 			}
@@ -57,11 +57,15 @@
 				// the apostrophe can be escaped by writing a double apostrophe.
 				char* str	= (char*) malloc(yyleng - 1);
 				*str		= '\0';	// terminate string
+				
 				// omit first and last char, which are both an apostrophe
 				yytext[yyleng - 1]	= '\0';
 				strcpy(str, (yytext + 1));
+				
 				// replace all occourences of a double apostrophe with a single
-				// one
+				// one.
+				// ATTENTION:	this causes a source and destination overlap in
+				//				strcat!
 				char* p		= str;
 				char* found	= NULL;
 				while (found = strstr(p, "''"))
