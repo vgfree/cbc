@@ -20,7 +20,7 @@
 
 			/* numbers */
 [0-9]+		{
-				yylval.value = atoi(yytext);
+				yylval.val = atoi(yytext);
 				return NUMBER;
 			}
 			

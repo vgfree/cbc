@@ -20,7 +20,7 @@ syntree* result_tree;
 	char* id;
 	cbstring str;
 	cbboolean boolval;
-	cbnumeric value;
+	cbnumeric val;
 	enum comparisontype_t cmp;
 };
 
@@ -29,7 +29,7 @@ syntree* result_tree;
 %token				PRINT
 %token				IF THEN ELSE ENDIF
 %token				WHILE DO END
-%token	<value>		NUMBER
+%token	<val>		NUMBER
 %token	<id>		IDENTIFIER
 %token	<str>		STRING
 %token	<boolval>	BOOLEAN
