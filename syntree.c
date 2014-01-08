@@ -179,8 +179,8 @@ void syntree_free(syntree* node)
 			break;
 		
 		case SNT_FUNC_CALL:
-			if (((fncall*) node)->params)
-				syntree_free(((fncall*) node)->params);
+			if (((fncall*) node)->args)
+				syntree_free(((fncall*) node)->args);
 			break;
 		
 		case SNT_CONSTVAL:
@@ -261,14 +261,15 @@ cbvalue* eval(syntree* node)
 		
 		case SNT_FUNC_CALL:
 		{
-			// symref_setsymbolfromtable can be used in this case, since both
+			// 'symref_setsymbolfromtable' can be used in this case, since both
 			// structs have the same signature
 			symref_setsymbolfromtable((symref*) node);
 			
-			syntree* params	= ((fncall*) node)->params;
+			syntree* args	= ((fncall*) node)->args;
 			symbol* f		= ((fncall*) node)->sym;
-			// validate function-parameters
-			if (f->func->params && params)
+			
+			// validate function-parameters and arguments
+			if (f->func->params && args)
 			{
 				// declare all parameters in the global symbol-table.
 				// since all parameters are already concatenated through their
@@ -277,20 +278,20 @@ cbvalue* eval(syntree* node)
 				variable_declare(gl_symtab,
 										((symref*) f->func->params)->sym->next);
 				
-				// assign parameter-values to previously defined
-				// parameter-symbols
-				syntree* current_value	= params;
+				// assign arguments to previously defined parameter-symbols
+				syntree* current_arg	= args;
 				symbol* current_param	= ((symref*) f->func->params)->sym->next;
-				while (current_param && current_value)
+				while (current_param && current_arg)
 				{
-					cbvalue_assign_freesource(	eval(current_value->r),
+					cbvalue_assign_freesource(	eval(current_arg->r),
 												current_param->value);
-					
+					// next parameter and next argument
 					current_param = current_param->next;
-					current_value = current_value->l;
+					current_arg = current_arg->l;
 				}
-				// check if there is a parameter or a value pending
-				if (current_param || current_value)
+				
+				// check if there are any parameters or arguments pending
+				if (current_param || current_arg)
 				{
 					yyerror("parameter count does not match the count of "\
 							"passed arguments");

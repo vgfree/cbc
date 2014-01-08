@@ -17,11 +17,11 @@ typedef struct
 	enum syn_nodetype_t type;
 	// symbol
 	symbol* sym;
-	// parameters
-	syntree* params;
+	// arguments
+	syntree* args;
 } fncall;
 
 // interface functions
-syntree* fncall_create(symbol* s, syntree* params);
+syntree* fncall_create(symbol* s, syntree* args);
 
 #endif // FNCALL_H
