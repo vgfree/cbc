@@ -40,8 +40,8 @@ syntree* result_tree;
 
 %nonassoc	<cmp>	COMPARE
 
-%type <ast> decllist decl paramlist_decl stmtlist stmt exprlist expressions expr
-%type <sym> params_decl id
+%type <ast> decllist decl stmtlist stmt exprlist expr params args
+%type <sym> paramlist id
 
 
 %%	/* RULES ---------------------------------------------------------------- */
@@ -62,18 +62,18 @@ decllist:
 								}
 	;
 
-paramlist_decl:
-	params_decl					{ $$ = symref_create($1); }
+params:
+	paramlist					{ $$ = symref_create($1); }
 	|							{ $$ = NULL; }	// NULL
 
-params_decl:
+paramlist:
 	id							{
 									symbol* symtab	= symtab_create();
 									symbol_settype($1, SYM_VARIABLE);
 									variable_declare(symtab, $1);
 									$$ = symtab;
 								}
-	| params_decl ',' id		{
+	| paramlist ',' id			{
 									symbol_settype($3, SYM_VARIABLE);
 									variable_declare($1, $3);
 									$$ = $1;
@@ -118,7 +118,7 @@ stmt:
 									$$ = flow_create(	SNT_FLOW_WHILE, $2, $4,
 														NULL);
 								}
-	|	FUNCTION id '(' paramlist_decl ')'
+	|	FUNCTION id '(' params ')'
 			stmtlist
 		END						{ $$ = fndecl_create($2, $6, $4); }
 	| PRINT expr				{ $$ = syntree_create(SNT_PRINT, $2, NULL); }
@@ -133,14 +133,14 @@ id:
 								}
 	;
 
-exprlist:
-	expressions					{ $$ = $1; }
+args:
+	exprlist					{ $$ = $1; }
 	|							{ $$ = NULL; } // NULL
 	;
 
-expressions:
+exprlist:
 	expr						{ $$ = syntree_create(SNT_LIST, NULL, $1); }
-	| expressions ',' expr		{
+	| exprlist ',' expr			{
 									$1->l = syntree_create(SNT_LIST, NULL, $3);
 									$$ = $1;
 								}
@@ -154,7 +154,7 @@ expr:
 									free($1);
 								}
 	| id						{ $$ = symref_create($1); }
-	| id '(' exprlist ')'		{ $$ = fncall_create($1, $3); }
+	| id '(' args ')'			{ $$ = fncall_create($1, $3); }
 	| id ASSIGN expr			{
 									$$ = syntree_create(SNT_ASSIGNMENT,
 														symref_create($1), $3);
