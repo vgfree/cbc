@@ -18,37 +18,36 @@ syntree* symref_create(symbol* s)
 		exit(1);
 	}
 	
-	node->type	= SNT_SYMREF;
-	node->sym	= s;
+	node->type		= SNT_SYMREF;
+	node->sym		= s;
+	node->table_sym	= NULL;
 	
 	return (syntree*) node;
 }
 
 // -----------------------------------------------------------------------------
-// this function replaces the 'sym'-member in the passed symref-struct with the
-// "actual" reference to the symbol in the symbol-table, if it exists.
-// furthermore, the old dummy symbol will be freed since it isn't necessary
-// anymore.
-// if there is no such a symbol in the symbol-table, everything stays as it is.
+// this function expects a symbol with the given identifier to exist in the
+// global symbol-table.
+// if there is no such a symbol, an error will be raised.
 // -----------------------------------------------------------------------------
 void symref_setsymbolfromtable(symref* node)
 {
-	symbol* sym = node->sym;
-	// check if symbol is already defined
-	if (sym->type != SYM_UNDEFINED)
-		return;	// symbol is "defined", that means it is contained in the
-				// symbol-table -> nothing has to be done.
+	symbol* table_sym = node->table_sym;
 	
-	symbol* dummy	= sym;	// remember dummy-symbol
-	sym				= symtab_lookup(gl_symtab, sym->identifier);
+	// check if reference to the instance in the symbol-table exists
+	if (table_sym)
+		return;	// reference to symbol in the global symbol-table is already
+				// available -> nothing has to be done.
+	
+	// get symbol-reference
+	symbol* dummy = symtab_lookup(gl_symtab, node->sym->identifier);
+	
 	// if there is no such a symbol -> error
-	if (!sym)
+	if (!dummy)
 	{
-		yyerror("undefined symbol: %s", dummy->identifier);
+		yyerror("undefined symbol: %s", node->sym->identifier);
 		exit(1);
 	}
-	// replace dummy-symbol with the actual symbol in the symbol-table
-	node->sym = sym;
-	// free dummy-symbol
-	symbol_free(dummy);
+	// symbol was found -> store reference
+	node->table_sym = dummy;
 }

@@ -157,7 +157,6 @@ void syntree_free(syntree* node)
 			syntree_free(node->l);
 		
 		// no child-nodes
-		case SNT_SYMREF:
 		case SNT_FUNC_DECL:
 			break;
 		
@@ -166,6 +165,11 @@ void syntree_free(syntree* node)
 			syntree_free(node->r);
 			if (node->l)
 				syntree_free(node->l);
+			break;
+		
+		case SNT_SYMREF:
+			// free dummy-symbol
+			symbol_free(((symref*) node)->sym);
 			break;
 		
 		case SNT_FLOW_IF:
@@ -218,30 +222,33 @@ cbvalue* eval(syntree* node)
 		
 		case SNT_SYMREF:
 			symref_setsymbolfromtable((symref*) node);
-			
-			if (((symref*) node)->sym->type == SYM_UNDEFINED)
-				result = cbvalue_create();			// return empty value
-			else
-				result = cbvalue_copy(((symref*) node)->sym->value);
-			
+			result = cbvalue_copy(((symref*) node)->table_sym->value);
 			break;
 		
 		case SNT_ASSIGNMENT:
-			symref_setsymbolfromtable((symref*) node->l);
-			cbvalue_assign_freesource(	eval(node->r),
-										((symref*) node->l)->sym->value);
-			result = cbvalue_copy(((symref*) node->l)->sym->value);
+		{
+			symref* sr = (symref*) node->l;
+			symref_setsymbolfromtable(sr);
+			cbvalue_assign_freesource(eval(node->r), sr->table_sym->value);
+			result = cbvalue_copy(sr->table_sym->value);
 			break;
+		}
 		
 		case SNT_DECLARATION:
-			symbol_settype(((symref*) node->l)->sym, SYM_VARIABLE);
-			variable_declare(gl_symtab, ((symref*) node->l)->sym);
+		{
+			symref* sr = (symref*) node->l;
+			// dummy-symbol 'sym' must be freed separately -> copy symbol
+			symbol* copy = symbol_create(SYM_VARIABLE, sr->sym->identifier);
+			variable_declare(gl_symtab, copy);
 			// return empty value
 			result = cbvalue_create();
 			break;
+		}
 		
 		case SNT_FUNC_DECL:
+			// TODO: due to changes in 'symref' this wont work anymore! --------
 			function_declare(gl_symtab, ((fndecl*) node)->sym);
+			// -----------------------------------------------------------------
 			// return empty value
 			result = cbvalue_create();
 			break;
@@ -258,7 +265,7 @@ cbvalue* eval(syntree* node)
 			break;
 		}
 		
-		case SNT_FUNC_CALL:
+		case SNT_FUNC_CALL: // TODO: due to changes in 'symref' this wont work anymore!
 		{
 			// 'symref_setsymbolfromtable' can be used in this case, since both
 			// structs have the same signature
@@ -332,7 +339,6 @@ cbvalue* eval(syntree* node)
 		
 		case SNT_FLOW_IF:
 		{
-			// evaluate condition and check its result
 			cbvalue* condition = eval(((flow*) node)->cond);
 			if (!cbvalue_istype(VT_BOOLEAN, condition))
 			{
@@ -340,6 +346,7 @@ cbvalue* eval(syntree* node)
 				exit(1);
 			}
 			
+			// evaluate condition and check its result
 			if (condition->boolean)
 				result = eval(((flow*) node)->tb);	// condition is ture:
 													// take the true-branch
