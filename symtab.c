@@ -202,9 +202,6 @@ void symbol_settype(symbol* s, enum symbol_type_t type)
 // -----------------------------------------------------------------------------
 void symbol_free(symbol* s)
 {
-	if (!s)
-		return;
-	
 	// set type to undefined, to automatically free the appropriate attributes
 	symbol_settype(s, SYM_UNDEFINED);
 	
