@@ -384,6 +384,9 @@ cbvalue* eval(syntree* node)
 				result	= eval(((flow*) node)->tb);
 				temp	= eval(((flow*) node)->cond);
 			}
+			
+			// free last dummy-value
+			cbvalue_free(temp);
 			break;
 		}
 		
