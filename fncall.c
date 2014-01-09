@@ -18,9 +18,10 @@ syntree* fncall_create(symbol* s, syntree* args)
 		exit(1);
 	}
 	
-	node->type	= SNT_FUNC_CALL;
-	node->sym	= s;
-	node->args	= args;
+	node->type		= SNT_FUNC_CALL;
+	node->sym		= s;
+	node->table_sym	= NULL;
+	node->args		= args;
 	
 	return (syntree*) node;
 }

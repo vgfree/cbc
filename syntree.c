@@ -155,9 +155,6 @@ void syntree_free(syntree* node)
 		case SNT_DECLARATION:
 		case SNT_PRINT:
 			syntree_free(node->l);
-		
-		// no child-nodes
-		case SNT_FUNC_DECL:
 			break;
 		
 		// special nodes
@@ -167,9 +164,9 @@ void syntree_free(syntree* node)
 				syntree_free(node->l);
 			break;
 		
+		case SNT_FUNC_DECL:
 		case SNT_SYMREF:
-			// free dummy-symbol
-			symbol_free(((symref*) node)->sym);
+			symbol_free(((symref*) node)->sym);	// free dummy-symbol
 			break;
 		
 		case SNT_FLOW_IF:
@@ -246,12 +243,19 @@ cbvalue* eval(syntree* node)
 		}
 		
 		case SNT_FUNC_DECL:
-			// TODO: due to changes in 'symref' this wont work anymore! --------
-			function_declare(gl_symtab, ((fndecl*) node)->sym);
-			// -----------------------------------------------------------------
+		{
+			fndecl* fn = (fndecl*) node;
+			
+			// declare function-symbol
+			function_declare(gl_symtab, fn->sym);
+			
+			// remove reference from declaration-node, otherwise the declared
+			// function-symbol would be freed too early!
+			fn->sym = symbol_create(SYM_UNDEFINED, fn->sym->identifier);
 			// return empty value
 			result = cbvalue_create();
 			break;
+		}
 		
 		case SNT_PRINT:
 		{
@@ -265,37 +269,46 @@ cbvalue* eval(syntree* node)
 			break;
 		}
 		
-		case SNT_FUNC_CALL: // TODO: due to changes in 'symref' this wont work anymore!
+		case SNT_FUNC_CALL:
 		{
 			// 'symref_setsymbolfromtable' can be used in this case, since both
 			// structs have the same signature
 			symref_setsymbolfromtable((symref*) node);
 			
 			syntree* args	= ((fncall*) node)->args;
-			symbol* f		= ((fncall*) node)->sym;
+			symbol* f		= ((fncall*) node)->table_sym;
 			
 			// validate function-parameters and arguments
 			if (f->func->params && args)
 			{
-				// declare all parameters in the global symbol-table.
-				// since all parameters are already concatenated through their
-				// 'next'-member, all parameters are declared in the global
-				// symbol-table at the same time.
-				variable_declare(gl_symtab,
-										((symref*) f->func->params)->sym->next);
+				// declare a copy of all parameters in the global symbol-table
+				symbol* current_param = ((symref*) f->func->params)->sym->next;
+				while (current_param)
+				{
+					symbol* copy = symbol_create(	SYM_VARIABLE,
+													current_param->identifier);
+					variable_declare(gl_symtab, copy);
+					current_param = current_param->next;
+				}
 				
-				// assign arguments to previously defined parameter-symbols
-				syntree* current_arg	= args;
-				symbol* current_param	= ((symref*) f->func->params)->sym->next;
+				// assign arguments to previously declared parameter-symbols
+				syntree* current_arg= args;
+				current_param		= ((symref*) f->func->params)->sym->next;
 				while (current_param && current_arg)
 				{
+					// get the actually declared symbol-reference from the
+					// global symbol-table
+					symbol* table_param = symtab_lookup(gl_symtab,
+														current_param->identifier);
+					// assign argument-value
 					cbvalue_assign_freesource(	eval(current_arg->r),
-												current_param->value);
+												table_param->value);
 					// next parameter and next argument
 					current_param = current_param->next;
 					current_arg = current_arg->l;
 				}
 				
+				// expecting all arguments and parameters to be processed.
 				// check if there are any parameters or arguments pending
 				if (current_param || current_arg)
 				{
@@ -313,25 +326,19 @@ cbvalue* eval(syntree* node)
 			if (f->func->params)
 			{
 				symbol* current_param = ((symref*) f->func->params)->sym->next;
-				// undeclare all parameters
+				// dispatch all parameters from symbol-table
 				while (current_param)
 				{
 					// current_param will be freed indirectly in symtab_remove!
-					// that is, we need to store the 'next' pointer into temp.
+					// that is, the 'next' pointer is stored into temp to keep
+					// concatenation of remaining items.
 					symbol* temp = current_param->next;
 					symtab_remove(gl_symtab, current_param->identifier);
 					current_param = temp;
 				}
-				// finally, free the temporary symbol-table.
-				// NOTE: do not use 'symtab_free' to free the table in this case,
-				//       since the table-items are already freed by calling
-				//       'symtab_remove'.
-				// TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-				// freeing all parameter-symbols will result in not being able
-				// to call the function a second time, since the
-				// parameter-symbols do not exist anymore!
-				free(((symref*) f->func->params)->sym);
-				// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+				
+				// TODO: free or not
+				//~ free(((symref*) f->func->params)->sym);
 			}
 			
 			break;

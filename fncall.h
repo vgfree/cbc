@@ -17,6 +17,8 @@ typedef struct
 	enum syn_nodetype_t type;
 	// symbol
 	symbol* sym;
+	// reference to the instance in the symbol-table
+	symbol* table_sym;
 	// arguments
 	syntree* args;
 } fncall;
