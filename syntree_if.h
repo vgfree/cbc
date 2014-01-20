@@ -29,8 +29,11 @@ enum syn_nodetype_t
 	SNT_FLOW_WHILE
 };
 
-// forward-declaration of syntree_t
-typedef struct syntax_tree syntree_t;
+// forward-declarations
+typedef struct syntree_node		syntree_t;
+typedef struct constval_node	constval_t;
+typedef struct flow_node		flow_t;
+typedef struct comparison_node	comparison_t;
 
 
 #endif // SYNTREE_IF_H

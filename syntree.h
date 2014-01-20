@@ -11,7 +11,7 @@
 #include "value.h"
 
 // general syntax-tree node
-struct syntax_tree
+struct syntree_node
 {
 	enum syn_nodetype_t type;	// type of the node
 	syntree_t* l;				// left tree-node
@@ -19,30 +19,30 @@ struct syntax_tree
 };
 
 // const-value node
-typedef struct
+struct constval_node
 {
 	enum syn_nodetype_t type;	// node-type is SNT_CONSTVAL
 	value_t* value;				// value
-} constval;
+};
 
 // control-flow node
-typedef struct
+struct flow_node
 {
 	enum syn_nodetype_t type;	// node-type is either SNT_FLOW_IF or
 								// SNT_FLOW_WHILE
 	syntree_t* cond;			// condition
 	syntree_t* tb;				// true-branch
 	syntree_t* fb;				// false-branch
-} flow;
+};
 
 // comparison node
-typedef struct
+struct comparison_node
 {
 	enum syn_nodetype_t type;		// node-type is SNT_COMPARISON
 	enum comparison_type_t cmp_type;// comparison-type
 	syntree_t* l;					// left tree-node
 	syntree_t* r;					// right tree-node
-} comparison;
+};
 
 
 // interface functions
