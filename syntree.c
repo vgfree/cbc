@@ -77,7 +77,7 @@ syntree_t* flow_create(	enum syn_nodetype_t type, syntree_t* condition,
 	{
 		fprintf(stderr, "Error: Invalid node-type for control-flow-node: %d",
 				type);
-		exit(1);
+		exit(EXIT_FAILURE);
 	}
 	
 	flow* node	= malloc(sizeof(flow));
@@ -187,7 +187,7 @@ void syntree_free(syntree_t* node)
 			
 		default:
 			fprintf(stderr, "syntax-tree node-type not recognized: %d", node->type);
-			exit(1);
+			exit(EXIT_FAILURE);
 	}
 	// always free node itself at the end
 	free(node);
@@ -275,7 +275,7 @@ value_t* syntree_eval(syntree_t* node, symtab_t* symtab)
 			if (!value_istype(condition, VT_BOOLEAN))
 			{
 				fprintf(stderr, "expecting boolean expression");
-				exit(1);
+				exit(EXIT_FAILURE);
 			}
 			
 			// evaluate condition and check its result
@@ -296,7 +296,7 @@ value_t* syntree_eval(syntree_t* node, symtab_t* symtab)
 			if (!value_istype(temp, VT_BOOLEAN))
 			{
 				fprintf(stderr, "expecting boolean expression");
-				exit(1);
+				exit(EXIT_FAILURE);
 			}
 			
 			// evaluate true-branch while the condition returns true
@@ -352,7 +352,7 @@ value_t* syntree_eval(syntree_t* node, symtab_t* symtab)
 		
 		default:
 			fprintf(stderr, "syntax-tree node-type not recognized: %d", node->type);
-			exit(1);
+			exit(EXIT_FAILURE);
 	}
 	
 	return result;

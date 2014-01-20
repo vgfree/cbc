@@ -57,7 +57,7 @@ void symbol_setid(symbol_t* s, char* id)
 	{
 		fprintf(stderr, "Error: Cannot change symbol-identifer after beeing "\
 						"already set\n");
-		exit(1);
+		exit(EXIT_FAILURE);
 	}
 }
 

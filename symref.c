@@ -44,7 +44,7 @@ void symref_setsymbolfromtable(symref_t* node, symtab_t* symtab)
 	if (!dummy)
 	{
 		fprintf(stderr, "Error: Undefined symbol: %s\n", node->sym_id);
-		exit(1);
+		exit(EXIT_FAILURE);
 	}
 	
 	// symbol was found -> store reference

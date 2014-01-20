@@ -197,8 +197,8 @@ int main(int argc, char* argv[])
 		FILE* input = fopen(argv[1], "r");
 		if (!input)
 		{
-			printf("error: unable to open file `%s'!\n", argv[1]);
-			exit(1);
+			printf("Error: Unable to open file `%s'!\n", argv[1]);
+			exit(EXIT_FAILURE);
 		}
 		
 		yyin = input;
