@@ -1,30 +1,30 @@
 /*******************************************************************************
- * symref_t -- 'syntree_t'-node, that references a symbol in the symbol-table.
+ * funccall_t -- 'syntree_t'-node, that creates a function-call.
  * 
  *  	This structure is part of the abstract syntax-tree 'syntree_t'.
- *  	It uses the node-type SNT_SYMREF.
  ******************************************************************************/
 
-#ifndef SYMREF_H
-#define SYMREF_H
+#ifndef FUNCCALL_H
+#define FUNCCALL_H
 
 
 #include "symbol.h"
 #include "symtab_if.h"
 #include "syntree_if.h"
+#include "strlist.h"
 
-// symbol-reference node
+// function-call node
 typedef struct
 {
-	enum syn_nodetype_t type;	// node-type is SNT_SYMREF
-	char* sym_id;				// symbol identifier
+	enum syn_nodetype_t type;	// node-type is SNT_FUNC_CALL
+	char* sym_id;				// function identifier
 	symbol_t* table_sym;		// reference to the instance in the symbol-table
-} symref_t;
+	strlist_t* args;			// a list of arguments
+} funccall_t;
 
 
 // interface functions
-syntree_t* symref_create(char* identifier);
-void symref_setsymbolfromtable(symref_t* node, symtab_t* symtab);
+syntree_t* funccall_create(char* identifier, strlist_t* args);
 
 
-#endif // SYMREF_H
+#endif // FUNCCALL_H

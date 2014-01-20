@@ -1,93 +1,62 @@
 /*******************************************************************************
- * syntree -- implementation of an abstract syntax tree structure
+ * syntree_t -- Implementation of an abstract syntax tree structure.
  ******************************************************************************/
 
 #ifndef SYNTREE_H
 #define SYNTREE_H
 
-#include "cbvalues.h"
 
-// syntax-node types
-enum syn_nodetype_t
+#include "syntree_if.h"
+#include "symtab_if.h"
+#include "value.h"
+
+// general syntax-tree node
+struct syntax_tree
 {
-	// all node-types up to the following have two child-nodes
-	SNT_ASSIGNMENT = 256,
-	SNT_COMPARISON,
-	SNT_STATEMENTLIST,
-	SNT_FUNC_DECL,
-	SNT_FUNC_CALL,
-	SNT_LIST,
-	// the following node-types have one child-node
-	SNT_UNARYMINUS,
-	SNT_DECLARATION,
-	SNT_PRINT,
-	// the following node-types have no child-nodes
-	SNT_CONSTVAL,
-	SNT_CONSTBOOL,
-	SNT_CONSTSTR,
-	SNT_SYMREF,
-	SNT_FLOW_IF,
-	SNT_FLOW_WHILE
+	enum syn_nodetype_t type;	// type of the node
+	syntree_t* l;				// left tree-node
+	syntree_t* r;				// right tree-node
 };
-
-// syntax-tree node
-typedef struct syntree_t
-{
-	// type of the node
-	enum syn_nodetype_t type;
-	// left tree-node
-	struct syntree_t* l;
-	// right tree-node
-	struct syntree_t* r;
-} syntree;
 
 // const-value node
 typedef struct
 {
-	// type of the node
-	enum syn_nodetype_t type;
-	// value
-	cbvalue* value;
+	enum syn_nodetype_t type;	// node-type is SNT_CONSTVAL
+	value_t* value;				// value
 } constval;
 
 // control-flow node
 typedef struct
 {
-	// type of the node
-	enum syn_nodetype_t type;
-	// condition
-	syntree* cond;
-	// true-branch
-	syntree* tb;
-	// false-branch
-	syntree* fb;
+	enum syn_nodetype_t type;	// node-type is either SNT_FLOW_IF or
+								// SNT_FLOW_WHILE
+	syntree_t* cond;			// condition
+	syntree_t* tb;				// true-branch
+	syntree_t* fb;				// false-branch
 } flow;
 
 // comparison node
 typedef struct
 {
-	// type of the node
-	enum syn_nodetype_t type;
-	// comparison-type
-	enum comparisontype_t cmp_type;
-	// left tree-node
-	struct syntree_t* l;
-	// right tree-node
-	struct syntree_t* r;
+	enum syn_nodetype_t type;		// node-type is SNT_COMPARISON
+	enum comparison_type_t cmp_type;// comparison-type
+	syntree_t* l;					// left tree-node
+	syntree_t* r;					// right tree-node
 } comparison;
 
 
 // interface functions
-syntree* syntree_create(enum syn_nodetype_t type, syntree* left_node,
-						syntree* right_node);
-syntree* constval_create(cbnumeric value);
-syntree* conststr_create(cbstring string);
-syntree* constbool_create(cbboolean boolean);
-syntree* flow_create(	enum syn_nodetype_t type, syntree* condition,
-						syntree* then_branch, syntree* else_branch);
-syntree* comparison_create(	enum comparisontype_t type, syntree* left_node,
-							syntree* right_node);
-void syntree_free(syntree* node);
-cbvalue* eval(syntree* node);
+syntree_t* syntree_create(	enum syn_nodetype_t type, syntree_t* left_node,
+							syntree_t* right_node);
+syntree_t* constval_create(cbnumeric value);
+syntree_t* conststr_create(cbstring string);
+syntree_t* constbool_create(cbboolean boolean);
+syntree_t* flow_create(	enum syn_nodetype_t type, syntree_t* condition,
+						syntree_t* then_branch, syntree_t* else_branch);
+syntree_t* comparison_create(	enum comparison_type_t type,
+								syntree_t* left_node, syntree_t* right_node);
+void syntree_free(syntree_t* node);
+value_t* syntree_eval(syntree_t* node, symtab_t* symtab);
+
 
 #endif // SYNTREE_H

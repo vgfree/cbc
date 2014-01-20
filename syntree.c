@@ -1,31 +1,31 @@
 /*******************************************************************************
- * syntree -- implementation of an abstract syntax tree structure
+ * syntree_t -- Implementation of an abstract syntax tree structure.
  ******************************************************************************/
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "syntree.h"
+#include "symbol.h"
 #include "symref.h"
-#include "fncall.h"
-#include "fndecl.h"
-#include "errors.h"
+#include "funccall.h"
+#include "funcdecl.h"
+
+
+// #############################################################################
+// interface-functions
+// #############################################################################
 
 // -----------------------------------------------------------------------------
 // create a syntax-tree node
 // -----------------------------------------------------------------------------
-syntree* syntree_create(enum syn_nodetype_t type, syntree* left_node,
-						syntree* right_node)
+syntree_t* syntree_create(	enum syn_nodetype_t type, syntree_t* left_node,
+							syntree_t* right_node)
 {
-	syntree* node = malloc(sizeof(syntree));
-	if (!node)
-	{
-		yyerror(ERR_BADALLOC);
-		exit(1);
-	}
-	
-	node->type	= type;
-	node->l		= left_node;
-	node->r		= right_node;
+	syntree_t* node	= malloc(sizeof(syntree_t));
+	node->type		= type;
+	node->l			= left_node;
+	node->r			= right_node;
 	
 	return node;
 }
@@ -33,110 +33,81 @@ syntree* syntree_create(enum syn_nodetype_t type, syntree* left_node,
 // -----------------------------------------------------------------------------
 // create a syntax-tree value-node
 // -----------------------------------------------------------------------------
-syntree* constval_create(cbnumeric value)
+syntree_t* constval_create(cbnumeric value)
 {
-	constval* node = malloc(sizeof(constval));
-	if (!node)
-	{
-		yyerror(ERR_BADALLOC);
-		exit(1);
-	}
+	constval* node	= malloc(sizeof(constval));
+	node->type		= SNT_CONSTVAL;
+	node->value		= cbnumeric_create(value);
 	
-	node->type	= SNT_CONSTVAL;
-	node->value	= cbnumeric_create(value);
-	
-	return (syntree*) node;
+	return (syntree_t*) node;
 }
 
 // -----------------------------------------------------------------------------
 // create a string-node
 // -----------------------------------------------------------------------------
-syntree* conststr_create(cbstring string)
+syntree_t* conststr_create(cbstring string)
 {
-	constval* node = malloc(sizeof(constval));
-	if (!node)
-	{
-		yyerror(ERR_BADALLOC);
-		exit(1);
-	}
+	constval* node	= malloc(sizeof(constval));
+	node->type		= SNT_CONSTSTR;
+	node->value		= cbstring_create(strdup(string));
 	
-	node->type	= SNT_CONSTSTR;
-	node->value	= cbstring_create(strdup(string));
-	
-	return (syntree*) node;
+	return (syntree_t*) node;
 }
 
 // -----------------------------------------------------------------------------
 // create a boolean-node
 // -----------------------------------------------------------------------------
-syntree* constbool_create(cbboolean boolean)
+syntree_t* constbool_create(cbboolean boolean)
 {
-	constval* node = malloc(sizeof(constval));
-	if (!node)
-	{
-		yyerror(ERR_BADALLOC);
-		exit(1);
-	}
+	constval* node	= malloc(sizeof(constval));
+	node->type		= SNT_CONSTBOOL;
+	node->value		= cbboolean_create(boolean);
 	
-	node->type	= SNT_CONSTBOOL;
-	node->value	= cbboolean_create(boolean);
-	
-	return (syntree*) node;
+	return (syntree_t*) node;
 }
 
 // -----------------------------------------------------------------------------
 // create a control-flow-node
 // -----------------------------------------------------------------------------
-syntree* flow_create(	enum syn_nodetype_t type, syntree* condition,
-						syntree* then_branch, syntree* else_branch)
+syntree_t* flow_create(	enum syn_nodetype_t type, syntree_t* condition,
+						syntree_t* then_branch, syntree_t* else_branch)
 {
 	// check if passed type is valid for this node
 	if (type != SNT_FLOW_IF && type != SNT_FLOW_WHILE)
 	{
-		yyerror("invalid node-type for control-flow-node: %d", type);
+		fprintf(stderr, "Error: Invalid node-type for control-flow-node: %d",
+				type);
 		exit(1);
 	}
 	
-	flow* node = malloc(sizeof(flow));
-	if (!node)
-	{
-		yyerror(ERR_BADALLOC);
-		exit(1);
-	}
-	
+	flow* node	= malloc(sizeof(flow));
 	node->type	= type;
 	node->cond	= condition;
 	node->tb	= then_branch;
 	node->fb	= else_branch;
 	
-	return (syntree*) node;
+	return (syntree_t*) node;
 }
 
 // -----------------------------------------------------------------------------
 // create a comparison-node
 // -----------------------------------------------------------------------------
-syntree* comparison_create(	enum comparisontype_t type, syntree* left_node,
-							syntree* right_node)
+syntree_t* comparison_create(	enum comparison_type_t type,
+								syntree_t* left_node, syntree_t* right_node)
 {
-	comparison* node = malloc(sizeof(comparison));
-	if (!node)
-	{
-		yyerror(ERR_BADALLOC);
-		exit(1);
-	}
+	comparison* node	= malloc(sizeof(comparison));
+	node->type			= SNT_COMPARISON;
+	node->cmp_type		= type;
+	node->l				= left_node;
+	node->r				= right_node;
 	
-	node->type		= SNT_COMPARISON;
-	node->cmp_type	= type;
-	node->l			= left_node;
-	node->r			= right_node;
-	
-	return (syntree*) node;
+	return (syntree_t*) node;
 }
 
 // -----------------------------------------------------------------------------
 // free a syntax-tree
 // -----------------------------------------------------------------------------
-void syntree_free(syntree* node)
+void syntree_free(syntree_t* node)
 {
 	switch (node->type)
 	{
@@ -165,8 +136,10 @@ void syntree_free(syntree* node)
 			break;
 		
 		case SNT_FUNC_DECL:
+			break;
+			
 		case SNT_SYMREF:
-			symbol_free(((symref*) node)->sym);	// free dummy-symbol
+			free(((symref_t*) node)->sym_id);
 			break;
 		
 		case SNT_FLOW_IF:
@@ -179,14 +152,32 @@ void syntree_free(syntree* node)
 			break;
 		
 		case SNT_FUNC_CALL:
-			if (((fncall*) node)->args)
-				syntree_free(((fncall*) node)->args);
+		{
+			strlist_t* args = ((funccall_t*) node)->args;
+			if (args)
+			{
+				strlist_t* current = args;
+				// free argument-nodes,
+				// since they won't be freed by 'strlist_free()'
+				while (current)
+				{
+					strlist_t* temp = current;
+					current = current->next;
+					syntree_free(temp->data);
+				}
+				
+				strlist_free(args);
+			}
+			
+			free(((funccall_t*) node)->sym_id);
+			
 			break;
+		}
 		
 		case SNT_CONSTVAL:
 		case SNT_CONSTBOOL:
 		case SNT_CONSTSTR:
-			cbvalue_free(((constval*) node)->value);
+			value_free(((constval*) node)->value);
 			break;
 		
 		case SNT_COMPARISON:
@@ -195,7 +186,7 @@ void syntree_free(syntree* node)
 			break;
 			
 		default:
-			yyerror("syntax-tree node-type not recognized: %d", node->type);
+			fprintf(stderr, "syntax-tree node-type not recognized: %d", node->type);
 			exit(1);
 	}
 	// always free node itself at the end
@@ -205,215 +196,162 @@ void syntree_free(syntree* node)
 // -----------------------------------------------------------------------------
 // evaluate a complete syntax tree and return its result
 // -----------------------------------------------------------------------------
-cbvalue* eval(syntree* node)
+value_t* syntree_eval(syntree_t* node, symtab_t* symtab)
 {
-	cbvalue* result = NULL;
+	value_t* result = NULL;
 	
 	switch (node->type)
 	{
 		case SNT_CONSTVAL:
 		case SNT_CONSTBOOL:
 		case SNT_CONSTSTR:
-			result = cbvalue_copy(((constval*) node)->value);
+			result = value_copy(((constval*) node)->value);
 			break;
 		
 		case SNT_SYMREF:
-			symref_setsymbolfromtable((symref*) node);
-			result = cbvalue_copy(((symref*) node)->table_sym->value);
+			symref_setsymbolfromtable((symref_t*) node, symtab);
+			result = value_copy(((symref_t*) node)->table_sym->value);
 			break;
 		
 		case SNT_ASSIGNMENT:
 		{
-			symref* sr = (symref*) node->l;
-			symref_setsymbolfromtable(sr);
-			cbvalue_assign_freesource(eval(node->r), sr->table_sym->value);
-			result = cbvalue_copy(sr->table_sym->value);
+			symref_t* sr = (symref_t*) node->l;
+			symref_setsymbolfromtable(sr, symtab);
+			value_assign_freesource(syntree_eval(node->r, symtab), sr->table_sym->value);
+			
+			result = value_copy(sr->table_sym->value);
 			break;
 		}
 		
 		case SNT_DECLARATION:
 		{
-			symref* sr = (symref*) node->l;
-			// dummy-symbol 'sym' must be freed separately -> copy symbol
-			symbol* copy = symbol_create(SYM_VARIABLE, sr->sym->identifier);
-			variable_declare(gl_symtab, copy);
-			// return empty value
-			result = cbvalue_create();
+			symref_t* sr = (symref_t*) node->l;
+			
+			symbol_t* dummy = symbol_create();		// create new symbol
+			symbol_setid(dummy, sr->sym_id);
+			symbol_settype(dummy, SYM_TYPE_VARIABLE);
+			symtab_append(symtab, dummy);			// declare symbol
+			
+			result = value_create();				// return empty value
 			break;
 		}
 		
 		case SNT_FUNC_DECL:
 		{
-			fndecl* fn = (fndecl*) node;
+			funcdecl_t* fndecl = (funcdecl_t*) node;
+			symtab_append(symtab, fndecl->function_sym);	// declare function
 			
-			// declare function-symbol
-			function_declare(gl_symtab, fn->sym);
-			
-			// remove reference from declaration-node, otherwise the declared
-			// function-symbol would be freed too early!
-			fn->sym = symbol_create(SYM_UNDEFINED, fn->sym->identifier);
-			// return empty value
-			result = cbvalue_create();
+			result = value_create();						// return empty value
 			break;
 		}
 		
 		case SNT_PRINT:
 		{
-			cbvalue* temp = eval(node->l);
-			cbvalue_print(temp);
-			cbvalue_free(temp);
+			value_t* temp = syntree_eval(node->l, symtab);
+			value_print(temp);
+			value_free(temp);
 			// print newline
 			printf("\n");
 			// return empty value
-			result = cbvalue_create();
+			result = value_create();
 			break;
 		}
 		
 		case SNT_FUNC_CALL:
 		{
-			// 'symref_setsymbolfromtable' can be used in this case, since both
-			// structs have the same signature
-			symref_setsymbolfromtable((symref*) node);
+			funccall_t* fncall = (funccall_t*) node;
+			symref_setsymbolfromtable((symref_t*) fncall, symtab);
+			function_t* f = fncall->table_sym->function;
 			
-			syntree* args	= ((fncall*) node)->args;
-			symbol* f		= ((fncall*) node)->table_sym;
-			
-			// validate function-parameters and arguments
-			if (f->func->params && args)
-			{
-				// declare a copy of all parameters in the global symbol-table
-				symbol* current_param = ((symref*) f->func->params)->sym->next;
-				while (current_param)
-				{
-					symbol* copy = symbol_create(	SYM_VARIABLE,
-													current_param->identifier);
-					variable_declare(gl_symtab, copy);
-					current_param = current_param->next;
-				}
-				
-				// assign arguments to previously declared parameter-symbols
-				syntree* current_arg= args;
-				current_param		= ((symref*) f->func->params)->sym->next;
-				while (current_param && current_arg)
-				{
-					// get the actually declared symbol-reference from the
-					// global symbol-table
-					symbol* table_param = symtab_lookup(gl_symtab,
-														current_param->identifier);
-					// assign argument-value
-					cbvalue_assign_freesource(	eval(current_arg->r),
-												table_param->value);
-					// next parameter and next argument
-					current_param = current_param->next;
-					current_arg = current_arg->l;
-				}
-				
-				// expecting all arguments and parameters to be processed.
-				// check if there are any parameters or arguments pending
-				if (current_param || current_arg)
-				{
-					yyerror("parameter count does not match the count of "\
-							"passed arguments");
-					exit(1);
-				}
-			}
-			
-			// execute function
-			result = eval(f->func->body);
-			
-			// remove parameters from the global symbol-table after function-
-			// execution
-			if (f->func->params)
-			{
-				symbol* current_param = ((symref*) f->func->params)->sym->next;
-				// dispatch all parameters from symbol-table
-				while (current_param)
-				{
-					// current_param will be freed indirectly in symtab_remove!
-					// that is, the 'next' pointer is stored into temp to keep
-					// concatenation of remaining items.
-					symbol* temp = current_param->next;
-					symtab_remove(gl_symtab, current_param->identifier);
-					current_param = temp;
-				}
-				
-				// TODO: free or not
-				//~ free(((symref*) f->func->params)->sym);
-			}
+			function_call(f, fncall->args);
+			result = value_copy(f->result);
 			
 			break;
 		}
 		
 		case SNT_FLOW_IF:
 		{
-			cbvalue* condition = eval(((flow*) node)->cond);
-			if (!cbvalue_istype(VT_BOOLEAN, condition))
+			value_t* condition = syntree_eval(((flow*) node)->cond, symtab);
+			if (!value_istype(condition, VT_BOOLEAN))
 			{
-				yyerror("expecting boolean expression");
+				fprintf(stderr, "expecting boolean expression");
 				exit(1);
 			}
 			
 			// evaluate condition and check its result
 			if (condition->boolean)
-				result = eval(((flow*) node)->tb);	// condition is ture:
-													// take the true-branch
+				result = syntree_eval(((flow*) node)->tb, symtab);	// condition is ture:
+																	// take the true-branch
 			else
-				result = eval(((flow*) node)->fb);	// condition is false:
-													// take the false-branch
+				result = syntree_eval(((flow*) node)->fb, symtab);	// condition is false:
+																	// take the false-branch
 			
-			cbvalue_free(condition);
+			value_free(condition);
 			break;
 		}
 		
 		case SNT_FLOW_WHILE:
 		{
-			cbvalue* temp = eval(((flow*) node)->cond);
-			if (!cbvalue_istype(VT_BOOLEAN, temp))
+			value_t* temp = syntree_eval(((flow*) node)->cond, symtab);
+			if (!value_istype(temp, VT_BOOLEAN))
 			{
-				yyerror("expecting boolean expression");
+				fprintf(stderr, "expecting boolean expression");
 				exit(1);
 			}
 			
 			// evaluate true-branch while the condition returns true
 			while (temp->boolean)
 			{
-				cbvalue_free(temp);
+				value_free(temp);
 				if (result)
-					cbvalue_free(result);
+					value_free(result);
 				
-				result	= eval(((flow*) node)->tb);
-				temp	= eval(((flow*) node)->cond);
+				result	= syntree_eval(((flow*) node)->tb, symtab);
+				temp	= syntree_eval(((flow*) node)->cond, symtab);
 			}
 			
 			// free last dummy-value
-			cbvalue_free(temp);
+			value_free(temp);
 			break;
 		}
 		
 		case SNT_COMPARISON:
 		{
 			comparison* cmp = ((comparison*) node);
-			result = cbvalue_compare(cmp->cmp_type, eval(cmp->l), eval(cmp->r));
+			result = value_compare(	cmp->cmp_type, syntree_eval(cmp->l, symtab),
+									syntree_eval(cmp->r, symtab));
 			break;
 		}
 		
 		case SNT_STATEMENTLIST:
-			cbvalue_free(eval(node->l));
-			result = eval(node->r);
+			value_free(syntree_eval(node->l, symtab));
+			result = syntree_eval(node->r, symtab);
 			break;
 		
-		case '+': result = cbnumeric_add(eval(node->l), eval(node->r)); break;
-		case '-': result = cbnumeric_sub(eval(node->l), eval(node->r)); break;
-		case '*': result = cbnumeric_mul(eval(node->l), eval(node->r)); break;
-		case '/': result = cbnumeric_div(eval(node->l), eval(node->r)); break;
+		case '+':
+			result = cbnumeric_add(	syntree_eval(node->l, symtab),
+									syntree_eval(node->r, symtab));
+			break;
+		case '-':
+			result = cbnumeric_sub(	syntree_eval(node->l, symtab),
+									syntree_eval(node->r, symtab));
+			break;
+		case '*':
+			result = cbnumeric_mul(	syntree_eval(node->l, symtab),
+									syntree_eval(node->r, symtab));
+			break;
+		case '/':
+			result = cbnumeric_div(	syntree_eval(node->l, symtab),
+									syntree_eval(node->r, symtab));
+			break;
 		
 		case SNT_UNARYMINUS:
-			result = eval(node->l);
-			result->value = - result->value;
+			result			= syntree_eval(node->l, symtab);
+			result->value	= - result->value;
 			break;
 		
 		default:
-			yyerror("syntax-tree node-type not recognized: %d", node->type);
+			fprintf(stderr, "syntax-tree node-type not recognized: %d", node->type);
 			exit(1);
 	}
 	

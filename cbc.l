@@ -6,9 +6,11 @@
 %{
 
 #include <stdlib.h>
+#include "value.h"
 #include "syntree.h"
-#include "cbc_parse.h"
+#include "strlist.h"
 #include "errors.h"
+#include "cbc_parse.h"
 
 %}
 

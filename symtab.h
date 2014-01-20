@@ -1,76 +1,39 @@
 /*******************************************************************************
- * symtab -- implementation of a symbol-table structure
+ * symtab_t -- Implementation of a symbol-table structure
  * 
- *  	the symbol-table is supposed to store all symbols ocourring in the
- *  	codeblock source-code being parsed.
- *  	every symbol contains a symbol-identifier, the type and the value of
- *  	the symbol.
+ *      The symbol-table is supposed to store all symbols ocourring in the
+ *      codeblock source-code being parsed.
  ******************************************************************************/
 
 #ifndef SYMTAB_H
 #define SYMTAB_H
 
-#include "cbvalues.h"
-#include "syntree.h"
 
-// symbol types
-enum symbol_type_t
+#include <stdbool.h>
+#include <stddef.h>
+#include "symtab_if.h"
+#include "symbol.h"
+
+struct symbol_table
 {
-	SYM_UNDEFINED,
-	SYM_SYMTAB,
-	SYM_VARIABLE,
-	SYM_FUNCTION
+	symbol_t* first;
+	symbol_t* last;
+	symbol_t* current;
+	size_t size;
 };
 
-// function parameter declaration and body
-typedef struct
-{
-	syntree* params;
-	syntree* body;
-} function;
-
-// symbol structure:
-// a symbol either represents a variable or a function.
-// therefore the specific elements of a symbol are contained within an union.
-// these are on one hand the value-element for variables and the
-// function-element for functions on the other hand.
-typedef struct symbol_t
-{
-	// type of the node
-	enum symbol_type_t type;
-	// symbol-name
-	char* identifier;
-	
-	union
-	{
-		// symbol-value
-		cbvalue* value;
-		// function-code
-		function* func;
-	};
-	
-	// next symbol
-	struct symbol_t* next;
-} symbol;
-
-// interface functions
-symbol* symtab_create();
-void symtab_append(symbol* symtab, symbol* s);
-void symtab_remove(symbol* symtab, char* identifier);
-symbol* symtab_lookup(symbol* symtab, char* key);
-void symtab_free(symbol* symtab);
-
-symbol* symbol_create(enum symbol_type_t type, char* identifier);
-void symbol_settype(symbol* s, enum symbol_type_t type);
-void symbol_free(symbol* s);
-
-function* function_create();
-void function_free(function* f);
-
-void function_declare(symbol* symtab, symbol* s);
-void variable_declare(symbol* symtab, symbol* s);
-
-// global symbol-table, has to be initialized and freed in the main-function
-symbol* gl_symtab;
+// Interface functions
+symtab_t* symtab_create();
+void symtab_free(symtab_t* st);
+symbol_t* symtab_append(symtab_t* st, symbol_t* s);
+symbol_t* symtab_dispatch(symtab_t* st, char* id);
+void symtab_remove(symtab_t* st, char* id);
+void symtab_dispatch_all(symtab_t* st);
+void symtab_clear(symtab_t* st);
+symbol_t* symtab_lookup(symtab_t* st, char* id);
+symbol_t* symtab_next(symtab_t* st);
+symbol_t* symtab_current(symtab_t* st);
+symbol_t* symtab_previous(symtab_t* st);
+bool symtab_isempty(symtab_t* st);
 
 #endif // SYMTAB_H

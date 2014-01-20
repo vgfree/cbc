@@ -1,28 +1,31 @@
 /*******************************************************************************
- * symref -- part of the abstrct-syntax-tree struct 'syntree'.
+ * symref_t -- 'syntree_t'-node, that references a symbol in the symbol-table.
  ******************************************************************************/
 
+#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <assert.h>
 #include "symref.h"
-#include "errors.h"
+#include "symtab.h"
+#include "syntree.h"
+
+
+// #############################################################################
+// interface-functions
+// #############################################################################
 
 // -----------------------------------------------------------------------------
-// create a syntax-tree symbol-reference-node
+// constructor
 // -----------------------------------------------------------------------------
-syntree* symref_create(symbol* s)
+syntree_t* symref_create(char* identifier)
 {
-	symref* node = malloc(sizeof(symref));
-	if (!node)
-	{
-		yyerror(ERR_BADALLOC);
-		exit(1);
-	}
-	
+	symref_t* node	= malloc(sizeof(symref_t));
 	node->type		= SNT_SYMREF;
-	node->sym		= s;
+	node->sym_id	= strdup(identifier);
 	node->table_sym	= NULL;
 	
-	return (syntree*) node;
+	return (syntree_t*) node;
 }
 
 // -----------------------------------------------------------------------------
@@ -30,24 +33,20 @@ syntree* symref_create(symbol* s)
 // global symbol-table.
 // if there is no such a symbol, an error will be raised.
 // -----------------------------------------------------------------------------
-void symref_setsymbolfromtable(symref* node)
+void symref_setsymbolfromtable(symref_t* node, symtab_t* symtab)
 {
-	symbol* table_sym = node->table_sym;
-	
-	// check if reference to the instance in the symbol-table exists
-	if (table_sym)
-		return;	// reference to symbol in the global symbol-table is already
-				// available -> nothing has to be done.
+	symbol_t* table_sym = node->table_sym;
 	
 	// get symbol-reference
-	symbol* dummy = symtab_lookup(gl_symtab, node->sym->identifier);
+	symbol_t* dummy = symtab_lookup(symtab, node->sym_id);
 	
 	// if there is no such a symbol -> error
 	if (!dummy)
 	{
-		yyerror("undefined symbol: %s", node->sym->identifier);
+		fprintf(stderr, "Error: Undefined symbol: %s\n", node->sym_id);
 		exit(1);
 	}
+	
 	// symbol was found -> store reference
 	node->table_sym = dummy;
 }

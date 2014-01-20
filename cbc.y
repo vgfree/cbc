@@ -3,25 +3,27 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "cbvalues.h"
+#include "codeblock.h"
+#include "value.h"
 #include "syntree.h"
 #include "symtab.h"
 #include "symref.h"
-#include "fncall.h"
-#include "fndecl.h"
+#include "funccall.h"
+#include "funcdecl.h"
+#include "strlist.h"
 
-syntree* result_tree;
+codeblock_t* cb;
 
 %}
 
 %union {
-	syntree* ast;
-	struct symbol_t* sym;
+	syntree_t* ast;
 	char* id;
 	cbstring str;
 	cbboolean boolval;
 	cbnumeric val;
-	enum comparisontype_t cmp;
+	enum comparison_type_t cmp;
+	strlist_t* list;
 };
 
 %token				ENDOFFILE
@@ -40,8 +42,8 @@ syntree* result_tree;
 
 %nonassoc	<cmp>	COMPARE
 
-%type <ast> decllist decl stmtlist stmt exprlist expr params args
-%type <sym> paramlist id
+%type <ast>		decllist decl stmtlist stmt expr
+%type <list>	params paramlist exprlist args
 
 
 %%	/* RULES ---------------------------------------------------------------- */
@@ -49,7 +51,7 @@ syntree* result_tree;
 
 prog:
 	stmtlist ENDOFFILE			{
-									result_tree = $1;
+									cb->ast = $1;
 									YYACCEPT;
 								}
 	;
@@ -63,28 +65,27 @@ decllist:
 	;
 
 params:
-	paramlist					{ $$ = symref_create($1); }
-	|							{ $$ = NULL; }	// NULL
+	paramlist					{ $$ = $1; }
+	|							{ $$ = NULL; }	// no params were specified
 
 paramlist:
-	id							{
-									symbol* symtab	= symtab_create();
-									symbol_settype($1, SYM_VARIABLE);
-									variable_declare(symtab, $1);
-									$$ = symtab;
+	IDENTIFIER					{
+									$$ = strlist_create($1);
+									free($1);	// free duplicated string
 								}
-	| paramlist ',' id			{
-									symbol_settype($3, SYM_VARIABLE);
-									variable_declare($1, $3);
+	| paramlist ',' IDENTIFIER	{
+									strlist_append($1, $3);
+									free($3);	// free duplicated string
 									$$ = $1;
 								}
 	;
 
 decl:
-	id							{
+	IDENTIFIER					{
 									$$ = syntree_create(SNT_DECLARATION,
 														symref_create($1),
 														NULL);
+									free($1);	// free duplicated string
 								}
 	;
 
@@ -118,19 +119,14 @@ stmt:
 									$$ = flow_create(	SNT_FLOW_WHILE, $2, $4,
 														NULL);
 								}
-	|	FUNCTION id '(' params ')'
+	|	FUNCTION IDENTIFIER '(' params ')'
 			stmtlist
-		END						{ $$ = fndecl_create($2, $6, $4); }
-	| PRINT expr				{ $$ = syntree_create(SNT_PRINT, $2, NULL); }
-	;
-
-id:
-	IDENTIFIER					{
-									$$ = symbol_create(SYM_UNDEFINED, $1);
-									// identifier was copied in symbol creation
-									// -> free identifier-string
-									free($1);
+		END						{
+									$$ = funcdecl_create(	$2, $6, $4,
+															cb->global_symtab);
+									free($2);	// free duplicated string
 								}
+	| PRINT expr				{ $$ = syntree_create(SNT_PRINT, $2, NULL); }
 	;
 
 args:
@@ -139,9 +135,19 @@ args:
 	;
 
 exprlist:
-	expr						{ $$ = syntree_create(SNT_LIST, NULL, $1); }
+	expr						{
+									// create empty strlist-item
+									strlist_t* args	= strlist_create("");
+									// fill data-attribute with
+									// argument-expression
+									args->data		= $1;
+									$$ = args;
+								}
 	| exprlist ',' expr			{
-									$1->l = syntree_create(SNT_LIST, NULL, $3);
+									// capture new item
+									strlist_t* item	= strlist_append($1, "");
+									// fill data-attribute
+									item->data		= $3;
 									$$ = $1;
 								}
 	;
@@ -153,11 +159,18 @@ expr:
 									$$ = conststr_create($1);
 									free($1);
 								}
-	| id						{ $$ = symref_create($1); }
-	| id '(' args ')'			{ $$ = fncall_create($1, $3); }
-	| id ASSIGN expr			{
+	| IDENTIFIER				{
+									$$ = symref_create($1);
+									free($1);	// free duplicated string
+								}
+	| IDENTIFIER '(' args ')'	{
+									$$ = funccall_create($1, $3);
+									free($1);	// free duplicated string
+								}
+	| IDENTIFIER ASSIGN expr	{
 									$$ = syntree_create(SNT_ASSIGNMENT,
 														symref_create($1), $3);
+									free($1);	// free duplicated string
 								}
 	| expr '+' expr				{ $$ = syntree_create('+', $1, $3); }
 	| expr '-' expr				{ $$ = syntree_create('-', $1, $3); }
@@ -191,17 +204,18 @@ int main(int argc, char* argv[])
 		yyin = input;
 	}
 	
-	gl_symtab = symtab_create();
-	yyparse();
+	cb					= codeblock_create();
+	cb->global_symtab	= symtab_create();
 	
-	if (result_tree)
-	{
-		cbvalue* cbresult = eval(result_tree);
-		cbvalue_print(cbresult);
-		cbvalue_free(cbresult);
-		syntree_free(result_tree);
-	}
+	yyparse();					// parse codeblock-code
 	
-	symtab_free(gl_symtab);
+	codeblock_execute(cb);		// execute ...
+	value_print(cb->result);	// and print result
+	
+	// cleanup
+	symtab_free(cb->global_symtab);
+	syntree_free(cb->ast);
+	codeblock_free(cb);
+	
 	return 0;
 }
