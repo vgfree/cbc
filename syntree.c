@@ -299,11 +299,15 @@ value_t* syntree_eval(syntree_t* node, symtab_t* symtab)
 				exit(EXIT_FAILURE);
 			}
 			
+			// default result (in case the while-loop won't be entered)
+			result = value_create();
+			
 			// evaluate true-branch while the condition returns true
 			while (temp->boolean)
 			{
 				value_free(temp);
-				if (result)
+				if (result)	// TODO:	Check is not necessary since result is
+							//			assigend before, so it can't be NULL.
 					value_free(result);
 				
 				result	= syntree_eval(((flow_t*) node)->tb, symtab);
