@@ -3,23 +3,24 @@
 # ##############################################################################
 
 TARGET		:= cbc_test
-SRC			:=	codeblock.c symtab.c symbol.c function.c syntree.c symref.c \
-				value.c strlist.c
-SRC			:= $(addprefix ../, $(SRC))
 SRC_TEST	:= cbc_test.c
-OBJ			:= $(SRC:%.c=%.o) $(SRC_TEST:%.c=%.o)
+SRC_CBC		:=	codeblock.c symtab.c symbol.c function.c syntree.c symref.c \
+				value.c strlist.c
+SRC_CBC		:= $(addprefix ../, $(SRC_CBC))
+OBJ_TEST	:= $(SRC_TEST:%.c=%.o)
+OBJ_ALL		:= $(OBJ_TEST) $(SRC_CBC:%.c=%.o)
 CFLAGS		:= -g -D _CBC_DEBUG -I ..
 LDFLAGS		:= -lcheck
 
 # default-target
-build: $(OBJ)
+build: $(OBJ_ALL)
 	$(CC) -o $(TARGET) $^ $(LDFLAGS)
 
 # build object-files
 %.o: %.c
-	$(CC) $(CFLAGS) -c $<
+	$(CC) -o $@ $(CFLAGS) -c $<
 
 clean:
-	rm $(TARGET) $(OBJ)
+	rm $(TARGET) $(OBJ_TEST)
 
 .PHONY: clean
