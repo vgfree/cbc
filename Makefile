@@ -13,7 +13,10 @@ SRC		:=	$(TYACC) $(TLEX) errors.c symbol.c symtab.c function.c value.c \
 OBJ		:= $(SRC:%.c=%.o)
 CFLAGS	:= 
 LDFLAGS	:= 
-UNITTEST:= test.sh
+
+TEST_DIR	:= test
+TEST_MAKE	:= Makefile
+TEST		:= $(TEST_DIR)/$(TARGET)_test
 
 # default target is debug
 default: debug
@@ -42,8 +45,17 @@ $(TLEX): $(SRC_LEX)
 	flex -o $@ $^
 
 # run unit-test
-test: $(UNITTEST)
+runtest: $(TEST)
+	@echo "Running unit-test:"
+ifeq ($(OS), Windows_NT)
+	$<.exe
+else
 	./$<
+endif
+
+# build test
+test: $(TEST_DIR)/$(TEST_MAKE)
+	cd $(TEST_DIR); make -f $(TEST_MAKE)
 
 clean:
 ifeq ($(OS), Windows_NT)
@@ -52,4 +64,7 @@ else
 	rm $(TARGET) $(TYACC) $(HYACC) $(TLEX) $(OBJ)
 endif
 
-.PHONY: clean
+clean-test: $(TEST_DIR)/$(TEST_MAKE)
+	cd $(TEST_DIR); make -f $(TEST_MAKE) clean
+
+.PHONY: clean clean-test test
