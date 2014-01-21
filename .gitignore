@@ -1,4 +1,5 @@
 /cbc
+/test/cbc_test
 *.exe
 *.o
 
