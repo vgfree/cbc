@@ -1,70 +1,109 @@
 # ##############################################################################
-# Codeblock compiler "cbc" makefile
+# Codeblock compiler/interpreter "cbc" makefile
 # ##############################################################################
 
-TARGET	:= cbc
-SRC_YAC	:= cbc.y
-SRC_LEX	:= cbc.l
-TLEX	:= $(TARGET)_lex.c
-TYACC	:= $(TARGET)_parse.c
-HYACC	:= $(TYACC:%.c=%.h)
-SRC		:=	$(TYACC) $(TLEX) errors.c symbol.c symtab.c function.c value.c \
-			strlist.c codeblock.c syntree.c symref.c funccall.c funcdecl.c
-OBJ		:= $(SRC:%.c=%.o)
-CFLAGS	:= 
-LDFLAGS	:= 
+TARGET			:= cbc
 
-TEST_DIR	:= test
-TEST_MAKE	:= Makefile
-TEST		:= $(TEST_DIR)/$(TARGET)_test
+SRC_LEXER		:= cbc.l
+SRC_PARSER		:= cbc.y
+LEXER			:= $(TARGET)_lex.c
+PARSER			:= $(TARGET)_parse.c
+INC_PARSER		:= $(PARSER:%.c=%.h)
+
+SRC				:= 	codeblock.c symbol.c symtab.c function.c value.c strlist.c \
+					syntree.c symref.c funccall.c funcdecl.c
+OBJ				:= $(SRC:%.c=%.o)
+
+SRC_CBC			:= $(LEXER) $(PARSER) $(SRC)
+OBJ_CBC			:= $(SRC_CBC:%.c=%.o)
+
+CFLAGS			:= 
+LDFLAGS			:= 
+
+LEX				:= flex
+YACC			:= bison
+
+TEST_DIR		:= test
+TEST_DEP_FILE	:= $(TEST_DIR)/test.dep
+
+
+# ------------------------------------------------------------------------------
+# codeblock-compiler/interpreter
+# ------------------------------------------------------------------------------
 
 # default target is debug
 default: debug
 
-# debug
+# source-dependencies
+$(LEXER): $(SRC_LEXER)
+$(PARSER): $(SRC_PARSER)
+$(OBJ_CBC): $(SRC_CBC)
+$(OBJ): $(SRC)
+
+# debug-build
 debug: CFLAGS := -g -D _CBC_DEBUG -D _CBC_NOLOG
 debug: build
 
-# release
+# release-build
 release: build
 
-# build executable
-build: $(TLEX) $(TYACC) $(OBJ)
-	$(CC) -o $(TARGET) $(OBJ) $(LDFLAGS)
+# build codeblock-compiler executable
+build: $(OBJ_CBC) errors.o
+	$(CC) -o $(TARGET) $^ $(LDFLAGS)
 
-# build objects
+# build object-files
 %.o: %.c
 	$(CC) $(CFLAGS) -c $<
 
 # build yacc/bison output
-$(TYACC): $(SRC_YAC)
-	bison -y -d $^ -o $@
+$(PARSER): $(SRC_PARSER)
+	$(YACC) -y -d $^ -o $@
 
 # build lex/flex output
-$(TLEX): $(SRC_LEX)
-	flex -o $@ $^
+$(LEXER): $(SRC_LEXER)
+	$(LEX) -o $@ $^
 
-# run unit-test
-runtest: $(TEST)
-	@echo "Running unit-test:"
-ifeq ($(OS), Windows_NT)
-	$<.exe
-else
-	./$<
-endif
+
+# ------------------------------------------------------------------------------
+# codeblock-test
+# ------------------------------------------------------------------------------
 
 # build test
-test: $(TEST_DIR)/$(TEST_MAKE)
-	cd $(TEST_DIR); make -f $(TEST_MAKE)
+test: $(OBJ) make-depfile
+	make --directory $(TEST_DIR)
 
-clean:
+# run test
+runtest:
+	make --directory $(TEST_DIR) run
+
+# create dependencies-file for test build
+make-depfile:
+	@echo $(addprefix ../, $(OBJ)) > $(TEST_DEP_FILE)
+
+# clean test
+clean-test:
+	make --directory $(TEST_DIR) clean
+	$(RM) $(TEST_DEP_FILE)
+
+
+# ------------------------------------------------------------------------------
+# cleanup targets
+# ------------------------------------------------------------------------------
+
+# clean codeblock-compiler/interpreter
 ifeq ($(OS), Windows_NT)
-	rm $(TARGET).exe $(TYACC) $(HYACC) $(TLEX) $(OBJ)
+clean-cbc: TARGET := $(TARGET).exe
 else
-	rm $(TARGET) $(TYACC) $(HYACC) $(TLEX) $(OBJ)
+clean-cbc:
 endif
+	$(RM) $(TARGET) $(PARSER) $(INC_PARSER) $(LEXER) $(OBJ_CBC) errors.o
 
-clean-test: $(TEST_DIR)/$(TEST_MAKE)
-	cd $(TEST_DIR); make -f $(TEST_MAKE) clean
+# default clean-target
+clean: clean-cbc
 
-.PHONY: clean clean-test test
+# invoke all clean targets
+clean-all: clean-cbc clean-test
+
+
+.PHONY:	clean clean-all clean-cbc clean-test test runtest build debug release \
+		default make-depfile

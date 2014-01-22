@@ -1,26 +1,56 @@
 # ##############################################################################
-# Codeblock compiler unit-test makefile
+# Codeblock Unit-Test makefile
 # ##############################################################################
 
 TARGET		:= cbc_test
-SRC_TEST	:= cbc_test.c
-SRC_CBC		:=	codeblock.c symtab.c symbol.c function.c syntree.c symref.c \
-				value.c strlist.c
-SRC_CBC		:= $(addprefix ../, $(SRC_CBC))
-OBJ_TEST	:= $(SRC_TEST:%.c=%.o)
-OBJ_ALL		:= $(OBJ_TEST) $(SRC_CBC:%.c=%.o)
-CFLAGS		:= -g -D _CBC_DEBUG -I ..
-LDFLAGS		:= -lcheck
 
-# default-target
-build: $(OBJ_ALL)
-	$(CC) -o $(TARGET) $^ $(LDFLAGS)
+DEP_FILE	:= test.dep
+OBJ_DEP		:= 
+
+SRC			:= cbc_test.c
+OBJ			:= $(SRC:%.c=%.o)
+
+CFLAGS		:= -g -I sput
+LDFLAGS		:= 
+
+
+# ------------------------------------------------------------------------------
+# Unit-Test
+# ------------------------------------------------------------------------------
+
+# default target is test
+default: test
+
+# build Unit-Test executable
+test: OBJ_DEP := $(shell cat ${DEP_FILE})
+test: $(OBJ) $(OBJ_DEP)
+	$(CC) -o $(TARGET) $(OBJ) $(OBJ_DEP) $(LDFLAGS)
 
 # build object-files
 %.o: %.c
-	$(CC) -o $@ $(CFLAGS) -c $<
+	$(CC) $(CFLAGS) -c $<
 
+# run test
+run:
+	@echo "####################################################################"
+ifeq ($(OS), Windows_NT)
+	$(TARGET).exe
+else
+	./$(TARGET)
+endif
+	@echo "####################################################################"
+
+
+# ------------------------------------------------------------------------------
+# cleanup target
+# ------------------------------------------------------------------------------
+
+ifeq ($(OS), Windows_NT)
+clean: TARGET := $(TARGET).exe
+else
 clean:
-	rm $(TARGET) $(OBJ_TEST)
+endif
+	$(RM) $(TARGET) $(OBJ)
 
-.PHONY: clean
+
+.PHONY:	clean
