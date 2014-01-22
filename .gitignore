@@ -2,4 +2,4 @@
 /test/cbc_test
 *.exe
 *.o
-
+*.dep
