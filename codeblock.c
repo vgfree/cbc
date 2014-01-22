@@ -38,8 +38,7 @@ codeblock_t* codeblock_create()
 // -----------------------------------------------------------------------------
 void codeblock_free(codeblock_t* cb)
 {
-	if (cb->result)
-		value_free(cb->result);
+	codeblock_reset(cb);
 	
 	free(cb);
 }
