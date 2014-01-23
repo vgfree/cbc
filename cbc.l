@@ -5,11 +5,12 @@
 
 %{
 
+#include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
 #include "value.h"
 #include "syntree.h"
 #include "strlist.h"
-#include "errors.h"
 #include "cbc_parse.h"
 
 void yyerror(const char* format, ...);
