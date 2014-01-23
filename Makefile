@@ -48,7 +48,7 @@ debug: build
 release: build
 
 # build codeblock-compiler executable
-build: $(OBJ_CBC) errors.o
+build: $(OBJ_CBC)
 	$(CC) -o $(TARGET) $^ $(LDFLAGS)
 
 # build object-files
@@ -96,7 +96,7 @@ clean-cbc: TARGET := $(TARGET).exe
 else
 clean-cbc:
 endif
-	$(RM) $(TARGET) $(PARSER) $(INC_PARSER) $(LEXER) $(OBJ_CBC) errors.o
+	$(RM) $(TARGET) $(PARSER) $(INC_PARSER) $(LEXER) $(OBJ_CBC)
 
 # default clean-target
 clean: clean-cbc
