@@ -7,10 +7,11 @@ TARGET		:= cbc_test
 DEP_FILE	:= test.dep
 OBJ_DEP		:= 
 
-SRC			:= cbc_test.c
-OBJ			:= $(SRC:%.c=%.o)
+SRC			:= cbc_test.c codeblock_test.c
+CUTEST_SRC	:= cutest/CuTest.c
+OBJ			:= $(SRC:%.c=%.o) $(CUTEST_SRC:%.c=%.o)
 
-CFLAGS		:= -g -I sput
+CFLAGS		:= -g -I cutest
 LDFLAGS		:= 
 
 
@@ -28,7 +29,7 @@ test: $(OBJ) $(OBJ_DEP)
 
 # build object-files
 %.o: %.c
-	$(CC) $(CFLAGS) -c $<
+	$(CC) -o $@ $(CFLAGS) -c $<
 
 # run test
 run:
