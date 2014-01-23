@@ -283,8 +283,13 @@ value_t* syntree_eval(syntree_t* node, symtab_t* symtab)
 				result = syntree_eval(((flow_t*) node)->tb, symtab);// condition is ture:
 																	// take the true-branch
 			else
-				result = syntree_eval(((flow_t*) node)->fb, symtab);// condition is false:
-																	// take the false-branch
+			{
+				// condition is false: take the false-branch, if there is one
+				if (((flow_t*) node)->fb)
+					result = syntree_eval(((flow_t*) node)->fb, symtab);
+				else
+					result = value_create();
+			}
 			
 			value_free(condition);
 			break;
