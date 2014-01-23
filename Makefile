@@ -93,9 +93,8 @@ clean-test:
 # clean codeblock-compiler/interpreter
 ifeq ($(OS), Windows_NT)
 clean-cbc: TARGET := $(TARGET).exe
-else
-clean-cbc:
 endif
+clean-cbc:
 	$(RM) $(TARGET) $(PARSER) $(INC_PARSER) $(LEXER) $(OBJ_CBC)
 
 # default clean-target

@@ -47,9 +47,8 @@ endif
 
 ifeq ($(OS), Windows_NT)
 clean: TARGET := $(TARGET).exe
-else
-clean:
 endif
+clean:
 	$(RM) $(TARGET) $(OBJ)
 
 
