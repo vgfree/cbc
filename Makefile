@@ -70,11 +70,11 @@ $(LEXER): $(SRC_LEXER)
 
 # build test
 test: $(OBJ) make-depfile
-	make --directory $(TEST_DIR)
+	$(MAKE) --directory $(TEST_DIR)
 
 # run test
 runtest:
-	make --directory $(TEST_DIR) run
+	$(MAKE) --directory $(TEST_DIR) run
 
 # create dependencies-file for test build
 make-depfile:
@@ -82,7 +82,7 @@ make-depfile:
 
 # clean test
 clean-test:
-	make --directory $(TEST_DIR) clean
+	$(MAKE) --directory $(TEST_DIR) clean
 	$(RM) $(TEST_DEP_FILE)
 
 
