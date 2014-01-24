@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <CuTest.h>
 #include "codeblock_test.h"
+#include "scope_test.h"
 
 // #############################################################################
 // Main
@@ -16,6 +17,7 @@ int main(int argc, char *argv[])
 	CuSuite* suite	= CuSuiteNew();
 	
 	CuSuiteAddSuite(suite, make_suite_codeblock());
+	CuSuiteAddSuite(suite, make_suite_scope());
 	
 	CuSuiteRun(suite);
 	CuSuiteSummary(suite, output);
