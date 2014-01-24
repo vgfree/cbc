@@ -1,6 +1,10 @@
 	/* DEFINITIONS ---------------------------------------------------------- */
 %{
 
+#ifdef _CBC_TRACK_EXECUTION_TIME
+#include <time.h>
+#endif // _CBC_TRACK_EXECUTION_TIME
+
 #include <stdio.h>
 #include <stdlib.h>
 #include "codeblock.h"
@@ -203,14 +207,30 @@ int main(int argc, char* argv[])
 		
 		yyin = input;
 	}
-	
+
 	cb					= codeblock_create();
 	cb->global_symtab	= symtab_create();
 	
 	yyparse();					// parse codeblock-code
 	
+#ifdef _CBC_TRACK_EXECUTION_TIME
+	clock_t begin;
+	begin = clock();
+#endif // _CBC_TRACK_EXECUTION_TIME
+	
 	codeblock_execute(cb);		// execute ...
+	
+#ifdef _CBC_TRACK_EXECUTION_TIME
+	clock_t end;
+	end = clock();
+	float diff = ((float) end - (float) begin);
+#endif // _CBC_TRACK_EXECUTION_TIME
+	
 	value_print(cb->result);	// and print result
+	
+#ifdef _CBC_TRACK_EXECUTION_TIME
+	printf("\nExecution duration: %f seconds", diff / CLOCKS_PER_SEC);
+#endif // _CBC_TRACK_EXECUTION_TIME
 	
 	// cleanup
 	symtab_free(cb->global_symtab);
