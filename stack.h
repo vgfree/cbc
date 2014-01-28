@@ -25,6 +25,7 @@ stack_t* stack_create();
 void stack_free(stack_t* stack);
 void stack_push(stack_t* stack, const void* item);
 int stack_pop(stack_t* stack, void** dest);
+const void* stack_get_top_item(const stack_t* stack);
 bool stack_is_empty(const stack_t* stack);
 
 

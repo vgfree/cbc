@@ -79,6 +79,18 @@ int stack_pop(stack_t* stack, void** dest)
 }
 
 // -----------------------------------------------------------------------------
+// get the pointer to the data-member of the top-item
+// -----------------------------------------------------------------------------
+const void* stack_get_top_item(const stack_t* stack)
+{
+	const void* result = NULL;
+	if (stack->top)
+		result = stack->top->data;
+	
+	return result;
+}
+
+// -----------------------------------------------------------------------------
 // check whether the stack is empty
 // -----------------------------------------------------------------------------
 bool stack_is_empty(const stack_t* stack)

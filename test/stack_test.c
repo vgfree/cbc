@@ -51,7 +51,11 @@ void test_stack_complex(CuTest *tc)
 	
 	int i = 0;
 	for (; i < 10; i++)
-		stack_push(stack, scope_create("scope", i + 1));
+	{
+		scope_t* dummy = scope_create("scope", i + 1);
+		stack_push(stack, dummy);
+		CuAssertPtrEquals(tc, dummy, (scope_t*) stack_get_top_item(stack));
+	}
 	
 	CuAssertIntEquals(tc, 10, stack->count);
 	CuAssertPtrNotNull(tc, stack->top);
