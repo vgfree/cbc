@@ -7,6 +7,7 @@
 #include "codeblock_test.h"
 #include "scope_test.h"
 #include "stack_test.h"
+#include "symtab_test.h"
 
 
 // #############################################################################
@@ -35,6 +36,7 @@ int main(int argc, char *argv[])
 	CuSuiteAddSuite_Custom(suite, make_suite_codeblock());
 	CuSuiteAddSuite_Custom(suite, make_suite_scope());
 	CuSuiteAddSuite_Custom(suite, make_suite_stack());
+	CuSuiteAddSuite_Custom(suite, make_suite_symtab());
 	
 	// run tests
 	CuSuiteRun(suite);

@@ -6,17 +6,19 @@
 #include <stdlib.h>
 #include <string.h>
 #include "symtab.h"
+#include "scope.h"
 
 // -----------------------------------------------------------------------------
 // Constructor
 // -----------------------------------------------------------------------------
 symtab_t* symtab_create()
 {
-	symtab_t* st= (symtab_t*) malloc(sizeof(symtab_t));
-	st->first	= NULL;
-	st->last	= NULL;
-	st->current	= NULL;
-	st->size	= 0;
+	symtab_t* st	= (symtab_t*) malloc(sizeof(symtab_t));
+	st->first		= NULL;
+	st->last		= NULL;
+	st->current		= NULL;
+	st->size		= 0;
+	st->scope_stack	= stack_create();
 	
 	return st;
 }
@@ -36,6 +38,7 @@ void symtab_free(symtab_t* st)
 		symbol_free(temp);
 	}
 	
+	stack_free(st->scope_stack);
 	free(st);
 }
 
@@ -61,6 +64,7 @@ symbol_t* symtab_append(symtab_t* st, symbol_t* s)
 	else
 		symbol_connect(st->last, s);
 	
+	s->scope = stack_get_top_item(st->scope_stack);
 	st->last = s;
 	st->size++;
 	
@@ -161,8 +165,18 @@ symbol_t* symtab_lookup(symtab_t* st, char* id)
 	{
 		if (strcmp(id, current->id) == 0)
 		{
-			result = current;
-			break;
+			if (scope_equals(	current->scope,
+								stack_get_top_item(st->scope_stack)))
+			{
+				result = current;
+				break;	// Correct symbol was found -> break
+			}
+			// NULL-scope means, that the current symbol is in global scope.
+			// -> Can potentially be used, if there is no local declaration.
+			else if (current->scope == NULL)
+				// Do not break in this case,
+				// since there could still be a local declaration of the symbol!
+				result = current;
 		}
 		current = current->next;
 	}
@@ -212,4 +226,23 @@ symbol_t* symtab_previous(symtab_t* st)
 bool symtab_isempty(symtab_t* st)
 {
 	return st->size == 0;
+}
+
+// -----------------------------------------------------------------------------
+// Enter new scope
+// -----------------------------------------------------------------------------
+void symtab_enter_scope(symtab_t* st, char* context)
+{
+	scope_t* new_scope = scope_create(context, st->scope_stack->count + 1);
+	stack_push(st->scope_stack, new_scope);
+}
+
+// -----------------------------------------------------------------------------
+// Leave current scope
+// -----------------------------------------------------------------------------
+void symtab_leave_scope(symtab_t* st)
+{
+	scope_t* current_scope;
+	stack_pop(st->scope_stack, (void*) &current_scope);	// pop and
+	scope_free(current_scope);							// free current scope
 }

@@ -24,6 +24,7 @@ symbol_t* symbol_create()
 	s->id		= NULL;
 	s->next		= NULL;
 	s->previous	= NULL;
+	s->scope	= NULL;
 	
 	return s;
 }

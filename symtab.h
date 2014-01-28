@@ -13,6 +13,7 @@
 #include <stddef.h>
 #include "symtab_if.h"
 #include "symbol.h"
+#include "stack.h"
 
 struct symbol_table
 {
@@ -20,6 +21,7 @@ struct symbol_table
 	symbol_t* last;
 	symbol_t* current;
 	size_t size;
+	stack_t* scope_stack;
 };
 
 // Interface functions
@@ -35,5 +37,7 @@ symbol_t* symtab_next(symtab_t* st);
 symbol_t* symtab_current(symtab_t* st);
 symbol_t* symtab_previous(symtab_t* st);
 bool symtab_isempty(symtab_t* st);
+void symtab_enter_scope(symtab_t* st, char* context);
+void symtab_leave_scope(symtab_t* st);
 
 #endif // SYMTAB_H

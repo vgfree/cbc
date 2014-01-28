@@ -12,6 +12,7 @@
 
 #include "value.h"
 #include "function.h"
+#include "scope.h"
 
 // enum symbol_type_t -- type of the symbol
 enum symbol_type_t
@@ -36,6 +37,7 @@ typedef struct cb_symbol_t
 	char* id;						// identifier
 	struct cb_symbol_t* next;		// reference to the next symbol (in case of a list)
 	struct cb_symbol_t* previous;	// reference to the previous symbol (in case of a list)
+	const scope_t* scope;			// scope, in which the symbol is valid
 	
 	union
 	{
