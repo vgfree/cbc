@@ -6,6 +6,8 @@
 #define SCOPE_H
 
 
+#include <stdbool.h>
+
 // scope_t struct
 typedef struct
 {
@@ -17,6 +19,7 @@ typedef struct
 // interface functions
 scope_t* scope_create(char* context, int level);
 void scope_free(scope_t* scope);
+bool scope_equals(const scope_t* scope1, const scope_t* scope2);
 
 
 #endif // SCOPE_H

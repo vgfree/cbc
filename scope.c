@@ -31,3 +31,15 @@ void scope_free(scope_t* scope)
 	free(scope->context);
 	free(scope);
 }
+
+// -----------------------------------------------------------------------------
+// compare scopes
+// -----------------------------------------------------------------------------
+bool scope_equals(const scope_t* scope1, const scope_t* scope2)
+{
+	if (scope1 == NULL || scope2 == NULL)
+		return scope1 == scope2;
+	else
+		return (scope1->level == scope2->level &&
+				strcmp(scope1->context, scope2->context) == 0);
+}

@@ -15,12 +15,26 @@
 // -----------------------------------------------------------------------------
 void test_scope(CuTest *tc)
 {
-	scope_t* scope = scope_create("global", 0);
+	scope_t* scope1			= scope_create("scope1", 1);
+	scope_t* scope2			= scope_create("scope2", 2);
+	scope_t* scope1_clone	= scope_create("scope1", 1);
 	
-	CuAssertStrEquals(tc, "global",	scope->context);
-	CuAssertIntEquals(tc, 0,		scope->level);
+	CuAssertStrEquals(tc, "scope1",	scope1->context);
+	CuAssertIntEquals(tc, 1,		scope1->level);
+	CuAssertStrEquals(tc, "scope1",	scope1_clone->context);
+	CuAssertIntEquals(tc, 1,		scope1_clone->level);
+	CuAssertStrEquals(tc, "scope2",	scope2->context);
+	CuAssertIntEquals(tc, 2,		scope2->level);
 	
-	scope_free(scope);
+	CuAssertTrue(tc, !scope_equals(scope1, scope2));
+	CuAssertTrue(tc, !scope_equals(NULL, scope2));
+	CuAssertTrue(tc, !scope_equals(scope1, NULL));
+	CuAssertTrue(tc, scope_equals(scope1, scope1_clone));
+	CuAssertTrue(tc, scope_equals(NULL, NULL));
+	
+	scope_free(scope1);
+	scope_free(scope1_clone);
+	scope_free(scope2);
 }
 
 
