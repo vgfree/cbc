@@ -11,13 +11,13 @@ PARSER			:= $(TARGET)_parse.c
 INC_PARSER		:= $(PARSER:%.c=%.h)
 
 SRC				:= 	codeblock.c symbol.c symtab.c function.c value.c strlist.c \
-					syntree.c symref.c funccall.c funcdecl.c scope.c
+					syntree.c symref.c funccall.c funcdecl.c scope.c stack.c
 OBJ				:= $(SRC:%.c=%.o)
 
 SRC_CBC			:= $(LEXER) $(PARSER) $(SRC)
 OBJ_CBC			:= $(SRC_CBC:%.c=%.o)
 
-CFLAGS			:= 
+CFLAGS			:= -g -D _CBC_DEBUG -D _CBC_NOLOG
 LDFLAGS			:= 
 
 LEX				:= flex
@@ -41,10 +41,10 @@ $(OBJ_CBC): $(SRC_CBC)
 $(OBJ): $(SRC)
 
 # debug-build
-debug: CFLAGS := -g -D _CBC_DEBUG -D _CBC_NOLOG
 debug: build
 
 # release-build
+release: CFLAGS := -D _CBC_TRACK_EXECUTION_TIME
 release: build
 
 # build codeblock-compiler executable
