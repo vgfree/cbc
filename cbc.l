@@ -13,6 +13,10 @@
 #include "strlist.h"
 #include "cbc_parse.h"
 
+#ifndef _CBC_NOLOG
+#define _CBC_LOG_FILENAME "cbc.log"
+#endif // _CBC_NOLOG
+
 void yyerror(const char* format, ...);
 
 %}
@@ -140,7 +144,7 @@ void yyerror(const char* format, ...)
 #endif // _CBC_DEBUG
 #ifndef _CBC_NOLOG
 	// log to file
-	FILE* log_file = fopen(CBC_LOG_FILENAME, "a+");
+	FILE* log_file = fopen(_CBC_LOG_FILENAME, "a+");
 	fyyerror(log_file, format, &arglist);
 	fclose(log_file);
 #endif // _CBC_NOLOG
