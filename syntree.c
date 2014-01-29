@@ -215,9 +215,16 @@ value_t* syntree_eval(syntree_t* node, symtab_t* symtab)
 		
 		case SNT_ASSIGNMENT:
 		{
+			// evaluate right-hand-side first, since it could contain a
+			// function-call, which could change the order in the symbol-table!
+			value_t* rhs = syntree_eval(node->r, symtab);
+			
+			// after that, set symbol from the symbol-table
 			symref_t* sr = (symref_t*) node->l;
 			symref_setsymbolfromtable(sr, symtab);
-			value_assign_freesource(syntree_eval(node->r, symtab), sr->table_sym->value);
+			
+			// assign right-hand-side expression
+			value_assign_freesource(rhs, sr->table_sym->value);
 			
 			result = value_copy(sr->table_sym->value);
 			break;
@@ -265,6 +272,7 @@ value_t* syntree_eval(syntree_t* node, symtab_t* symtab)
 			
 			function_call(f, fncall->args);
 			result = value_copy(f->result);
+			function_reset(f);
 			
 			break;
 		}

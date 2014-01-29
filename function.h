@@ -35,6 +35,7 @@ function_t* function_create();
 void function_free(function_t* f);
 void function_addparam(function_t* f, char* param_id);
 value_t* function_call(function_t* f, strlist_t* args);
+void function_reset(function_t* f);
 
 
 #endif // FUNCTION_H

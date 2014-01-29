@@ -8,13 +8,7 @@
 #include "function.h"
 #include "symtab.h"
 #include "syntree.h"
-
-
-// #############################################################################
-// declarations
-// #############################################################################
-
-void function_reset(function_t* f);
+#include "stack.h"
 
 
 // #############################################################################
@@ -88,6 +82,7 @@ value_t* function_call(function_t* f, strlist_t* args)
 		exit(EXIT_FAILURE);
 	}
 	
+	stack_t* arg_stack = stack_create();
 	// declare and assign parameters, if necessary
 	if (count_params > 0)
 	{
@@ -103,13 +98,31 @@ value_t* function_call(function_t* f, strlist_t* args)
 			value_t* arg_value = syntree_eval(((syntree_t*) curr_arg->data), f->symtab);
 			
 			value_assign_freesource(arg_value, s->value);	// assign argument-value
-			symtab_append(f->symtab, s);					// declare symbol
+			stack_push(arg_stack, s);						// push argument on the stack
 			
 			// process next items
 			curr_param	= curr_param->next;
 			curr_arg	= curr_arg->next;
 		}
 	}
+	
+	symtab_enter_scope(f->symtab, "func");	// enter function-scope
+	
+	// declare all arguments
+	if (count_params > 0)
+	{
+		strlist_t* curr_param = f->params;
+		while (curr_param)
+		{
+			symbol_t* arg;
+			stack_pop(arg_stack, (void*) &arg);
+			symtab_append(f->symtab, arg);	// declare argument within function-
+											// scope
+			curr_param = curr_param->next;
+		}
+	}
+	
+	stack_free(arg_stack);
 	
 	// execute function
 	f->result = syntree_eval(f->body, f->symtab);
@@ -125,16 +138,13 @@ value_t* function_call(function_t* f, strlist_t* args)
 		}
 	}
 	
+	symtab_leave_scope(f->symtab);			// leave function-scope
+	
 	return f->result;
 }
 
-
-// #############################################################################
-// internal functions
-// #############################################################################
-
 // -----------------------------------------------------------------------------
-// reset function (internal)
+// reset function
 // -----------------------------------------------------------------------------
 void function_reset(function_t* f)
 {
