@@ -256,6 +256,7 @@ value_t* syntree_eval(syntree_t* node, symtab_t* symtab)
 			symbol_t* s = symbol_create();
 			symbol_setid(s, fndecl->sym_id);
 			symbol_settype(s, SYM_TYPE_FUNCTION);
+			s->function->id		= strdup(fndecl->sym_id);
 			s->function->body	= fndecl->body;
 			s->function->params	= fndecl->params;
 			s->function->symtab	= fndecl->symtab;

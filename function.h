@@ -18,10 +18,11 @@
 // function_t struct
 typedef struct
 {
+	char* id;			// name of the function
 	syntree_t* body;	// contains actual function-code
-	strlist_t* params;	// list of identifiers that represent parameters
+	strlist_t* params;	// list of identifiers that represent formal parameters
 	symtab_t* symtab;	// reference to the symbol-table, that will be used to
-						// declare the parameters.
+						// declare parameters and other local symbols.
 	value_t* result;	// result of the function after calling it
 	
 	// TODO:	Implement a state-attribute that indicates whether a function

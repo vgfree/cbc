@@ -21,6 +21,7 @@
 function_t* function_create()
 {
 	function_t* f	= (function_t*) malloc(sizeof(function_t));
+	f->id			= NULL;
 	f->body			= NULL;
 	f->params		= NULL;
 	f->symtab		= NULL;
@@ -35,6 +36,9 @@ function_t* function_create()
 void function_free(function_t* f)
 {
 	function_reset(f);
+	
+	if (f->id)	// free identifier, if necessary
+		free(f->id);
 	
 	free(f);
 }
@@ -101,7 +105,7 @@ value_t* function_call(function_t* f, strlist_t* args)
 		}
 	}
 	
-	symtab_enter_scope(f->symtab, "func");	// enter function-scope
+	symtab_enter_scope(f->symtab, f->id);	// enter function-scope
 	
 	// declare all arguments
 	if (count_params > 0)
