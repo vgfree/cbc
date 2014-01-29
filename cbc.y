@@ -7,6 +7,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include "codeblock.h"
 #include "value.h"
 #include "syntree.h"
@@ -195,8 +196,9 @@ expr:
 int main(int argc, char* argv[])
 {
 	extern FILE* yyin;
+	bool parse_file = argc > 1;	// determine whether to parse a file
 	
-	if (argc > 1)
+	if (parse_file)
 	{
 		FILE* input = fopen(argv[1], "r");
 		if (!input)
@@ -211,7 +213,10 @@ int main(int argc, char* argv[])
 	cb					= codeblock_create();
 	cb->global_symtab	= symtab_create();
 	
-	yyparse();					// parse codeblock-code
+	yyparse();			// parse codeblock-code
+	
+	if (parse_file)		// if parsed stream is not stdin
+		fclose(yyin);	// -> close file stream
 	
 #ifdef _CBC_TRACK_EXECUTION_TIME
 	clock_t begin;
