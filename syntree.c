@@ -136,8 +136,14 @@ void syntree_free(syntree_t* node)
 			break;
 		
 		case SNT_FUNC_DECL:
+		{
+			funcdecl_t* fndecl = ((funcdecl_t*) node);
+			free(fndecl->sym_id);
+			syntree_free(fndecl->body);
+			strlist_free(fndecl->params);
 			break;
-			
+		}
+		
 		case SNT_SYMREF:
 			free(((symref_t*) node)->sym_id);
 			break;
@@ -246,9 +252,17 @@ value_t* syntree_eval(syntree_t* node, symtab_t* symtab)
 		case SNT_FUNC_DECL:
 		{
 			funcdecl_t* fndecl = (funcdecl_t*) node;
-			symtab_append(symtab, fndecl->function_sym);	// declare function
 			
-			result = value_create();						// return empty value
+			symbol_t* s = symbol_create();
+			symbol_setid(s, fndecl->sym_id);
+			symbol_settype(s, SYM_TYPE_FUNCTION);
+			s->function->body	= fndecl->body;
+			s->function->params	= fndecl->params;
+			s->function->symtab	= fndecl->symtab;
+			
+			symtab_append(symtab, s);	// declare function
+			
+			result = value_create();	// return empty value
 			break;
 		}
 		

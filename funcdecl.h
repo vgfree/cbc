@@ -1,8 +1,8 @@
 /*******************************************************************************
- * funcdecl_t -- 'syntree_t'-node, that declares a function in the symbol-table.
+ * funcdecl_t -- 'syntree_t'-node, that contains information about a function.
  * 
  *  	This structure is part of the abstract syntax-tree 'syntree_t'.
- *  	It either uses the node-type SNT_FNCALL or SNT_FNDECL.
+ *  	It either uses the node-type SNT_FUNC_DECL.
  ******************************************************************************/
 
 #ifndef FUNCDECL_H
@@ -13,12 +13,17 @@
 #include "symtab_if.h"
 #include "syntree_if.h"
 #include "strlist.h"
+#include "function.h"
 
 // function-declaration node
 typedef struct
 {
 	enum syn_nodetype_t type;	// node-type is SNT_FUNC_DECL
-	symbol_t* function_sym;		// reference to a prepared function-symobl
+	char* sym_id;				// function-identifier
+	syntree_t* body;			// contains the code of the function
+	strlist_t* params;			// formal parameters
+	symtab_t* symtab;			// pointer to the symbol-table that should be
+								// used
 } funcdecl_t;
 
 

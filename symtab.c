@@ -242,6 +242,23 @@ void symtab_enter_scope(symtab_t* st, char* context)
 // -----------------------------------------------------------------------------
 void symtab_leave_scope(symtab_t* st)
 {
+	// Remove all local symbols in the current scope.
+	// Begin with last symbol in the symbol-table, because recently appended
+	// symbols are always at the end of the table!
+	symbol_t* current = st->last;
+	while (current)
+	{
+		symbol_t* temp	= current;
+		current			= current->previous;
+		
+		if (scope_equals(	temp->scope,
+							(scope_t*) stack_get_top_item(st->scope_stack)))
+			// TODO: Use a different method to dispatch and remove the symbol.
+			// Since symtab_dispatch() calls symtab_lookup() this could be a
+			// quite slow operation!
+			symtab_remove(st, temp->id);
+	}
+	
 	scope_t* current_scope;
 	stack_pop(st->scope_stack, (void*) &current_scope);	// pop and
 	scope_free(current_scope);							// free current scope

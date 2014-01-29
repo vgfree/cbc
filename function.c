@@ -36,11 +36,6 @@ void function_free(function_t* f)
 {
 	function_reset(f);
 	
-	if (f->params)
-		strlist_free(f->params);
-	if (f->body)
-		syntree_free(f->body);
-	
 	free(f);
 }
 
@@ -124,21 +119,12 @@ value_t* function_call(function_t* f, strlist_t* args)
 	
 	stack_free(arg_stack);
 	
-	// execute function
-	f->result = syntree_eval(f->body, f->symtab);
+	f->result = syntree_eval(f->body, f->symtab);	// execute function
 	
-	// remove declared arguments from symbol-table, if necessary
-	if (count_params > 0)
-	{
-		strlist_t* curr_param = f->params;
-		while (curr_param)
-		{
-			symtab_remove(f->symtab, curr_param->string);
-			curr_param = curr_param->next;
-		}
-	}
-	
-	symtab_leave_scope(f->symtab);			// leave function-scope
+	// leave function-scope:
+	// all symbols, that were declared within this scope (like parameters),
+	// will be freed!
+	symtab_leave_scope(f->symtab);
 	
 	return f->result;
 }

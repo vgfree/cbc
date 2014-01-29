@@ -1,8 +1,9 @@
 /*******************************************************************************
- * funcdecl_t -- 'syntree_t'-node, that declares a function in the symbol-table.
+ * funcdecl_t -- 'syntree_t'-node, that contains information about a function.
  ******************************************************************************/
 
 #include <stdlib.h>
+#include <string.h>
 #include "funcdecl.h"
 #include "symbol.h"
 #include "symtab.h"
@@ -21,15 +22,10 @@ syntree_t* funcdecl_create(	char* identifier, syntree_t* body,
 {
 	funcdecl_t* node= malloc(sizeof(funcdecl_t));
 	node->type		= SNT_FUNC_DECL;
-	
-	symbol_t* s 	= symbol_create();
-	symbol_setid(s, identifier);
-	symbol_settype(s, SYM_TYPE_FUNCTION);
-	s->function->body	= body;
-	s->function->params	= params;
-	s->function->symtab	= symtab;
-	
-	node->function_sym	= s;
+	node->sym_id	= strdup(identifier);
+	node->body		= body;
+	node->params	= params;
+	node->symtab	= symtab;
 	
 	return (syntree_t*) node;
 }
