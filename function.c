@@ -107,6 +107,14 @@ value_t* function_call(function_t* f, strlist_t* args)
 	
 	symtab_enter_scope(f->symtab, f->id);	// enter function-scope
 	
+#ifdef _CBC_DEFAULT_FUNC_RESULT_SYMBOL
+	// declare default function-result symbol
+	symbol_t* default_result = symbol_create();
+	symbol_setid(default_result, "Result");
+	symbol_settype(default_result, SYM_TYPE_VARIABLE);
+	symtab_append(f->symtab, default_result);
+#endif // _CBC_DEFAULT_FUNC_RESULT_SYMBOL
+	
 	// declare all arguments
 	if (count_params > 0)
 	{
@@ -123,7 +131,15 @@ value_t* function_call(function_t* f, strlist_t* args)
 	
 	stack_free(arg_stack);
 	
-	f->result = syntree_eval(f->body, f->symtab);	// execute function
+	// execute function
+#ifdef _CBC_DEFAULT_FUNC_RESULT_SYMBOL
+	value_free(syntree_eval(f->body, f->symtab));
+	f->result = value_copy(default_result->value);	// result is value of the
+													// "Result"-symbol
+#else
+	f->result = syntree_eval(f->body, f->symtab);	// result is the last
+													// expression in the function
+#endif // _CBC_DEFAULT_FUNC_RESULT_SYMBOL
 	
 	// leave function-scope:
 	// all symbols, that were declared within this scope (like parameters),

@@ -17,7 +17,12 @@ OBJ				:= $(SRC:%.c=%.o)
 SRC_CBC			:= $(LEXER) $(PARSER) $(SRC)
 OBJ_CBC			:= $(SRC_CBC:%.c=%.o)
 
-CFLAGS			:= -g -D _CBC_DEBUG -D _CBC_NOLOG
+CFLAGS			:=	-g \
+					-D _CBC_DEBUG \
+					-D _CBC_NOLOG \
+					-D _CBC_DEFAULT_FUNC_RESULT_SYMBOL
+CFLAGS_RELEASE	:=	-D _CBC_TRACK_EXECUTION_TIME \
+					-D _CBC_DEFAULT_FUNC_RESULT_SYMBOL
 LDFLAGS			:= 
 
 LEX				:= flex
@@ -44,7 +49,7 @@ $(OBJ): $(SRC)
 debug: build
 
 # release-build
-release: CFLAGS := -D _CBC_TRACK_EXECUTION_TIME
+release: CFLAGS := $(CFLAGS_RELEASE)
 release: build
 
 # build codeblock-compiler executable
