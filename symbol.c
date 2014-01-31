@@ -10,21 +10,49 @@
 
 
 // #############################################################################
+// implementation-functions
+// #############################################################################
+
+// -----------------------------------------------------------------------------
+// constructor (internal)
+// -----------------------------------------------------------------------------
+symbol_t* symbol_create(char* identifier)
+{
+	symbol_t* s	= (symbol_t*) malloc(sizeof(symbol_t));
+	s->type		= SYM_TYPE_UNDEFINED;
+	s->id		= strdup(identifier);
+	s->next		= NULL;
+	s->previous	= NULL;
+	s->scope	= NULL;
+	
+	return s;
+}
+
+
+// #############################################################################
 // interface-functions
 // #############################################################################
 
 // -----------------------------------------------------------------------------
-// constructor
+// constructor (variable)
 // -----------------------------------------------------------------------------
-symbol_t* symbol_create()
+symbol_t* symbol_create_variable(char* identifier)
 {
-	symbol_t* s	= (symbol_t*) malloc(sizeof(symbol_t));
-	s->type		= SYM_TYPE_UNDEFINED;
-	s->state	= SYM_STATE_INITIAL;
-	s->id		= NULL;
-	s->next		= NULL;
-	s->previous	= NULL;
-	s->scope	= NULL;
+	symbol_t* s	= symbol_create(identifier);
+	s->type		= SYM_TYPE_VARIABLE;
+	s->value	= value_create();
+	
+	return s;
+}
+
+// -----------------------------------------------------------------------------
+// constructor (function)
+// -----------------------------------------------------------------------------
+symbol_t* symbol_create_function(char* identifier, function_t* func_object)
+{
+	symbol_t* s	= symbol_create(identifier);
+	s->type		= SYM_TYPE_FUNCTION;
+	s->function	= func_object;
 	
 	return s;
 }
@@ -34,32 +62,20 @@ symbol_t* symbol_create()
 // -----------------------------------------------------------------------------
 void symbol_free(symbol_t* s)
 {
-	if (s->state > SYM_STATE_INITIAL)
-		free(s->id);
+	free(s->id);
 	
-	// destroy attributes
-	symbol_settype(s, SYM_TYPE_UNDEFINED);
+	switch (s->type)
+	{
+		case SYM_TYPE_VARIABLE:
+			value_free(s->value);
+			break;
+		
+		case SYM_TYPE_FUNCTION:
+			function_free(s->function);
+			break;
+	}
 	
 	free(s);
-}
-
-// -----------------------------------------------------------------------------
-// set symbol-identifier
-// -----------------------------------------------------------------------------
-void symbol_setid(symbol_t* s, char* id)
-{
-	if (s->state == SYM_STATE_INITIAL)
-	{
-		s->id	= strdup(id);
-		s->state= SYM_STATE_HASID;
-	}
-	// TODO: Error-handling
-	else
-	{
-		fprintf(stderr, "Error: Cannot change symbol-identifer after beeing "\
-						"already set\n");
-		exit(EXIT_FAILURE);
-	}
 }
 
 // -----------------------------------------------------------------------------
@@ -74,40 +90,4 @@ void symbol_connect(symbol_t* s1, symbol_t* s2)
 	
 	s1->next	= s2;
 	s2->previous= s1;
-}
-
-// -----------------------------------------------------------------------------
-// set symbol-type
-// -----------------------------------------------------------------------------
-void symbol_settype(symbol_t* s, enum symbol_type_t type)
-{
-	if (s->type == type) // nothing changed -> nothing to do
-		return;
-	
-	// free old attributes first, if necessary
-	switch (s->type)
-	{
-		case SYM_TYPE_VARIABLE:
-			value_free(s->value);
-			break;
-		
-		case SYM_TYPE_FUNCTION:
-			function_free(s->function);
-			break;
-	}
-	
-	// set new attributes
-	switch (type)
-	{
-		case SYM_TYPE_VARIABLE:
-			s->value = value_create();
-			break;
-		
-		case SYM_TYPE_FUNCTION:
-			s->function = function_create();
-			break;
-	}
-	
-	// finally, apply new symobl-type
-	s->type = type;
 }

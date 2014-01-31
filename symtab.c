@@ -52,10 +52,6 @@ symbol_t* symtab_append(symtab_t* st, symbol_t* s)
 	assert(s->next		== NULL); // allow appending single symbols only
 	assert(s->previous	== NULL);
 	
-	// do not append undefined symbol-objects
-	if (s->state == SYM_STATE_INITIAL)
-		return NULL;
-	
 	if (symtab_isempty(st))
 	{
 		st->first	= s;

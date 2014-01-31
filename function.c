@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include "function.h"
+#include "symbol.h"
 #include "symtab.h"
 #include "syntree.h"
 #include "stack.h"
@@ -89,13 +90,10 @@ value_t* function_call(function_t* f, strlist_t* args)
 		strlist_t* curr_arg		= args;
 		while (curr_param)
 		{
-			symbol_t* s = symbol_create();
-			symbol_setid(s, curr_param->string);	// set symbol-identifier
-			symbol_settype(s, SYM_TYPE_VARIABLE);	// set type
-			
 			// obtain argument value
 			value_t* arg_value = syntree_eval(((syntree_t*) curr_arg->data), f->symtab);
 			
+			symbol_t* s = symbol_create_variable(curr_param->string);
 			value_assign_freesource(arg_value, s->value);	// assign argument-value
 			stack_push(arg_stack, s);						// push argument on the stack
 			
@@ -109,9 +107,7 @@ value_t* function_call(function_t* f, strlist_t* args)
 	
 #ifdef _CBC_DEFAULT_FUNC_RESULT_SYMBOL
 	// declare default function-result symbol
-	symbol_t* default_result = symbol_create();
-	symbol_setid(default_result, "Result");
-	symbol_settype(default_result, SYM_TYPE_VARIABLE);
+	symbol_t* default_result = symbol_create_variable("Result");
 	symtab_append(f->symtab, default_result);
 #endif // _CBC_DEFAULT_FUNC_RESULT_SYMBOL
 	

@@ -26,9 +26,7 @@ void test_symtab(CuTest* tc)
 	CuAssertPtrNotNull(tc, symtab->scope_stack);
 	
 	// append variable
-	symbol_t* s = symbol_create();
-	symbol_setid(s, "test_symbol");
-	symbol_settype(s, SYM_TYPE_VARIABLE);
+	symbol_t* s = symbol_create_variable("test_symbol");
 	symtab_append(symtab, s);
 	
 	CuAssertIntEquals(tc, 1, symtab->size);
@@ -37,9 +35,7 @@ void test_symtab(CuTest* tc)
 	CuAssertPtrEquals(tc, s, symtab->last);
 	
 	// append second variable
-	symbol_t* s2 = symbol_create();
-	symbol_setid(s2, "test_symbol_2");
-	symbol_settype(s2, SYM_TYPE_VARIABLE);
+	symbol_t* s2 = symbol_create_variable("test_symbol_2");
 	symtab_append(symtab, s2);
 	
 	CuAssertIntEquals(tc, 2, symtab->size);
@@ -48,9 +44,7 @@ void test_symtab(CuTest* tc)
 	CuAssertPtrEquals(tc, s2, symtab->last);
 	
 	// append third variable
-	symbol_t* s3 = symbol_create();
-	symbol_setid(s3, "test_symbol_3");
-	symbol_settype(s3, SYM_TYPE_VARIABLE);
+	symbol_t* s3 = symbol_create_variable("test_symbol_3");
 	symtab_append(symtab, s3);
 	
 	CuAssertIntEquals(tc, 3, symtab->size);
@@ -104,9 +98,7 @@ void test_symtab_scope_stack(CuTest* tc)
 	CuAssertPtrEquals(tc, NULL, symtab->scope_stack->top);
 	
 	// declare symbol in global scope
-	symbol_t* sym = symbol_create();
-	symbol_setid(sym, "symbol_global");
-	symbol_settype(sym, SYM_TYPE_VARIABLE);
+	symbol_t* sym = symbol_create_variable("symbol_global");
 	symtab_append(symtab, sym);
 	
 	// find global symbol
@@ -132,9 +124,7 @@ void test_symtab_scope_stack(CuTest* tc)
 		// global symbol always has to be found in any scope
 		CuAssertPtrEquals(tc, sym, symtab_lookup(symtab, "symbol_global"));
 		
-		symbol_t* s = symbol_create();
-		symbol_setid(s, sym_id->buffer);
-		symbol_settype(s, SYM_TYPE_VARIABLE);
+		symbol_t* s = symbol_create_variable(sym_id->buffer);
 		symtab_append(symtab, s);	// declare symbol within new scope
 		
 		// find new symbol

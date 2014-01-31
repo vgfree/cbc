@@ -240,12 +240,10 @@ value_t* syntree_eval(syntree_t* node, symtab_t* symtab)
 		{
 			symref_t* sr = (symref_t*) node->l;
 			
-			symbol_t* dummy = symbol_create();		// create new symbol
-			symbol_setid(dummy, sr->sym_id);
-			symbol_settype(dummy, SYM_TYPE_VARIABLE);
-			symtab_append(symtab, dummy);			// declare symbol
+			symbol_t* dummy = symbol_create_variable(sr->sym_id);
+			symtab_append(symtab, dummy);	// declare symbol
 			
-			result = value_create();				// return empty value
+			result = value_create();		// return empty value
 			break;
 		}
 		
@@ -253,14 +251,14 @@ value_t* syntree_eval(syntree_t* node, symtab_t* symtab)
 		{
 			funcdecl_t* fndecl = (funcdecl_t*) node;
 			
-			symbol_t* s = symbol_create();
-			symbol_setid(s, fndecl->sym_id);
-			symbol_settype(s, SYM_TYPE_FUNCTION);
-			s->function->id		= strdup(fndecl->sym_id);
-			s->function->body	= fndecl->body;
-			s->function->params	= fndecl->params;
-			s->function->symtab	= fndecl->symtab;
+			// prepare function-object
+			function_t* func	= function_create();
+			func->id			= strdup(fndecl->sym_id);
+			func->body			= fndecl->body;
+			func->params		= fndecl->params;
+			func->symtab		= fndecl->symtab;
 			
+			symbol_t* s = symbol_create_function(fndecl->sym_id, func);
 			symtab_append(symtab, s);	// declare function
 			
 			result = value_create();	// return empty value
