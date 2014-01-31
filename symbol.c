@@ -16,7 +16,7 @@
 // -----------------------------------------------------------------------------
 // constructor (internal)
 // -----------------------------------------------------------------------------
-symbol_t* symbol_create(char* identifier)
+static symbol_t* symbol_create(char* identifier)
 {
 	symbol_t* s	= (symbol_t*) malloc(sizeof(symbol_t));
 	s->type		= SYM_TYPE_UNDEFINED;
