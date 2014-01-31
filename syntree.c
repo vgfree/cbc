@@ -215,9 +215,12 @@ value_t* syntree_eval(syntree_t* node, symtab_t* symtab)
 			break;
 		
 		case SNT_SYMREF:
-			symref_setsymbolfromtable((symref_t*) node, symtab);
-			result = value_copy(((symref_t*) node)->table_sym->value);
+		{
+			symref_t* sr = (symref_t*) node;
+			symref_setsymbolfromtable(sr, symtab);
+			result = value_copy(symbol_variable_get_value(sr->table_sym));
 			break;
+		}
 		
 		case SNT_ASSIGNMENT:
 		{
@@ -230,9 +233,10 @@ value_t* syntree_eval(syntree_t* node, symtab_t* symtab)
 			symref_setsymbolfromtable(sr, symtab);
 			
 			// assign right-hand-side expression
-			value_assign_freesource(rhs, sr->table_sym->value);
+			symbol_variable_assign_value(sr->table_sym, rhs);
+			value_free(rhs);
 			
-			result = value_copy(sr->table_sym->value);
+			result = value_copy(symbol_variable_get_value(sr->table_sym));
 			break;
 		}
 		
@@ -281,7 +285,7 @@ value_t* syntree_eval(syntree_t* node, symtab_t* symtab)
 		{
 			funccall_t* fncall = (funccall_t*) node;
 			symref_setsymbolfromtable((symref_t*) fncall, symtab);
-			function_t* f = fncall->table_sym->function;
+			function_t* f = symbol_function_get_function(fncall->table_sym);
 			
 			function_call(f, fncall->args);
 			result = value_copy(f->result);

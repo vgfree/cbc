@@ -28,11 +28,11 @@ struct symbol_table
 symtab_t* symtab_create();
 void symtab_free(symtab_t* st);
 symbol_t* symtab_append(symtab_t* st, symbol_t* s);
-symbol_t* symtab_dispatch(symtab_t* st, char* id);
-void symtab_remove(symtab_t* st, char* id);
+symbol_t* symtab_dispatch(symtab_t* st, const char* id);
+void symtab_remove(symtab_t* st, const char* id);
 void symtab_dispatch_all(symtab_t* st);
 void symtab_clear(symtab_t* st);
-symbol_t* symtab_lookup(symtab_t* st, char* id);
+symbol_t* symtab_lookup(symtab_t* st, const char* id);
 symbol_t* symtab_next(symtab_t* st);
 symbol_t* symtab_current(symtab_t* st);
 symbol_t* symtab_previous(symtab_t* st);

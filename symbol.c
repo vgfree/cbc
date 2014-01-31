@@ -10,6 +10,27 @@
 
 
 // #############################################################################
+// declarations
+// #############################################################################
+
+// symbol_t struct
+struct symbol_t
+{
+	enum symbol_type_t type;	// type
+	char* id;					// identifier
+	struct symbol_t* next;		// reference to the next symbol (in case of a list)
+	struct symbol_t* previous;	// reference to the previous symbol (in case of a list)
+	const scope_t* scope;		// scope, in which the symbol is valid
+	
+	union
+	{
+		value_t* value;			// symbol-value, is used if the symbol is a variable
+		function_t* function;	// function, is used if the symbol is a function
+	};
+};
+
+
+// #############################################################################
 // implementation-functions
 // #############################################################################
 
@@ -90,4 +111,90 @@ void symbol_connect(symbol_t* s1, symbol_t* s2)
 	
 	s1->next	= s2;
 	s2->previous= s1;
+}
+
+// -----------------------------------------------------------------------------
+// get identifier
+// -----------------------------------------------------------------------------
+const char* symbol_get_id(const symbol_t* s)
+{
+	return s->id;
+}
+
+// -----------------------------------------------------------------------------
+// get next-item
+// -----------------------------------------------------------------------------
+symbol_t* symbol_get_next(const symbol_t* s)
+{
+	return s->next;
+}
+
+// -----------------------------------------------------------------------------
+// get previous-item
+// -----------------------------------------------------------------------------
+symbol_t* symbol_get_previous(const symbol_t* s)
+{
+	return s->previous;
+}
+
+// -----------------------------------------------------------------------------
+// get scope
+// -----------------------------------------------------------------------------
+const scope_t* symbol_get_scope(const symbol_t* s)
+{
+	return s->scope;
+}
+
+// -----------------------------------------------------------------------------
+// set next-item
+// -----------------------------------------------------------------------------
+void symbol_set_next(symbol_t* s, const symbol_t* next)
+{
+	s->next = (symbol_t*) next;
+}
+
+// -----------------------------------------------------------------------------
+// set previous-item
+// -----------------------------------------------------------------------------
+void symbol_set_previous(symbol_t* s, const symbol_t* previous)
+{
+	s->previous = (symbol_t*) previous;
+}
+
+// -----------------------------------------------------------------------------
+// set scope
+// -----------------------------------------------------------------------------
+void symbol_set_scope(symbol_t* s, const scope_t* scope)
+{
+	s->scope = scope;
+}
+
+// -----------------------------------------------------------------------------
+// get value-object of an variable-symbol (variables only!)
+// -----------------------------------------------------------------------------
+const value_t* symbol_variable_get_value(const symbol_t* s)
+{
+	assert(s->type == SYM_TYPE_VARIABLE);
+	
+	return s->value;
+}
+
+// -----------------------------------------------------------------------------
+// assign new value to the symbol-value (variables only!)
+// -----------------------------------------------------------------------------
+void symbol_variable_assign_value(symbol_t* s, const value_t* new_value)
+{
+	assert(s->type == SYM_TYPE_VARIABLE);
+	
+	value_assign(new_value, s->value);
+}
+
+// -----------------------------------------------------------------------------
+// get function-object of an function-symbol (functions only!)
+// -----------------------------------------------------------------------------
+function_t* symbol_function_get_function(const symbol_t* s)
+{
+	assert(s->type == SYM_TYPE_FUNCTION);
+	
+	return s->function;
 }

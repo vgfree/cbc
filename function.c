@@ -94,8 +94,9 @@ value_t* function_call(function_t* f, strlist_t* args)
 			value_t* arg_value = syntree_eval(((syntree_t*) curr_arg->data), f->symtab);
 			
 			symbol_t* s = symbol_create_variable(curr_param->string);
-			value_assign_freesource(arg_value, s->value);	// assign argument-value
-			stack_push(arg_stack, s);						// push argument on the stack
+			symbol_variable_assign_value(s, arg_value);	// assign argument-value
+			value_free(arg_value);
+			stack_push(arg_stack, s);					// push argument on the stack
 			
 			// process next items
 			curr_param	= curr_param->next;
@@ -130,8 +131,8 @@ value_t* function_call(function_t* f, strlist_t* args)
 	// execute function
 #ifdef _CBC_DEFAULT_FUNC_RESULT_SYMBOL
 	value_free(syntree_eval(f->body, f->symtab));
-	f->result = value_copy(default_result->value);	// result is value of the
-													// "Result"-symbol
+	// result is value of the "Result"-symbol
+	f->result = value_copy(symbol_variable_get_value(default_result));
 #else
 	f->result = syntree_eval(f->body, f->symtab);	// result is the last
 													// expression in the function
