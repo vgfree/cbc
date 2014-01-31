@@ -71,7 +71,7 @@ void value_free(value_t* val)
 // -----------------------------------------------------------------------------
 // check for given value-type
 // -----------------------------------------------------------------------------
-bool value_istype(value_t* val, enum value_type_t type)
+bool value_istype(const value_t* val, enum value_type_t type)
 {
 	if (val->type == type)
 		return true;
@@ -82,7 +82,7 @@ bool value_istype(value_t* val, enum value_type_t type)
 // -----------------------------------------------------------------------------
 // assign attributes from one codeblock-value struct to another
 // -----------------------------------------------------------------------------
-void value_assign(value_t* source, value_t* destination)
+void value_assign(const value_t* source, value_t* destination)
 {
 	switch (source->type)
 	{
@@ -119,7 +119,7 @@ void value_assign_freesource(value_t* source, value_t* destination)
 // -----------------------------------------------------------------------------
 // copy a codeblock-value struct
 // -----------------------------------------------------------------------------
-value_t* value_copy(value_t* val)
+value_t* value_copy(const value_t* val)
 {
 	value_t* copy = value_create();
 	value_assign(val, copy);
@@ -132,7 +132,7 @@ value_t* value_copy(value_t* val)
 // IMPORTANT:	the c-string must be freed after usage, since allocation occurs
 //				in this function!
 // -----------------------------------------------------------------------------
-char* value_tostring(value_t* val)
+char* value_tostring(const value_t* val)
 {
 	char* result_buf;
 	
@@ -172,7 +172,7 @@ char* value_tostring(value_t* val)
 // -----------------------------------------------------------------------------
 // print a codeblock-value
 // -----------------------------------------------------------------------------
-void value_print(value_t* val)
+void value_print(const value_t* val)
 {
 	char* string = value_tostring(val);
 	printf("%s", string);
@@ -260,7 +260,8 @@ value_t* cbnumeric_operation(	enum cbnumeric_operation_t type, value_t* l,
 // -----------------------------------------------------------------------------
 // numerical comparison
 // -----------------------------------------------------------------------------
-value_t* cbnumeric_compare(enum comparison_type_t type, value_t* l, value_t* r)
+value_t* cbnumeric_compare(	enum comparison_type_t type, const value_t* l,
+							const value_t* r)
 {
 	if (!value_istype(l, VT_NUMERIC) || !value_istype(r, VT_NUMERIC))
 	{
@@ -319,7 +320,8 @@ value_t* cbnumeric_div(value_t* l, value_t* r)
 // -----------------------------------------------------------------------------
 // string comparison
 // -----------------------------------------------------------------------------
-value_t* cbstring_compare(enum comparison_type_t type, value_t* l, value_t* r)
+value_t* cbstring_compare(	enum comparison_type_t type, const value_t* l,
+							const value_t* r)
 {
 	if (!value_istype(l, VT_STRING) || !value_istype(r, VT_STRING))
 	{
@@ -358,7 +360,8 @@ value_t* cbstring_compare(enum comparison_type_t type, value_t* l, value_t* r)
 // -----------------------------------------------------------------------------
 // boolean comparison
 // -----------------------------------------------------------------------------
-value_t* cbboolean_compare(enum comparison_type_t type, value_t* l, value_t* r)
+value_t* cbboolean_compare(	enum comparison_type_t type, const value_t* l,
+							const value_t* r)
 {
 	if (!value_istype(l, VT_BOOLEAN))
 	{
