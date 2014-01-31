@@ -59,7 +59,7 @@ void test_codeblock_execute_complex(CuTest *tc)
 										"Inc",
 										syntree_create(
 											SNT_ASSIGNMENT,
-											symref_create("nNumber"),
+											symref_create("Result"),
 											syntree_create('+', symref_create("nNumber"), constval_create(1))
 										)
 										,
