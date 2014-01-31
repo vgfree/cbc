@@ -127,8 +127,7 @@ stmt:
 	|	FUNCTION IDENTIFIER '(' params ')'
 			stmtlist
 		END						{
-									$$ = funcdecl_create(	$2, $6, $4,
-															cb->global_symtab);
+									$$ = funcdecl_create($2, $6, $4);
 									free($2);	// free duplicated string
 								}
 	| PRINT expr				{ $$ = syntree_create(SNT_PRINT, $2, NULL); }

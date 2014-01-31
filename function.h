@@ -21,8 +21,6 @@ typedef struct
 	char* id;			// name of the function
 	syntree_t* body;	// contains actual function-code
 	strlist_t* params;	// list of identifiers that represent formal parameters
-	symtab_t* symtab;	// reference to the symbol-table, that will be used to
-						// declare parameters and other local symbols.
 	value_t* result;	// result of the function after calling it
 	
 	// TODO:	Implement a state-attribute that indicates whether a function
@@ -35,7 +33,7 @@ typedef struct
 function_t* function_create();
 void function_free(function_t* f);
 void function_addparam(function_t* f, char* param_id);
-value_t* function_call(function_t* f, strlist_t* args);
+value_t* function_call(function_t* f, strlist_t* args, symtab_t* symtab);
 void function_reset(function_t* f);
 
 

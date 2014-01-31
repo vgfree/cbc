@@ -63,8 +63,7 @@ void test_codeblock_execute_complex(CuTest *tc)
 											syntree_create('+', symref_create("nNumber"), constval_create(1))
 										)
 										,
-										strlist_create("nNumber"),
-										cb->global_symtab
+										strlist_create("nNumber")
 									),
 									syntree_create(
 										SNT_STATEMENTLIST,

@@ -260,7 +260,6 @@ value_t* syntree_eval(syntree_t* node, symtab_t* symtab)
 			func->id			= strdup(fndecl->sym_id);
 			func->body			= fndecl->body;
 			func->params		= fndecl->params;
-			func->symtab		= fndecl->symtab;
 			
 			symbol_t* s = symbol_create_function(fndecl->sym_id, func);
 			symtab_append(symtab, s);	// declare function
@@ -287,7 +286,7 @@ value_t* syntree_eval(syntree_t* node, symtab_t* symtab)
 			symref_setsymbolfromtable((symref_t*) fncall, symtab);
 			function_t* f = symbol_function_get_function(fncall->table_sym);
 			
-			function_call(f, fncall->args);
+			function_call(f, fncall->args, symtab);
 			result = value_copy(f->result);
 			function_reset(f);
 			

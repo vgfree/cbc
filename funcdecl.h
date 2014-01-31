@@ -28,11 +28,8 @@ typedef struct
 
 
 // interface functions
-
-// funcdecl_create TODO: Reference to symbol-table should be determined only
-// right before function run-time.
 syntree_t* funcdecl_create(	char* identifier, syntree_t* body,
-							strlist_t* params, symtab_t* symtab);
+							strlist_t* params);
 
 
 #endif // FUNCDECL_H

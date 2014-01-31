@@ -18,14 +18,13 @@
 // constructor
 // -----------------------------------------------------------------------------
 syntree_t* funcdecl_create(	char* identifier, syntree_t* body,
-							strlist_t* params, symtab_t* symtab)
+							strlist_t* params)
 {
 	funcdecl_t* node= malloc(sizeof(funcdecl_t));
 	node->type		= SNT_FUNC_DECL;
 	node->sym_id	= strdup(identifier);
 	node->body		= body;
 	node->params	= params;
-	node->symtab	= symtab;
 	
 	return (syntree_t*) node;
 }

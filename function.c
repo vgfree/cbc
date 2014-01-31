@@ -25,7 +25,6 @@ function_t* function_create()
 	f->id			= NULL;
 	f->body			= NULL;
 	f->params		= NULL;
-	f->symtab		= NULL;
 	f->result		= NULL;
 	
 	return f;
@@ -62,7 +61,7 @@ void function_addparam(function_t* f, char* param_id)
 // call function
 // if the function has no parameters, pass a NULL-value as arguments.
 // -----------------------------------------------------------------------------
-value_t* function_call(function_t* f, strlist_t* args)
+value_t* function_call(function_t* f, strlist_t* args, symtab_t* symtab)
 {
 	assert(f->body);
 	
@@ -91,7 +90,7 @@ value_t* function_call(function_t* f, strlist_t* args)
 		while (curr_param)
 		{
 			// obtain argument value
-			value_t* arg_value = syntree_eval(((syntree_t*) curr_arg->data), f->symtab);
+			value_t* arg_value = syntree_eval(((syntree_t*) curr_arg->data), symtab);
 			
 			symbol_t* s = symbol_create_variable(curr_param->string);
 			symbol_variable_assign_value(s, arg_value);	// assign argument-value
@@ -104,12 +103,12 @@ value_t* function_call(function_t* f, strlist_t* args)
 		}
 	}
 	
-	symtab_enter_scope(f->symtab, f->id);	// enter function-scope
+	symtab_enter_scope(symtab, f->id);	// enter function-scope
 	
 #ifdef _CBC_DEFAULT_FUNC_RESULT_SYMBOL
 	// declare default function-result symbol
 	symbol_t* default_result = symbol_create_variable("Result");
-	symtab_append(f->symtab, default_result);
+	symtab_append(symtab, default_result);
 #endif // _CBC_DEFAULT_FUNC_RESULT_SYMBOL
 	
 	// declare all arguments
@@ -120,7 +119,7 @@ value_t* function_call(function_t* f, strlist_t* args)
 		{
 			symbol_t* arg;
 			stack_pop(arg_stack, (void*) &arg);
-			symtab_append(f->symtab, arg);	// declare argument within function-
+			symtab_append(symtab, arg);	// declare argument within function-
 											// scope
 			curr_param = curr_param->next;
 		}
@@ -130,18 +129,18 @@ value_t* function_call(function_t* f, strlist_t* args)
 	
 	// execute function
 #ifdef _CBC_DEFAULT_FUNC_RESULT_SYMBOL
-	value_free(syntree_eval(f->body, f->symtab));
+	value_free(syntree_eval(f->body, symtab));
 	// result is value of the "Result"-symbol
 	f->result = value_copy(symbol_variable_get_value(default_result));
 #else
-	f->result = syntree_eval(f->body, f->symtab);	// result is the last
+	f->result = syntree_eval(f->body, symtab);	// result is the last
 													// expression in the function
 #endif // _CBC_DEFAULT_FUNC_RESULT_SYMBOL
 	
 	// leave function-scope:
 	// all symbols, that were declared within this scope (like parameters),
 	// will be freed!
-	symtab_leave_scope(f->symtab);
+	symtab_leave_scope(symtab);
 	
 	return f->result;
 }
