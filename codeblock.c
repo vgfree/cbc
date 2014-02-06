@@ -7,6 +7,7 @@
 #include <assert.h>
 #include "codeblock.h"
 #include "syntree.h"
+#include "builtin.h"
 
 
 // #############################################################################
@@ -60,6 +61,9 @@ value_t* codeblock_execute(codeblock_t* cb)
 	// this is necessary in case the codeblock was already executed and prduced
 	// a result.
 	codeblock_reset(cb);
+	
+	// register builtin symbols
+	register_builtin_all(cb->global_symtab);
 	
 	// execute codeblock
 	cb->result = syntree_eval(cb->ast, cb->global_symtab);

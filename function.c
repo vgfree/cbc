@@ -4,6 +4,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <assert.h>
 #include "function.h"
 #include "symbol.h"
@@ -17,17 +18,42 @@
 // #############################################################################
 
 // -----------------------------------------------------------------------------
-// constructor
+// constructor (internal)
 // -----------------------------------------------------------------------------
-function_t* function_create()
+function_t* function_create(char* identifier)
 {
 	function_t* f	= (function_t*) malloc(sizeof(function_t));
-	f->id			= NULL;
-	f->body			= NULL;
-	f->params		= NULL;
+	f->id			= strdup(identifier);
+	f->param_count	= 0;
 	f->result		= NULL;
 	
+	f->func_ref		= NULL;
+	f->params		= NULL;
+	f->body			= NULL;
+	
 	return f;
+}
+
+// -----------------------------------------------------------------------------
+// constructor (builtin function)
+// -----------------------------------------------------------------------------
+function_t* function_create_builtin(char* identifier, int param_count,
+									func_ref_t func_ref)
+{
+	function_t* f	= function_create(identifier);
+	f->type			= FUNC_TYPE_BUILTIN;
+	f->func_ref		= func_ref;
+	f->param_count	= param_count;
+}
+
+// -----------------------------------------------------------------------------
+// constructor (user-defined function)
+// -----------------------------------------------------------------------------
+function_t* function_create_user_defined(char* identifier, syntree_t* body)
+{
+	function_t* f	= function_create(identifier);
+	f->type			= FUNC_TYPE_USER_DEFINED;
+	f->body			= body;
 }
 
 // -----------------------------------------------------------------------------
@@ -55,6 +81,8 @@ void function_addparam(function_t* f, char* param_id)
 		f->params = strlist_create(param_id);
 	else
 		strlist_append(f->params, param_id);
+	
+	f->param_count = f->params->count;
 }
 
 // -----------------------------------------------------------------------------
@@ -63,15 +91,13 @@ void function_addparam(function_t* f, char* param_id)
 // -----------------------------------------------------------------------------
 value_t* function_call(function_t* f, strlist_t* args, symtab_t* symtab)
 {
-	assert(f->body);
-	
 	// reset function-result
 	// this is necessary in case the function was already called.
 	function_reset(f);
 	
 	// determine parameter- and argument-count
-	size_t count_params	= (f->params)	? f->params->count	: 0;
-	size_t count_args	= (args)		? (args->count)		: 0;
+	size_t count_params	= f->param_count;
+	size_t count_args	= (args) ? (args->count) : 0;
 	
 	// validate params and arguments
 	if (count_params != count_args)
@@ -82,60 +108,66 @@ value_t* function_call(function_t* f, strlist_t* args, symtab_t* symtab)
 	}
 	
 	stack_t* arg_stack = stack_create();
-	// declare and assign parameters, if necessary
+	// evaluate argument values
 	if (count_params > 0)
 	{
-		strlist_t* curr_param	= f->params;
-		strlist_t* curr_arg		= args;
-		while (curr_param)
+		strlist_t* curr_arg = args;
+		while (curr_arg)
 		{
 			// obtain argument value
-			value_t* arg_value = syntree_eval(((syntree_t*) curr_arg->data), symtab);
-			
-			symbol_t* s = symbol_create_variable(curr_param->string);
-			symbol_variable_assign_value(s, arg_value);	// assign argument-value
-			value_free(arg_value);
-			stack_push(arg_stack, s);					// push argument on the stack
-			
-			// process next items
-			curr_param	= curr_param->next;
+			value_t* arg_value = syntree_eval(	((syntree_t*) curr_arg->data),
+												symtab);
+			// push argument value on the stack
+			stack_push(arg_stack, arg_value);
+			// process next item
 			curr_arg	= curr_arg->next;
 		}
 	}
 	
 	symtab_enter_scope(symtab, f->id);	// enter function-scope
 	
-#ifdef _CBC_DEFAULT_FUNC_RESULT_SYMBOL
-	// declare default function-result symbol
-	symbol_t* default_result = symbol_create_variable("Result");
-	symtab_append(symtab, default_result);
-#endif // _CBC_DEFAULT_FUNC_RESULT_SYMBOL
-	
-	// declare all arguments
-	if (count_params > 0)
+	if (f->type == FUNC_TYPE_USER_DEFINED)
 	{
-		strlist_t* curr_param = f->params;
-		while (curr_param)
-		{
-			symbol_t* arg;
-			stack_pop(arg_stack, (void*) &arg);
-			symtab_append(symtab, arg);	// declare argument within function-
-											// scope
-			curr_param = curr_param->next;
-		}
-	}
 	
-	stack_free(arg_stack);
-	
-	// execute function
 #ifdef _CBC_DEFAULT_FUNC_RESULT_SYMBOL
-	value_free(syntree_eval(f->body, symtab));
-	// result is value of the "Result"-symbol
-	f->result = value_copy(symbol_variable_get_value(default_result));
+		// declare default function-result symbol
+		symbol_t* default_result = symbol_create_variable("Result");
+		symtab_append(symtab, default_result);
+#endif // _CBC_DEFAULT_FUNC_RESULT_SYMBOL
+		
+		// declare all arguments
+		if (count_params > 0)
+		{
+			strlist_t* curr_param = f->params;
+			while (curr_param)
+			{
+				value_t* arg_value;
+				stack_pop(arg_stack, (void*) &arg_value);
+				symbol_t* arg = symbol_create_variable(curr_param->string);
+				symbol_variable_assign_value(arg, arg_value);
+				value_free(arg_value);
+				symtab_append(symtab, arg);	// declare argument within function-
+											// scope
+				curr_param = curr_param->next;
+			}
+		}
+	
+		stack_free(arg_stack);
+		
+#ifdef _CBC_DEFAULT_FUNC_RESULT_SYMBOL
+		value_free(syntree_eval(f->body, symtab));
+		// result is value of the "Result"-symbol
+		f->result = value_copy(symbol_variable_get_value(default_result));
 #else
-	f->result = syntree_eval(f->body, symtab);	// result is the last
+		f->result = syntree_eval(f->body, symtab);	// result is the last
 													// expression in the function
 #endif // _CBC_DEFAULT_FUNC_RESULT_SYMBOL
+	}
+	else
+	{
+		f->result = f->func_ref(arg_stack);
+		stack_free(arg_stack);
+	}
 	
 	// leave function-scope:
 	// all symbols, that were declared within this scope (like parameters),

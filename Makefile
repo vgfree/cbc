@@ -11,7 +11,8 @@ PARSER			:= $(TARGET)_parse.c
 INC_PARSER		:= $(PARSER:%.c=%.h)
 
 SRC				:= 	codeblock.c symbol.c symtab.c function.c value.c strlist.c \
-					syntree.c symref.c funccall.c funcdecl.c scope.c stack.c
+					syntree.c symref.c funccall.c funcdecl.c scope.c stack.c \
+					builtin.c
 OBJ				:= $(SRC:%.c=%.o)
 
 SRC_CBC			:= $(LEXER) $(PARSER) $(SRC)

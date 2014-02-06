@@ -14,14 +14,28 @@
 #include "strlist.h"
 #include "symtab_if.h"
 #include "syntree_if.h"
+#include "builtin.h"
+
+enum function_type_t
+{
+	FUNC_TYPE_BUILTIN,
+	FUNC_TYPE_USER_DEFINED
+};
 
 // function_t struct
 typedef struct
 {
+	enum function_type_t type;
 	char* id;			// name of the function
+	int param_count;	// count of expected parameters
+	value_t* result;	// result of the function after calling it
+	
+	// type-specific attributes: FUNC_TYPE_BUILTIN
+	func_ref_t func_ref;
+	
+	// type-specific attributes: FUNC_TYPE_USER_DEFINED
 	syntree_t* body;	// contains actual function-code
 	strlist_t* params;	// list of identifiers that represent formal parameters
-	value_t* result;	// result of the function after calling it
 	
 	// TODO:	Implement a state-attribute that indicates whether a function
 	//			was already called.
@@ -30,7 +44,9 @@ typedef struct
 
 
 // interface-functions
-function_t* function_create();
+function_t* function_create_builtin(char* identifier, int param_count,
+									func_ref_t func_ref);
+function_t* function_create_user_defined(char* identifier, syntree_t* body);
 void function_free(function_t* f);
 void function_addparam(function_t* f, char* param_id);
 value_t* function_call(function_t* f, strlist_t* args, symtab_t* symtab);
