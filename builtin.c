@@ -27,14 +27,14 @@ typedef struct
 } builtin_func_info_item_t;
 
 // forward-declaration of all builtin symbols
-value_t* bi_writeln(stack_t* arg_stack);
-value_t* bi_mod(stack_t* arg_stack);
+value_t* bif_writeln(stack_t* arg_stack);
+value_t* bif_mod(stack_t* arg_stack);
 
 // registration-list of all builtin functions (will be registered by function
 //                                             'register_builtin_all()')
 builtin_func_info_item_t builtin_func_decl_list[] = {
-	{"WriteLn", bi_writeln, 1},
-	{"Mod", bi_mod, 2}
+	{"WriteLn", bif_writeln, 1},
+	{"Mod", bif_mod, 2}
 };
 
 
@@ -91,7 +91,7 @@ int register_builtin_all(symtab_t* symtab)
 // -----------------------------------------------------------------------------
 // WriteLn() -- Print value
 // -----------------------------------------------------------------------------
-value_t* bi_writeln(stack_t* arg_stack)
+value_t* bif_writeln(stack_t* arg_stack)
 {
 	assert(arg_stack->count == 1);
 	
@@ -109,7 +109,7 @@ value_t* bi_writeln(stack_t* arg_stack)
 // -----------------------------------------------------------------------------
 // Mod() -- Modulo
 // -----------------------------------------------------------------------------
-value_t* bi_mod(stack_t* arg_stack)
+value_t* bif_mod(stack_t* arg_stack)
 {
 	assert(arg_stack->count == 2);
 	
