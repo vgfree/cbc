@@ -29,12 +29,14 @@ typedef struct
 // forward-declaration of all builtin symbols
 value_t* bif_writeln(stack_t* arg_stack);
 value_t* bif_mod(stack_t* arg_stack);
+value_t* bif_valtype(stack_t* arg_stack);
 
 // registration-list of all builtin functions (will be registered by function
 //                                             'register_builtin_all()')
 builtin_func_info_item_t builtin_func_decl_list[] = {
 	{"WriteLn", bif_writeln, 1},
-	{"Mod", bif_mod, 2}
+	{"Mod", bif_mod, 2},
+	{"ValType", bif_valtype, 1}
 };
 
 
@@ -122,6 +124,42 @@ value_t* bif_mod(stack_t* arg_stack)
 	
 	value_free(arg1);
 	value_free(arg2);
+	
+	return result; // return empty value
+}
+
+// -----------------------------------------------------------------------------
+// ValType() -- Type of a value as character
+// -----------------------------------------------------------------------------
+value_t* bif_valtype(stack_t* arg_stack)
+{
+	assert(arg_stack->count == 1);
+	
+	value_t* arg;
+	stack_pop(arg_stack, (void*) &arg);
+	
+	value_t* result;
+	switch (arg->type)
+	{
+		case VT_BOOLEAN:
+			result = cbstring_create(strdup("L"));
+			break;
+		
+		case VT_NUMERIC:
+			result = cbstring_create(strdup("N"));
+			break;
+		
+		case VT_STRING:
+			result = cbstring_create(strdup("C"));
+			break;
+		
+		case VT_UNDEFINED:
+		default:
+			result = cbstring_create(strdup("U"));
+			break;
+	}
+	
+	value_free(arg);
 	
 	return result; // return empty value
 }
