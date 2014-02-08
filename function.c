@@ -120,7 +120,7 @@ value_t* function_call(function_t* f, strlist_t* args, symtab_t* symtab)
 			// push argument value on the stack
 			stack_push(arg_stack, arg_value);
 			// process next item
-			curr_arg	= curr_arg->next;
+			curr_arg = curr_arg->next;
 		}
 	}
 	

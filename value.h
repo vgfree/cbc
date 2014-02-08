@@ -37,7 +37,7 @@ enum comparison_type_t
 	CMP_GE,	// greater or equal
 	CMP_LE,	// lower or equal
 	CMP_GT,	// greater than
-	CMP_LT,	// lower than
+	CMP_LT	// lower than
 };
 
 // definition of codeblock-types
