@@ -362,8 +362,8 @@ value_t* syntree_eval(syntree_t* node, symtab_t* symtab)
 			break;
 		
 		case '+':
-			result = cbnumeric_add(	syntree_eval(node->l, symtab),
-									syntree_eval(node->r, symtab));
+			result = value_add(syntree_eval(node->l, symtab),
+							   syntree_eval(node->r, symtab));
 			break;
 		case '-':
 			result = cbnumeric_sub(	syntree_eval(node->l, symtab),

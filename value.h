@@ -20,6 +20,15 @@ enum value_type_t
 	VT_STRING
 };
 
+// operation-types
+enum operation_type_t
+{
+	OPR_ADD,
+	OPR_SUB,
+	OPR_MUL,
+	OPR_DIV
+};
+
 // comparison types
 enum comparison_type_t
 {
@@ -63,6 +72,7 @@ value_t* value_copy(const value_t* val);
 char* value_tostring(const value_t* val);
 void value_print(const value_t* val);
 value_t* value_compare(enum comparison_type_t type, value_t* l, value_t* r);
+value_t* value_add(value_t* l, value_t* r);
 // cbnumeric interface functions
 value_t* cbnumeric_compare(	enum comparison_type_t type, const value_t* l,
 							const value_t* r);

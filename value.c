@@ -9,14 +9,18 @@
 
 #define NO_VALUE_AS_STRING "<no value returned>"
 
-// numerical operation-types
-enum cbnumeric_operation_t
-{
-	NUM_ADD,
-	NUM_SUB,
-	NUM_MUL,
-	NUM_DIV
-};
+
+// #############################################################################
+// declarations
+// #############################################################################
+
+value_t* cbnumeric_operation(enum operation_type_t type, value_t* l, value_t* r);
+value_t* cbstring_concat(value_t* l, value_t* r);
+
+
+// #############################################################################
+// interface-functions
+// #############################################################################
 
 // -----------------------------------------------------------------------------
 // create a codeblock-value
@@ -219,45 +223,6 @@ value_t* value_compare(enum comparison_type_t type, value_t* l, value_t* r)
 }
 
 // -----------------------------------------------------------------------------
-// numerical operation
-// -----------------------------------------------------------------------------
-value_t* cbnumeric_operation(	enum cbnumeric_operation_t type, value_t* l,
-								value_t* r)
-{
-	if (!value_istype(l, VT_NUMERIC) || !value_istype(r, VT_NUMERIC))
-	{
-		fprintf(stderr, "Error: Value has invalid type for this operation, "\
-						"expecting VT_NUMERIC!");
-		exit(EXIT_FAILURE);
-	}
-	
-	value_t* result	= cbnumeric_create(0);
-	
-	switch (type)
-	{
-		case NUM_ADD: result->value = l->value + r->value; break;
-		case NUM_SUB: result->value = l->value - r->value; break;
-		case NUM_MUL: result->value = l->value * r->value; break;
-		case NUM_DIV:
-			// check for division by zero first!
-			if (r->value == 0)
-			{
-				fprintf(stderr, "Error: Division by zero is not allowed!\n");
-				exit(EXIT_FAILURE);
-			}
-			
-			result->value = l->value / r->value;
-			break;
-	}
-	
-	// free lhs and rhs
-	value_free(l);
-	value_free(r);
-	
-	return result;
-}
-
-// -----------------------------------------------------------------------------
 // numerical comparison
 // -----------------------------------------------------------------------------
 value_t* cbnumeric_compare(	enum comparison_type_t type, const value_t* l,
@@ -286,11 +251,27 @@ value_t* cbnumeric_compare(	enum comparison_type_t type, const value_t* l,
 }
 
 // -----------------------------------------------------------------------------
+// perform add-operation
+// -----------------------------------------------------------------------------
+value_t* value_add(value_t* l, value_t* r)
+{
+	switch (l->type)
+	{
+		case VT_NUMERIC:
+			return cbnumeric_operation(OPR_ADD, l, r);
+			break;
+		case VT_STRING:
+			return cbstring_concat(l, r);
+			break;
+	}
+}
+
+// -----------------------------------------------------------------------------
 // numerical addition
 // -----------------------------------------------------------------------------
 value_t* cbnumeric_add(value_t* l, value_t* r)
 {
-	return cbnumeric_operation(NUM_ADD, l, r);
+	return cbnumeric_operation(OPR_ADD, l, r);
 }
 
 // -----------------------------------------------------------------------------
@@ -298,7 +279,7 @@ value_t* cbnumeric_add(value_t* l, value_t* r)
 // -----------------------------------------------------------------------------
 value_t* cbnumeric_sub(value_t* l, value_t* r)
 {
-	return cbnumeric_operation(NUM_SUB, l, r);
+	return cbnumeric_operation(OPR_SUB, l, r);
 }
 
 // -----------------------------------------------------------------------------
@@ -306,7 +287,7 @@ value_t* cbnumeric_sub(value_t* l, value_t* r)
 // -----------------------------------------------------------------------------
 value_t* cbnumeric_mul(value_t* l, value_t* r)
 {
-	return cbnumeric_operation(NUM_MUL, l, r);
+	return cbnumeric_operation(OPR_MUL, l, r);
 }
 
 // -----------------------------------------------------------------------------
@@ -314,7 +295,7 @@ value_t* cbnumeric_mul(value_t* l, value_t* r)
 // -----------------------------------------------------------------------------
 value_t* cbnumeric_div(value_t* l, value_t* r)
 {
-	return cbnumeric_operation(NUM_DIV, l, r);
+	return cbnumeric_operation(OPR_DIV, l, r);
 }
 
 // -----------------------------------------------------------------------------
@@ -395,4 +376,69 @@ value_t* cbboolean_compare(	enum comparison_type_t type, const value_t* l,
 	
 	value_t* result_val = cbboolean_create(result);
 	return result_val;
+}
+
+
+// #############################################################################
+// internal functions
+// #############################################################################
+
+// -----------------------------------------------------------------------------
+// numerical operation (internal)
+// -----------------------------------------------------------------------------
+value_t* cbnumeric_operation(enum operation_type_t type, value_t* l, value_t* r)
+{
+	if (!value_istype(l, VT_NUMERIC))
+	{
+		fprintf(stderr, "Error: Value has invalid type for this operation, "\
+						"expecting VT_NUMERIC!");
+		exit(EXIT_FAILURE);
+	}
+	
+	value_t* result	= cbnumeric_create(0);
+	
+	switch (type)
+	{
+		case OPR_ADD: result->value = l->value + r->value; break;
+		case OPR_SUB: result->value = l->value - r->value; break;
+		case OPR_MUL: result->value = l->value * r->value; break;
+		case OPR_DIV:
+			// check for division by zero first!
+			if (r->value == 0)
+			{
+				fprintf(stderr, "Error: Division by zero is not allowed!\n");
+				exit(EXIT_FAILURE);
+			}
+			
+			result->value = l->value / r->value;
+			break;
+	}
+	
+	return result;
+}
+
+// -----------------------------------------------------------------------------
+// concatenate string (internal)
+// -----------------------------------------------------------------------------
+value_t* cbstring_concat(value_t* l, value_t* r)
+{
+	if (!value_istype(l, VT_STRING) || !value_istype(r, VT_STRING))
+	{
+		fprintf(stderr, "Error: Value has invalid type for this operation, "\
+						"expecting VT_STRING!");
+		exit(EXIT_FAILURE);
+	}
+	
+	char* buffer = (char*) malloc(strlen(l->string) +
+								  strlen(r->string) + 1);
+	*buffer = '\0';	// terminate string
+	strcat(buffer, l->string);
+	strcat(buffer, r->string);
+	value_t* result = cbstring_create(buffer);
+	
+	// free lhs and rhs
+	value_free(l);
+	value_free(r);
+	
+	return result;
 }
