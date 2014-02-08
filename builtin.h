@@ -1,6 +1,6 @@
 /*******************************************************************************
- * builtin --	Collection of functions to register builtin and pre-defined
- *  			symbols like functions and variables/constants.
+ * builtin -- Collection of functions to register builtin and pre-defined
+ *  		  symbols like functions and variables/constants.
  ******************************************************************************/
 
 #ifndef BUILTIN_H
@@ -16,8 +16,9 @@ typedef value_t* (*func_ref_t) (stack_t*);
 
 
 // interface functions
-int register_builtin_func(	symtab_t* symtab, char* identifier,
-							func_ref_t func, int expected_param_count);
+int register_builtin_func(symtab_t* symtab, char* identifier,
+						  func_ref_t func, int expected_param_count);
+int register_builtin_all(symtab_t* symtab);
 
 
 #endif // BUILTIN_H
