@@ -30,13 +30,15 @@ typedef struct
 value_t* bif_writeln(stack_t* arg_stack);
 value_t* bif_mod(stack_t* arg_stack);
 value_t* bif_valtype(stack_t* arg_stack);
+value_t* bif_str(stack_t* arg_stack);
 
 // registration-list of all builtin functions (will be registered by function
 //                                             'register_builtin_all()')
 builtin_func_info_item_t builtin_func_decl_list[] = {
 	{"WriteLn", bif_writeln, 1},
 	{"Mod", bif_mod, 2},
-	{"ValType", bif_valtype, 1}
+	{"ValType", bif_valtype, 1},
+	{"Str", bif_str, 1}
 };
 
 
@@ -125,7 +127,7 @@ value_t* bif_mod(stack_t* arg_stack)
 	value_free(arg1);
 	value_free(arg2);
 	
-	return result; // return empty value
+	return result;
 }
 
 // -----------------------------------------------------------------------------
@@ -161,5 +163,22 @@ value_t* bif_valtype(stack_t* arg_stack)
 	
 	value_free(arg);
 	
-	return result; // return empty value
+	return result;
+}
+
+// -----------------------------------------------------------------------------
+// Str() -- Convert any value to string
+// -----------------------------------------------------------------------------
+value_t* bif_str(stack_t* arg_stack)
+{
+	assert(arg_stack->count == 1);
+	
+	value_t* arg;
+	stack_pop(arg_stack, (void*) &arg);
+	
+	value_t* result = cbstring_create(value_tostring(arg));
+	
+	value_free(arg);
+	
+	return result;
 }
