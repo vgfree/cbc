@@ -414,6 +414,10 @@ value_t* cbnumeric_operation(enum operation_type_t type, value_t* l, value_t* r)
 			break;
 	}
 	
+	// free lhs and rhs
+	value_free(l);
+	value_free(r);
+	
 	return result;
 }
 
