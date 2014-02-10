@@ -7,6 +7,10 @@
 #include <assert.h>
 #include "cblib.h"
 
+#ifdef _CBC_PLAT_WNDS
+#include <windows.h>
+#endif // _CBC_PLAT_WNDS
+
 
 // #############################################################################
 // builtin-functions
@@ -102,3 +106,26 @@ value_t* bif_str(stack_t* arg_stack)
 	
 	return result;
 }
+
+#ifdef _CBC_PLAT_WNDS
+// -----------------------------------------------------------------------------
+// Meld() -- Display a Message-Box
+// -----------------------------------------------------------------------------
+value_t* bif_meld(stack_t* arg_stack)
+{
+	assert(arg_stack->count == 1);
+	
+	value_t* arg;
+	stack_pop(arg_stack, (void*) &arg);
+	
+	assert(value_istype(arg, VT_STRING));
+	
+	// display message
+	// NOTE: MessageBox() causes memory-leaks in MinGW32!
+	MessageBox(NULL, arg->string, "Information", MB_ICONINFORMATION | MB_OK);
+	
+	value_free(arg);
+	
+	return value_create();	// return empty value
+}
+#endif // _CBC_PLAT_WNDS

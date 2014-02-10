@@ -22,8 +22,14 @@ CFLAGS			:=	-g \
 					-D _CBC_DEBUG \
 					-D _CBC_NOLOG \
 					-D _CBC_DEFAULT_FUNC_RESULT_SYMBOL
+ifeq ($(OS), Windows_NT)
+CFLAGS			:= $(CFLAGS) -D _CBC_PLAT_WNDS
+endif
 CFLAGS_RELEASE	:=	-D _CBC_TRACK_EXECUTION_TIME \
 					-D _CBC_DEFAULT_FUNC_RESULT_SYMBOL
+ifeq ($(OS), Windows_NT)
+CFLAGS_RELEASE	:= $(CFLAGS_RELEASE) -D _CBC_PLAT_WNDS
+endif
 LDFLAGS			:= 
 
 LEX				:= flex
