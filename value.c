@@ -263,6 +263,11 @@ value_t* value_add(value_t* l, value_t* r)
 		case VT_STRING:
 			return cbstring_concat(l, r);
 			break;
+		default:
+			fprintf(stderr, "Error: Unable to perform OPR_ADD on value-type: " \
+					"%d!\n", l->type);
+			exit(EXIT_FAILURE);
+			break;
 	}
 }
 
