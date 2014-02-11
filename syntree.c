@@ -256,10 +256,13 @@ value_t* syntree_eval(syntree_t* node, symtab_t* symtab)
 			funcdecl_t* fndecl = (funcdecl_t*) node;
 			
 			// prepare function-object
-			function_t* func	= function_create_user_defined(	fndecl->sym_id,
-																fndecl->body);
-			func->params		= fndecl->params;
-			func->param_count	= func->params->count;
+			function_t* func	  = function_create_user_defined(fndecl->sym_id,
+																 fndecl->body);
+			func->params		  = fndecl->params;
+			if (!func->params)
+				func->param_count = 0;
+			else
+				func->param_count = func->params->count;
 			
 			symbol_t* s = symbol_create_function(fndecl->sym_id, func);
 			symtab_append(symtab, s);	// declare function
