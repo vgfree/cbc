@@ -112,11 +112,11 @@ check_cbc	"5"			"| foo | foo := 5, if foo <= 5 then 5, else 1, endif,"
 check_cbc	"5"			"| foo | foo := 1, if foo <= 5 then 5, else 1, endif,"
 check_cbc	"5"			"| foo, bar, baz | foo := 1, bar := 2, baz := 5, if foo < bar then baz, else 1, endif,"
 # checks (functions)
-check_cbc	"14"		"| foo | function bar () foo := foo + 2, end, foo := 10, bar(), bar(),"
-check_cbc	"2"			"function Inc(num) num := num + 1, end, Inc(1),"
-check_cbc	"15"		"function Add(num1, num2) num1 + num2, end, Add(5, 10),"
+check_cbc	"14"		"| foo | function bar () foo := foo + 2, Result := foo, end, foo := 10, bar(), bar(),"
+check_cbc	"2"			"function Inc(num) Result := num + 1, end, Inc(1),"
+check_cbc	"15"		"function Add(num1, num2) Result := num1 + num2, end, Add(5, 10),"
 ### the following test-case will currently fail, due to a bug in parameter (un)declaration
-check_cbc	"30"		"| foo | function Add(num1, num2) num1 + num2, end, foo := 5, foo := Add(foo, 10), foo := Add(foo, foo),"
+check_cbc	"30"		"| foo | function Add(num1, num2) Result := num1 + num2, end, foo := 5, foo := Add(foo, 10), foo := Add(foo, foo),"
 # checks (data-types: strings, boolean expressions, etc.)
 check_cbc	"True"		"| foo, bar, baz | foo := 1, bar := 2, if foo < bar then baz := True, else baz := False, endif, baz,"
 check_cbc	"True"		"| foo | foo := 'foobarbaz', foo = 'foobarbaz',"
@@ -126,15 +126,6 @@ check_cbc	"True"		"| foo | foo := 'foobarbaz', foo <> 'foobar',"
 check_cbc	"string1"	"| foo, bar, baz | foo := 1, bar := 2, if foo < bar then baz := 'string1', else baz := 'string2', endif, baz,"
 
 check_cbc_file	118	"1400\t// line 1\n- 630\t// line 2\n- 13\t// line 3\n- 75\t// line 4\n- 50\t// line 5\n- 10\t// line 6\n- 35\t// line 7\n- 100\t// line 8\n- 100\t// line 9\n- 200\t// line 10\n- (60 + 4 + 5) // line 11\n,\t// line 12"
-
-# error-checks
-check_cbc_error	"error: syntax error"						","
-check_cbc_error	"error: division by zero is not allowed!"	"3 / 0,"
-check_cbc_error	"error: undefined symbol: foo"				"foo,"
-check_cbc_error	"error: undefined symbol: foo"				"function Foobar(foo) foo := foo + 100, end, Foobar(11), foo,"
-check_cbc_error	"error: expecting boolean expression"		"| foo | foo := 0, if foo then 1, else 2, endif,"
-check_cbc_error	"$err_param_count_mismatch"					"function foo(bar) bar, end, foo(123, 456),"
-check_cbc_error	"$err_param_count_mismatch"					"function foo(bar, baz) bar, end, foo(123),"
 
 echo "---------------------------"
 echo "EXECUTED CHECKS: $checks"
