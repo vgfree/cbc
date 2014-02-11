@@ -107,20 +107,25 @@ value_t* function_call(function_t* f, strlist_t* args, symtab_t* symtab)
 		exit(EXIT_FAILURE);
 	}
 	
-	stack_t* arg_stack = stack_create();
+	stack_t* arg_stack   = stack_create();
+	stack_t* param_stack = stack_create();
 	// evaluate argument values
 	if (count_params > 0)
 	{
-		strlist_t* curr_arg = args;
+		strlist_t* curr_arg   = args;
+		strlist_t* curr_param = f->params;
 		while (curr_arg)
 		{
+			stack_push(param_stack, curr_param->string);	// push param name
+			
 			// obtain argument value
 			value_t* arg_value = syntree_eval(	((syntree_t*) curr_arg->data),
 												symtab);
 			// push argument value on the stack
 			stack_push(arg_stack, arg_value);
 			// process next item
-			curr_arg = curr_arg->next;
+			curr_arg   = curr_arg->next;
+			curr_param = curr_param->next;
 		}
 	}
 	
@@ -136,23 +141,24 @@ value_t* function_call(function_t* f, strlist_t* args, symtab_t* symtab)
 #endif // _CBC_DEFAULT_FUNC_RESULT_SYMBOL
 		
 		// declare all arguments
-		if (count_params > 0)
+		if (count_params > 0)	// TODO: If-statement is not necessary here.
 		{
-			strlist_t* curr_param = f->params;
-			while (curr_param)
+			while (!stack_is_empty(param_stack))
 			{
 				value_t* arg_value;
 				stack_pop(arg_stack, (void*) &arg_value);
-				symbol_t* arg = symbol_create_variable(curr_param->string);
+				char* param_id;
+				stack_pop(param_stack, (void*) &param_id);
+				symbol_t* arg = symbol_create_variable(param_id);
 				symbol_variable_assign_value(arg, arg_value);
 				value_free(arg_value);
 				symtab_append(symtab, arg);	// declare argument within function-
 											// scope
-				curr_param = curr_param->next;
 			}
 		}
 	
 		stack_free(arg_stack);
+		stack_free(param_stack);
 		
 #ifdef _CBC_DEFAULT_FUNC_RESULT_SYMBOL
 		value_free(syntree_eval(f->body, symtab));
@@ -167,6 +173,7 @@ value_t* function_call(function_t* f, strlist_t* args, symtab_t* symtab)
 	{
 		f->result = f->func_ref(arg_stack);
 		stack_free(arg_stack);
+		stack_free(param_stack);
 	}
 	
 	// leave function-scope:
