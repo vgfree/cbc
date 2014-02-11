@@ -115,8 +115,10 @@ check_cbc	"5"			"| foo, bar, baz | foo := 1, bar := 2, baz := 5, if foo < bar th
 check_cbc	"14"		"| foo | function bar () foo := foo + 2, Result := foo, end, foo := 10, bar(), bar(),"
 check_cbc	"2"			"function Inc(num) Result := num + 1, end, Inc(1),"
 check_cbc	"15"		"function Add(num1, num2) Result := num1 + num2, end, Add(5, 10),"
-### the following test-case will currently fail, due to a bug in parameter (un)declaration
 check_cbc	"30"		"| foo | function Add(num1, num2) Result := num1 + num2, end, foo := 5, foo := Add(foo, 10), foo := Add(foo, foo),"
+check_cbc	"0"			"function Dec(nNumber) nNumber := nNumber - 1, if nNumber > 0 then nNumber := Dec(nNumber), endif, Result := nNumber, end, Dec(10),"
+check_cbc	"\"foo\", \"bar\""	"function MainFunc(cParam1, cParam2) function Quote(cStr) Result := '\"' + cStr + '\"', end, Result := Quote(cParam1) + ', ' + Quote(cParam2), end, MainFunc('foo', 'bar'),"
+
 # checks (data-types: strings, boolean expressions, etc.)
 check_cbc	"True"		"| foo, bar, baz | foo := 1, bar := 2, if foo < bar then baz := True, else baz := False, endif, baz,"
 check_cbc	"True"		"| foo | foo := 'foobarbaz', foo = 'foobarbaz',"
