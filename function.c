@@ -116,7 +116,8 @@ value_t* function_call(function_t* f, strlist_t* args, symtab_t* symtab)
 		strlist_t* curr_param = f->params;
 		while (curr_arg)
 		{
-			stack_push(param_stack, curr_param->string);	// push param name
+			if (curr_param)
+				stack_push(param_stack, curr_param->string); // push param name
 			
 			// obtain argument value
 			value_t* arg_value = syntree_eval(	((syntree_t*) curr_arg->data),
@@ -124,8 +125,9 @@ value_t* function_call(function_t* f, strlist_t* args, symtab_t* symtab)
 			// push argument value on the stack
 			stack_push(arg_stack, arg_value);
 			// process next item
-			curr_arg   = curr_arg->next;
-			curr_param = curr_param->next;
+			curr_arg = curr_arg->next;
+			if (curr_param)
+				curr_param = curr_param->next;
 		}
 	}
 	
