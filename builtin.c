@@ -30,7 +30,8 @@ builtin_func_info_item_t builtin_func_decl_list[] = {
 	{"WriteLn", bif_writeln, 1},
 	{"Mod", bif_mod, 2},
 	{"ValType", bif_valtype, 1},
-	{"Str", bif_str, 1}
+	{"Str", bif_str, 1},
+	{"Eval", bif_eval, 1}
 #ifdef _CBC_PLAT_WNDS
 	, {"Meld", bif_meld, 1}
 #endif // _CBC_PLAT_WNDS

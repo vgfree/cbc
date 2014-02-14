@@ -7,6 +7,7 @@ TARGET			:= cbc
 SRC_LEXER		:= cbc.l
 SRC_PARSER		:= cbc.y
 LEXER			:= $(TARGET)_lex.c
+INC_LEXER		:= $(TARGET)_lex.h
 PARSER			:= $(TARGET)_parse.c
 INC_PARSER		:= $(PARSER:%.c=%.h)
 
@@ -23,7 +24,7 @@ CFLAGS			:=	-g \
 					-D _CBC_NOLOG \
 					-D _CBC_DEFAULT_FUNC_RESULT_SYMBOL
 ifeq ($(OS), Windows_NT)
-CFLAGS			:= $(CFLAGS) -D _CBC_PLAT_WNDS
+CFLAGS			:= $(CFLAGS) -D _CBC_PLAT_WNDSS
 endif
 CFLAGS_RELEASE	:=	-D _CBC_TRACK_EXECUTION_TIME \
 					-D _CBC_DEFAULT_FUNC_RESULT_SYMBOL
@@ -73,7 +74,7 @@ $(PARSER): $(SRC_PARSER)
 
 # build lex/flex output
 $(LEXER): $(SRC_LEXER)
-	$(LEX) -o $@ $^
+	$(LEX) --header-file=$(INC_LEXER) -o $@ $^
 
 
 # ------------------------------------------------------------------------------
@@ -107,7 +108,7 @@ ifeq ($(OS), Windows_NT)
 clean-cbc: TARGET := $(TARGET).exe
 endif
 clean-cbc:
-	$(RM) $(TARGET) $(PARSER) $(INC_PARSER) $(LEXER) $(OBJ_CBC)
+	$(RM) $(TARGET) $(PARSER) $(INC_PARSER) $(LEXER) $(INC_LEXER) $(OBJ_CBC)
 
 # default clean-target
 clean: clean-cbc

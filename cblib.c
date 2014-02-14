@@ -6,6 +6,9 @@
 #include <string.h>
 #include <assert.h>
 #include "cblib.h"
+#include "cbc_lex.h"
+#include "cbc_parse.h"
+#include "codeblock.h"
 
 #ifdef _CBC_PLAT_WNDS
 #include <windows.h>
@@ -103,6 +106,38 @@ value_t* bif_str(stack_t* arg_stack)
 	value_t* result = cbstring_create(value_tostring(arg));
 	
 	value_free(arg);
+	
+	return result;
+}
+
+// -----------------------------------------------------------------------------
+// Eval() -- Evaluate a codeblock string
+// -----------------------------------------------------------------------------
+value_t* bif_eval(stack_t* arg_stack)
+{
+	assert(arg_stack->count == 1);
+	
+	value_t* arg;
+	stack_pop(arg_stack, (void*) &arg);
+	
+	assert(value_istype(arg, VT_STRING));
+	
+	// Create codeblock environment
+	codeblock_t* cb = codeblock_create();
+	
+	// Process codeblock
+	YY_BUFFER_STATE buffer_state = yy_scan_string(arg->string);
+	yyparse(&cb->ast);
+	yy_delete_buffer(buffer_state);
+	yylex_destroy();
+	value_free(arg);
+	
+	codeblock_execute(cb);	// Execute codeblock
+	
+	value_t* result = value_copy(cb->result);
+	
+	syntree_free(cb->ast);
+	codeblock_free(cb);
 	
 	return result;
 }
