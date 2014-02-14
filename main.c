@@ -49,6 +49,9 @@ int main(int argc, char* argv[])
 	if (parse_file)		// if parsed stream is not stdin
 		fclose(yyin);	// -> close file stream
 	
+	// cleanup lexer
+	yylex_destroy();
+	
 #ifdef _CBC_TRACK_EXECUTION_TIME
 	clock_t begin;
 	begin = clock();
