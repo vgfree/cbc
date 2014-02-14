@@ -6,11 +6,7 @@
 %{
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <stdarg.h>
-#include "value.h"
-#include "syntree.h"
-#include "strlist.h"
 #include "cbc_parse.h"
 
 #ifndef _CBC_NOLOG
