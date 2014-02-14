@@ -42,8 +42,7 @@ int main(int argc, char* argv[])
 		yyin = input;
 	}
 
-	codeblock_t* cb		= codeblock_create();
-	cb->global_symtab	= symtab_create();
+	codeblock_t* cb = codeblock_create();
 	
 	yyparse(&cb->ast);	// parse codeblock-code
 	
@@ -70,7 +69,6 @@ int main(int argc, char* argv[])
 #endif // _CBC_TRACK_EXECUTION_TIME
 	
 	// cleanup
-	symtab_free(cb->global_symtab);
 	syntree_free(cb->ast);
 	codeblock_free(cb);
 	

@@ -27,7 +27,7 @@ void codeblock_reset(codeblock_t* cb);
 codeblock_t* codeblock_create()
 {
 	codeblock_t* cb		= (codeblock_t*) malloc(sizeof(codeblock_t));
-	cb->global_symtab	= NULL;
+	cb->global_symtab	= symtab_create();
 	cb->ast				= NULL;
 	cb->result			= NULL;
 	
@@ -40,6 +40,7 @@ codeblock_t* codeblock_create()
 void codeblock_free(codeblock_t* cb)
 {
 	codeblock_reset(cb);
+	symtab_free(cb->global_symtab);
 	
 	free(cb);
 }
