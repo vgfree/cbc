@@ -15,7 +15,9 @@
 // #############################################################################
 
 // -----------------------------------------------------------------------------
-// wrapper for CuSuiteAddSuite()
+// Wrapper for CuSuiteAddSuite()
+// This function avoids memory leaks when adding one test-suite to another,
+// since the passed CuSuite instance will be copied in the original function.
 // -----------------------------------------------------------------------------
 void CuSuiteAddSuite_Custom(CuSuite* testSuite, CuSuite* testSuite2)
 {
@@ -30,8 +32,8 @@ void CuSuiteAddSuite_Custom(CuSuite* testSuite, CuSuite* testSuite2)
 
 int main(int argc, char *argv[])
 {
-	CuString* output= CuStringNew();
-	CuSuite* suite	= CuSuiteNew();
+	CuString* output = CuStringNew();
+	CuSuite* suite	 = CuSuiteNew();
 	
 	CuSuiteAddSuite_Custom(suite, make_suite_codeblock());
 	CuSuiteAddSuite_Custom(suite, make_suite_scope());
