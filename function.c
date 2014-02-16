@@ -38,7 +38,7 @@ CbFunction* function_create(char* identifier)
 // constructor (builtin function)
 // -----------------------------------------------------------------------------
 CbFunction* cb_function_create_builtin(char* identifier, int param_count,
-									func_ref_t func_ref)
+									   CbBuiltinFunctionRef func_ref)
 {
 	CbFunction* f  = function_create(identifier);
 	f->type		   = FUNC_TYPE_BUILTIN;

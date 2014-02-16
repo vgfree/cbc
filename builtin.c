@@ -20,7 +20,7 @@
 typedef struct
 {
 	char* identifier;
-	func_ref_t func;
+	CbBuiltinFunctionRef func;
 	int param_count;
 } builtin_func_info_item_t;
 
@@ -46,7 +46,7 @@ builtin_func_info_item_t builtin_func_decl_list[] = {
 // register a builtin function in a symbol-table
 // -----------------------------------------------------------------------------
 int register_builtin_func(CbSymtab* symtab, char* identifier,
-						  func_ref_t func, int expected_param_count)
+						  CbBuiltinFunctionRef func, int expected_param_count)
 {
 	CbSymbol* s = cb_symbol_create_function(identifier,
 					cb_function_create_builtin(identifier, expected_param_count, func));

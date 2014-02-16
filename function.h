@@ -31,7 +31,7 @@ typedef struct
 	CbValue* result;	// result of the function after calling it
 	
 	// type-specific attributes: FUNC_TYPE_BUILTIN
-	func_ref_t func_ref;
+	CbBuiltinFunctionRef func_ref;
 	
 	// type-specific attributes: FUNC_TYPE_USER_DEFINED
 	CbSyntree* body;	// contains actual function-code
@@ -45,7 +45,7 @@ typedef struct
 
 // interface-functions
 CbFunction* cb_function_create_builtin(char* identifier, int param_count,
-									   func_ref_t func_ref);
+									   CbBuiltinFunctionRef func_ref);
 CbFunction* cb_function_create_user_defined(char* identifier, CbSyntree* body);
 void cb_function_free(CbFunction* f);
 void cb_function_add_param(CbFunction* f, char* param_id);

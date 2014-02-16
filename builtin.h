@@ -12,12 +12,12 @@
 #include "stack.h"
 
 // function-pointer to a generic builtin function
-typedef CbValue* (*func_ref_t) (CbStack*);
+typedef CbValue* (*CbBuiltinFunctionRef) (CbStack*);
 
 
 // interface functions
 int register_builtin_func(CbSymtab* symtab, char* identifier,
-						  func_ref_t func, int expected_param_count);
+						  CbBuiltinFunctionRef func, int expected_param_count);
 int register_builtin_all(CbSymtab* symtab);
 
 
