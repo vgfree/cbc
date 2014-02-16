@@ -1,5 +1,5 @@
 /*******************************************************************************
- * symbol -- Implementation of a symbol-structure
+ * CbSymbol -- Implementation of a symbol-structure.
  ******************************************************************************/
 
 #include <stdio.h>
@@ -14,12 +14,12 @@
 // #############################################################################
 
 // symbol_t struct
-struct symbol_t
+struct CbSymbol
 {
-	enum symbol_type_t type;	// type
+	enum cb_symbol_type type;	// type
 	char* id;					// identifier
-	struct symbol_t* next;		// reference to the next symbol (in case of a list)
-	struct symbol_t* previous;	// reference to the previous symbol (in case of a list)
+	struct CbSymbol* next;		// reference to the next symbol (in case of a list)
+	struct CbSymbol* previous;	// reference to the previous symbol (in case of a list)
 	const scope_t* scope;		// scope, in which the symbol is valid
 	
 	union
@@ -37,9 +37,9 @@ struct symbol_t
 // -----------------------------------------------------------------------------
 // constructor (internal)
 // -----------------------------------------------------------------------------
-static symbol_t* symbol_create(char* identifier)
+static CbSymbol* symbol_create(char* identifier)
 {
-	symbol_t* s	= (symbol_t*) malloc(sizeof(symbol_t));
+	CbSymbol* s	= (CbSymbol*) malloc(sizeof(CbSymbol));
 	s->type		= SYM_TYPE_UNDEFINED;
 	s->id		= strdup(identifier);
 	s->next		= NULL;
@@ -57,9 +57,9 @@ static symbol_t* symbol_create(char* identifier)
 // -----------------------------------------------------------------------------
 // constructor (variable)
 // -----------------------------------------------------------------------------
-symbol_t* symbol_create_variable(char* identifier)
+CbSymbol* cb_symbol_create_variable(char* identifier)
 {
-	symbol_t* s	= symbol_create(identifier);
+	CbSymbol* s	= symbol_create(identifier);
 	s->type		= SYM_TYPE_VARIABLE;
 	s->value	= cb_value_create();
 	
@@ -69,9 +69,9 @@ symbol_t* symbol_create_variable(char* identifier)
 // -----------------------------------------------------------------------------
 // constructor (function)
 // -----------------------------------------------------------------------------
-symbol_t* symbol_create_function(char* identifier, function_t* func_object)
+CbSymbol* cb_symbol_create_function(char* identifier, function_t* func_object)
 {
-	symbol_t* s	= symbol_create(identifier);
+	CbSymbol* s	= symbol_create(identifier);
 	s->type		= SYM_TYPE_FUNCTION;
 	s->function	= func_object;
 	
@@ -81,7 +81,7 @@ symbol_t* symbol_create_function(char* identifier, function_t* func_object)
 // -----------------------------------------------------------------------------
 // destructor
 // -----------------------------------------------------------------------------
-void symbol_free(symbol_t* s)
+void cb_symbol_free(CbSymbol* s)
 {
 	free(s->id);
 	
@@ -102,7 +102,7 @@ void symbol_free(symbol_t* s)
 // -----------------------------------------------------------------------------
 // connect two symbols with each other
 // -----------------------------------------------------------------------------
-void symbol_connect(symbol_t* s1, symbol_t* s2)
+void cb_symbol_connect(CbSymbol* s1, CbSymbol* s2)
 {
 	assert(s1);
 	assert(s2);
@@ -116,7 +116,7 @@ void symbol_connect(symbol_t* s1, symbol_t* s2)
 // -----------------------------------------------------------------------------
 // get identifier
 // -----------------------------------------------------------------------------
-const char* symbol_get_id(const symbol_t* s)
+const char* cb_symbol_get_id(const CbSymbol* s)
 {
 	return s->id;
 }
@@ -124,7 +124,7 @@ const char* symbol_get_id(const symbol_t* s)
 // -----------------------------------------------------------------------------
 // get next-item
 // -----------------------------------------------------------------------------
-symbol_t* symbol_get_next(const symbol_t* s)
+CbSymbol* cb_symbol_get_next(const CbSymbol* s)
 {
 	return s->next;
 }
@@ -132,7 +132,7 @@ symbol_t* symbol_get_next(const symbol_t* s)
 // -----------------------------------------------------------------------------
 // get previous-item
 // -----------------------------------------------------------------------------
-symbol_t* symbol_get_previous(const symbol_t* s)
+CbSymbol* cb_symbol_get_previous(const CbSymbol* s)
 {
 	return s->previous;
 }
@@ -140,7 +140,7 @@ symbol_t* symbol_get_previous(const symbol_t* s)
 // -----------------------------------------------------------------------------
 // get scope
 // -----------------------------------------------------------------------------
-const scope_t* symbol_get_scope(const symbol_t* s)
+const scope_t* cb_symbol_get_scope(const CbSymbol* s)
 {
 	return s->scope;
 }
@@ -148,23 +148,23 @@ const scope_t* symbol_get_scope(const symbol_t* s)
 // -----------------------------------------------------------------------------
 // set next-item
 // -----------------------------------------------------------------------------
-void symbol_set_next(symbol_t* s, const symbol_t* next)
+void cb_symbol_set_next(CbSymbol* s, const CbSymbol* next)
 {
-	s->next = (symbol_t*) next;
+	s->next = (CbSymbol*) next;
 }
 
 // -----------------------------------------------------------------------------
 // set previous-item
 // -----------------------------------------------------------------------------
-void symbol_set_previous(symbol_t* s, const symbol_t* previous)
+void cb_symbol_set_previous(CbSymbol* s, const CbSymbol* previous)
 {
-	s->previous = (symbol_t*) previous;
+	s->previous = (CbSymbol*) previous;
 }
 
 // -----------------------------------------------------------------------------
 // set scope
 // -----------------------------------------------------------------------------
-void symbol_set_scope(symbol_t* s, const scope_t* scope)
+void cb_symbol_set_scope(CbSymbol* s, const scope_t* scope)
 {
 	s->scope = scope;
 }
@@ -172,7 +172,7 @@ void symbol_set_scope(symbol_t* s, const scope_t* scope)
 // -----------------------------------------------------------------------------
 // get value-object of an variable-symbol (variables only!)
 // -----------------------------------------------------------------------------
-const CbValue* symbol_variable_get_value(const symbol_t* s)
+const CbValue* cb_symbol_variable_get_value(const CbSymbol* s)
 {
 	assert(s->type == SYM_TYPE_VARIABLE);
 	
@@ -182,7 +182,7 @@ const CbValue* symbol_variable_get_value(const symbol_t* s)
 // -----------------------------------------------------------------------------
 // assign new value to the symbol-value (variables only!)
 // -----------------------------------------------------------------------------
-void symbol_variable_assign_value(symbol_t* s, const CbValue* new_value)
+void cb_symbol_variable_assign_value(CbSymbol* s, const CbValue* new_value)
 {
 	assert(s->type == SYM_TYPE_VARIABLE);
 	
@@ -192,7 +192,7 @@ void symbol_variable_assign_value(symbol_t* s, const CbValue* new_value)
 // -----------------------------------------------------------------------------
 // get function-object of an function-symbol (functions only!)
 // -----------------------------------------------------------------------------
-function_t* symbol_function_get_function(const symbol_t* s)
+function_t* cb_symbol_function_get_function(const CbSymbol* s)
 {
 	assert(s->type == SYM_TYPE_FUNCTION);
 	

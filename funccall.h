@@ -18,7 +18,7 @@ typedef struct
 {
 	enum cb_syntree_node_type type;	// node-type is SNT_FUNC_CALL
 	char* sym_id;				// function identifier
-	symbol_t* table_sym;		// reference to the instance in the symbol-table
+	CbSymbol* table_sym;		// reference to the instance in the symbol-table
 	strlist_t* args;			// a list of arguments
 } funccall_t;
 

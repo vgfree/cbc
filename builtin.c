@@ -48,7 +48,7 @@ builtin_func_info_item_t builtin_func_decl_list[] = {
 int register_builtin_func(CbSymtab* symtab, char* identifier,
 						  func_ref_t func, int expected_param_count)
 {
-	symbol_t* s = symbol_create_function(identifier,
+	CbSymbol* s = cb_symbol_create_function(identifier,
 					function_create_builtin(identifier, expected_param_count, func));
 	
 	if (cb_symtab_append(symtab, s) != NULL)

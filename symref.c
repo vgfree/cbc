@@ -35,10 +35,10 @@ CbSyntree* symref_create(char* identifier)
 // -----------------------------------------------------------------------------
 void symref_setsymbolfromtable(symref_t* node, CbSymtab* symtab)
 {
-	symbol_t* table_sym = node->table_sym;
+	CbSymbol* table_sym = node->table_sym;
 	
 	// get symbol-reference
-	symbol_t* dummy = cb_symtab_lookup(symtab, node->sym_id);
+	CbSymbol* dummy = cb_symtab_lookup(symtab, node->sym_id);
 	
 	// if there is no such a symbol -> error
 	if (!dummy)

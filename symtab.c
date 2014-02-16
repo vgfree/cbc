@@ -30,12 +30,12 @@ void cb_symtab_free(CbSymtab* st)
 {
 	assert(st);
 	
-	symbol_t* current = st->first;
+	CbSymbol* current = st->first;
 	while (current)
 	{
-		symbol_t* temp	= current;
-		current			= symbol_get_next(current);
-		symbol_free(temp);
+		CbSymbol* temp	= current;
+		current			= cb_symbol_get_next(current);
+		cb_symbol_free(temp);
 	}
 	
 	stack_free(st->scope_stack);
@@ -45,12 +45,12 @@ void cb_symtab_free(CbSymtab* st)
 // -----------------------------------------------------------------------------
 // Append a symbol to the symbol-table
 // -----------------------------------------------------------------------------
-symbol_t* cb_symtab_append(CbSymtab* st, symbol_t* s)
+CbSymbol* cb_symtab_append(CbSymtab* st, CbSymbol* s)
 {
 	assert(st);
 	assert(s);
-	assert(symbol_get_next(s)	  == NULL); // allow appending single symbols only
-	assert(symbol_get_previous(s) == NULL);
+	assert(cb_symbol_get_next(s)	  == NULL); // allow appending single symbols only
+	assert(cb_symbol_get_previous(s) == NULL);
 	
 	if (cb_symtab_is_empty(st))
 	{
@@ -58,9 +58,9 @@ symbol_t* cb_symtab_append(CbSymtab* st, symbol_t* s)
 		st->current	= s;
 	}
 	else
-		symbol_connect(st->last, s);
+		cb_symbol_connect(st->last, s);
 	
-	symbol_set_scope(s, stack_get_top_item(st->scope_stack));
+	cb_symbol_set_scope(s, stack_get_top_item(st->scope_stack));
 	st->last = s;
 	st->size++;
 	
@@ -71,24 +71,24 @@ symbol_t* cb_symtab_append(CbSymtab* st, symbol_t* s)
 // Dispatch the symbol with the given id from the symbol-table.
 // If function returns NULL, then there was no symbol found with the given id.
 // -----------------------------------------------------------------------------
-symbol_t* cb_symtab_dispatch(CbSymtab* st, const char* id)
+CbSymbol* cb_symtab_dispatch(CbSymtab* st, const char* id)
 {
-	symbol_t* found = cb_symtab_lookup(st, id);
+	CbSymbol* found = cb_symtab_lookup(st, id);
 	
 	if (found)
 	{
-		symbol_t* prev = symbol_get_previous(found);
-		symbol_t* next = symbol_get_next(found);
+		CbSymbol* prev = cb_symbol_get_previous(found);
+		CbSymbol* next = cb_symbol_get_next(found);
 		
-		symbol_set_previous(found, NULL);
-		symbol_set_next(found, NULL);
+		cb_symbol_set_previous(found, NULL);
+		cb_symbol_set_next(found, NULL);
 		
 		// remove references to dispatched item
-		if (prev) symbol_set_next(prev, NULL);
-		if (next) symbol_set_previous(next, NULL);
+		if (prev) cb_symbol_set_next(prev, NULL);
+		if (next) cb_symbol_set_previous(next, NULL);
 		// connect free items
 		if (prev && next)
-			symbol_connect(prev, next);
+			cb_symbol_connect(prev, next);
 		
 		// update first, last and current item-references
 		if (st->current == found)
@@ -119,25 +119,25 @@ symbol_t* cb_symtab_dispatch(CbSymtab* st, const char* id)
 // -----------------------------------------------------------------------------
 void cb_symtab_remove(CbSymtab* st, const char* id)
 {
-	symbol_t* s = cb_symtab_dispatch(st, id);
+	CbSymbol* s = cb_symtab_dispatch(st, id);
 	
 	if (s)
-		symbol_free(s);
+		cb_symbol_free(s);
 }
 
 // -----------------------------------------------------------------------------
 // Lookup a symbol by id
 // -----------------------------------------------------------------------------
-symbol_t* cb_symtab_lookup(CbSymtab* st, const char* id)
+CbSymbol* cb_symtab_lookup(CbSymtab* st, const char* id)
 {
-	symbol_t* current	= st->first;
-	symbol_t* result	= NULL;
+	CbSymbol* current	= st->first;
+	CbSymbol* result	= NULL;
 	
 	while (current)
 	{
-		if (strcmp(id, symbol_get_id(current)) == 0)
+		if (strcmp(id, cb_symbol_get_id(current)) == 0)
 		{
-			if (scope_equals(symbol_get_scope(current),
+			if (scope_equals(cb_symbol_get_scope(current),
 							 stack_get_top_item(st->scope_stack)))
 			{
 				result = current;
@@ -145,12 +145,12 @@ symbol_t* cb_symtab_lookup(CbSymtab* st, const char* id)
 			}
 			// NULL-scope means, that the current symbol is in global scope.
 			// -> Can potentially be used, if there is no local declaration.
-			else if (symbol_get_scope(current) == NULL)
+			else if (cb_symbol_get_scope(current) == NULL)
 				// Do not break in this case,
 				// since there could still be a local declaration of the symbol!
 				result = current;
 		}
-		current = symbol_get_next(current);
+		current = cb_symbol_get_next(current);
 	}
 	
 	return result;
@@ -160,9 +160,9 @@ symbol_t* cb_symtab_lookup(CbSymtab* st, const char* id)
 // Get next item in the symbol-table and move the 'current'-pointer to the next
 // symbol
 // -----------------------------------------------------------------------------
-symbol_t* cb_symtab_next(CbSymtab* st)
+CbSymbol* cb_symtab_next(CbSymtab* st)
 {
-	symbol_t* result = symbol_get_next(cb_symtab_current(st));
+	CbSymbol* result = cb_symbol_get_next(cb_symtab_current(st));
 	
 	if (result)
 		st->current	= result;
@@ -173,7 +173,7 @@ symbol_t* cb_symtab_next(CbSymtab* st)
 // -----------------------------------------------------------------------------
 // Get current item in the symbol-table
 // -----------------------------------------------------------------------------
-symbol_t* cb_symtab_current(CbSymtab* st)
+CbSymbol* cb_symtab_current(CbSymtab* st)
 {
 	return st->current;
 }
@@ -182,9 +182,9 @@ symbol_t* cb_symtab_current(CbSymtab* st)
 // Get previous item in the symbol-table and move the 'current'-pointer to the
 // previous symbol
 // -----------------------------------------------------------------------------
-symbol_t* cb_symtab_previous(CbSymtab* st)
+CbSymbol* cb_symtab_previous(CbSymtab* st)
 {
-	symbol_t* result = symbol_get_previous(cb_symtab_current(st));
+	CbSymbol* result = cb_symbol_get_previous(cb_symtab_current(st));
 	
 	if (result)
 		st->current	= result;
@@ -217,18 +217,18 @@ void cb_symtab_leave_scope(CbSymtab* st)
 	// Remove all local symbols in the current scope.
 	// Begin with last symbol in the symbol-table, because recently appended
 	// symbols are always at the end of the table!
-	symbol_t* current = st->last;
+	CbSymbol* current = st->last;
 	while (current)
 	{
-		symbol_t* temp = current;
-		current		   = symbol_get_previous(current);
+		CbSymbol* temp = current;
+		current		   = cb_symbol_get_previous(current);
 		
-		if (scope_equals(symbol_get_scope(temp),
+		if (scope_equals(cb_symbol_get_scope(temp),
 						 (scope_t*) stack_get_top_item(st->scope_stack)))
 			// TODO: Use a different method to dispatch and remove the symbol.
 			// Since symtab_dispatch() calls symtab_lookup() this could be a
 			// quite slow operation!
-			cb_symtab_remove(st, symbol_get_id(temp));
+			cb_symtab_remove(st, cb_symbol_get_id(temp));
 	}
 	
 	scope_t* current_scope;

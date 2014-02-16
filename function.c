@@ -138,7 +138,7 @@ CbValue* function_call(function_t* f, strlist_t* args, CbSymtab* symtab)
 	
 #ifdef _CBC_DEFAULT_FUNC_RESULT_SYMBOL
 		// declare default function-result symbol
-		symbol_t* default_result = symbol_create_variable("Result");
+		CbSymbol* default_result = cb_symbol_create_variable("Result");
 		cb_symtab_append(symtab, default_result);
 #endif // _CBC_DEFAULT_FUNC_RESULT_SYMBOL
 		
@@ -151,8 +151,8 @@ CbValue* function_call(function_t* f, strlist_t* args, CbSymtab* symtab)
 				stack_pop(arg_stack, (void*) &arg_value);
 				char* param_id;
 				stack_pop(param_stack, (void*) &param_id);
-				symbol_t* arg = symbol_create_variable(param_id);
-				symbol_variable_assign_value(arg, arg_value);
+				CbSymbol* arg = cb_symbol_create_variable(param_id);
+				cb_symbol_variable_assign_value(arg, arg_value);
 				cb_value_free(arg_value);
 				cb_symtab_append(symtab, arg);	// declare argument within function-
 											// scope
@@ -165,7 +165,7 @@ CbValue* function_call(function_t* f, strlist_t* args, CbSymtab* symtab)
 #ifdef _CBC_DEFAULT_FUNC_RESULT_SYMBOL
 		cb_value_free(cb_syntree_eval(f->body, symtab));
 		// result is value of the "Result"-symbol
-		f->result = cb_value_copy(symbol_variable_get_value(default_result));
+		f->result = cb_value_copy(cb_symbol_variable_get_value(default_result));
 #else
 		f->result = cb_syntree_eval(f->body, symtab);	// result is the last
 													// expression in the function

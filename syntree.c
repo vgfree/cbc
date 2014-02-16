@@ -220,7 +220,7 @@ CbValue* cb_syntree_eval(CbSyntree* node, CbSymtab* symtab)
 		{
 			symref_t* sr = (symref_t*) node;
 			symref_setsymbolfromtable(sr, symtab);
-			result = cb_value_copy(symbol_variable_get_value(sr->table_sym));
+			result = cb_value_copy(cb_symbol_variable_get_value(sr->table_sym));
 			break;
 		}
 		
@@ -235,10 +235,10 @@ CbValue* cb_syntree_eval(CbSyntree* node, CbSymtab* symtab)
 			symref_setsymbolfromtable(sr, symtab);
 			
 			// assign right-hand-side expression
-			symbol_variable_assign_value(sr->table_sym, rhs);
+			cb_symbol_variable_assign_value(sr->table_sym, rhs);
 			cb_value_free(rhs);
 			
-			result = cb_value_copy(symbol_variable_get_value(sr->table_sym));
+			result = cb_value_copy(cb_symbol_variable_get_value(sr->table_sym));
 			break;
 		}
 		
@@ -246,7 +246,7 @@ CbValue* cb_syntree_eval(CbSyntree* node, CbSymtab* symtab)
 		{
 			symref_t* sr = (symref_t*) node->l;
 			
-			symbol_t* dummy = symbol_create_variable(sr->sym_id);
+			CbSymbol* dummy = cb_symbol_create_variable(sr->sym_id);
 			cb_symtab_append(symtab, dummy);	// declare symbol
 			
 			result = cb_value_create();		// return empty value
@@ -266,7 +266,7 @@ CbValue* cb_syntree_eval(CbSyntree* node, CbSymtab* symtab)
 			else
 				func->param_count = func->params->count;
 			
-			symbol_t* s = symbol_create_function(fndecl->sym_id, func);
+			CbSymbol* s = cb_symbol_create_function(fndecl->sym_id, func);
 			cb_symtab_append(symtab, s);	// declare function
 			
 			result = cb_value_create();	// return empty value
@@ -289,7 +289,7 @@ CbValue* cb_syntree_eval(CbSyntree* node, CbSymtab* symtab)
 		{
 			funccall_t* fncall = (funccall_t*) node;
 			symref_setsymbolfromtable((symref_t*) fncall, symtab);
-			function_t* f = symbol_function_get_function(fncall->table_sym);
+			function_t* f = cb_symbol_function_get_function(fncall->table_sym);
 			
 			function_call(f, fncall->args, symtab);
 			result = cb_value_copy(f->result);
