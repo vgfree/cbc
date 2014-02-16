@@ -204,7 +204,7 @@ void cb_syntree_free(CbSyntree* node)
 // -----------------------------------------------------------------------------
 // evaluate a complete syntax tree and return its result
 // -----------------------------------------------------------------------------
-CbValue* cb_syntree_eval(CbSyntree* node, symtab_t* symtab)
+CbValue* cb_syntree_eval(CbSyntree* node, CbSymtab* symtab)
 {
 	CbValue* result = NULL;
 	
@@ -247,7 +247,7 @@ CbValue* cb_syntree_eval(CbSyntree* node, symtab_t* symtab)
 			symref_t* sr = (symref_t*) node->l;
 			
 			symbol_t* dummy = symbol_create_variable(sr->sym_id);
-			symtab_append(symtab, dummy);	// declare symbol
+			cb_symtab_append(symtab, dummy);	// declare symbol
 			
 			result = cb_value_create();		// return empty value
 			break;
@@ -267,7 +267,7 @@ CbValue* cb_syntree_eval(CbSyntree* node, symtab_t* symtab)
 				func->param_count = func->params->count;
 			
 			symbol_t* s = symbol_create_function(fndecl->sym_id, func);
-			symtab_append(symtab, s);	// declare function
+			cb_symtab_append(symtab, s);	// declare function
 			
 			result = cb_value_create();	// return empty value
 			break;

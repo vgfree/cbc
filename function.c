@@ -89,7 +89,7 @@ void function_addparam(function_t* f, char* param_id)
 // call function
 // if the function has no parameters, pass a NULL-value as arguments.
 // -----------------------------------------------------------------------------
-CbValue* function_call(function_t* f, strlist_t* args, symtab_t* symtab)
+CbValue* function_call(function_t* f, strlist_t* args, CbSymtab* symtab)
 {
 	// reset function-result
 	// this is necessary in case the function was already called.
@@ -131,7 +131,7 @@ CbValue* function_call(function_t* f, strlist_t* args, symtab_t* symtab)
 		}
 	}
 	
-	symtab_enter_scope(symtab, f->id);	// enter function-scope
+	cb_symtab_enter_scope(symtab, f->id);	// enter function-scope
 	
 	if (f->type == FUNC_TYPE_USER_DEFINED)
 	{
@@ -139,7 +139,7 @@ CbValue* function_call(function_t* f, strlist_t* args, symtab_t* symtab)
 #ifdef _CBC_DEFAULT_FUNC_RESULT_SYMBOL
 		// declare default function-result symbol
 		symbol_t* default_result = symbol_create_variable("Result");
-		symtab_append(symtab, default_result);
+		cb_symtab_append(symtab, default_result);
 #endif // _CBC_DEFAULT_FUNC_RESULT_SYMBOL
 		
 		// declare all arguments
@@ -154,7 +154,7 @@ CbValue* function_call(function_t* f, strlist_t* args, symtab_t* symtab)
 				symbol_t* arg = symbol_create_variable(param_id);
 				symbol_variable_assign_value(arg, arg_value);
 				cb_value_free(arg_value);
-				symtab_append(symtab, arg);	// declare argument within function-
+				cb_symtab_append(symtab, arg);	// declare argument within function-
 											// scope
 			}
 		}
@@ -181,7 +181,7 @@ CbValue* function_call(function_t* f, strlist_t* args, symtab_t* symtab)
 	// leave function-scope:
 	// all symbols, that were declared within this scope (like parameters),
 	// will be freed!
-	symtab_leave_scope(symtab);
+	cb_symtab_leave_scope(symtab);
 	
 	return f->result;
 }

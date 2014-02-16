@@ -56,7 +56,7 @@ CbSyntree* cb_flow_create(enum cb_syntree_node_type type, CbSyntree* condition,
 CbSyntree* cb_comparison_create(enum cb_comparison_type type,
 								CbSyntree* left_node, CbSyntree* right_node);
 void cb_syntree_free(CbSyntree* node);
-CbValue* cb_syntree_eval(CbSyntree* node, symtab_t* symtab);
+CbValue* cb_syntree_eval(CbSyntree* node, CbSymtab* symtab);
 
 
 #endif // SYNTREE_H

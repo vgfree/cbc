@@ -45,13 +45,13 @@ builtin_func_info_item_t builtin_func_decl_list[] = {
 // -----------------------------------------------------------------------------
 // register a builtin function in a symbol-table
 // -----------------------------------------------------------------------------
-int register_builtin_func(symtab_t* symtab, char* identifier,
+int register_builtin_func(CbSymtab* symtab, char* identifier,
 						  func_ref_t func, int expected_param_count)
 {
 	symbol_t* s = symbol_create_function(identifier,
 					function_create_builtin(identifier, expected_param_count, func));
 	
-	if (symtab_append(symtab, s) != NULL)
+	if (cb_symtab_append(symtab, s) != NULL)
 		return EXIT_SUCCESS;
 	else
 		return EXIT_FAILURE;
@@ -60,7 +60,7 @@ int register_builtin_func(symtab_t* symtab, char* identifier,
 // -----------------------------------------------------------------------------
 // register all builtin symbols in the given symbol-table
 // -----------------------------------------------------------------------------
-int register_builtin_all(symtab_t* symtab)
+int register_builtin_all(CbSymtab* symtab)
 {
 	int lenght	= sizeof(builtin_func_decl_list) /
 				  sizeof(builtin_func_info_item_t);

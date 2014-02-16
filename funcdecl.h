@@ -22,7 +22,7 @@ typedef struct
 	char* sym_id;				// function-identifier
 	CbSyntree* body;			// contains the code of the function
 	strlist_t* params;			// formal parameters
-	symtab_t* symtab;			// pointer to the symbol-table that should be
+	CbSymtab* symtab;			// pointer to the symbol-table that should be
 								// used
 } funcdecl_t;
 

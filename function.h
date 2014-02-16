@@ -49,7 +49,7 @@ function_t* function_create_builtin(char* identifier, int param_count,
 function_t* function_create_user_defined(char* identifier, CbSyntree* body);
 void function_free(function_t* f);
 void function_addparam(function_t* f, char* param_id);
-CbValue* function_call(function_t* f, strlist_t* args, symtab_t* symtab);
+CbValue* function_call(function_t* f, strlist_t* args, CbSymtab* symtab);
 void function_reset(function_t* f);
 
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * symtab_t -- Implementation of a symbol-table structure
+ * CbSymtab -- Implementation of a symbol-table structure.
  * 
  *      The symbol-table is supposed to store all symbols ocourring in the
  *      codeblock source-code being parsed.
@@ -24,20 +24,21 @@ struct symbol_table
 	stack_t* scope_stack;
 };
 
+
 // Interface functions
-symtab_t* symtab_create();
-void symtab_free(symtab_t* st);
-symbol_t* symtab_append(symtab_t* st, symbol_t* s);
-symbol_t* symtab_dispatch(symtab_t* st, const char* id);
-void symtab_remove(symtab_t* st, const char* id);
-void symtab_dispatch_all(symtab_t* st);
-void symtab_clear(symtab_t* st);
-symbol_t* symtab_lookup(symtab_t* st, const char* id);
-symbol_t* symtab_next(symtab_t* st);
-symbol_t* symtab_current(symtab_t* st);
-symbol_t* symtab_previous(symtab_t* st);
-bool symtab_isempty(symtab_t* st);
-void symtab_enter_scope(symtab_t* st, char* context);
-void symtab_leave_scope(symtab_t* st);
+CbSymtab* cb_symtab_create();
+void cb_symtab_free(CbSymtab* st);
+symbol_t* cb_symtab_append(CbSymtab* st, symbol_t* s);
+symbol_t* cb_symtab_dispatch(CbSymtab* st, const char* id);
+void cb_symtab_remove(CbSymtab* st, const char* id);
+void symtab_dispatch_all(CbSymtab* st);
+void symtab_clear(CbSymtab* st);
+symbol_t* cb_symtab_lookup(CbSymtab* st, const char* id);
+symbol_t* cb_symtab_next(CbSymtab* st);
+symbol_t* cb_symtab_current(CbSymtab* st);
+symbol_t* cb_symtab_previous(CbSymtab* st);
+bool cb_symtab_is_empty(CbSymtab* st);
+void cb_symtab_enter_scope(CbSymtab* st, char* context);
+void cb_symtab_leave_scope(CbSymtab* st);
 
 #endif // SYMTAB_H

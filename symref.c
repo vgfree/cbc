@@ -33,12 +33,12 @@ CbSyntree* symref_create(char* identifier)
 // global symbol-table.
 // if there is no such a symbol, an error will be raised.
 // -----------------------------------------------------------------------------
-void symref_setsymbolfromtable(symref_t* node, symtab_t* symtab)
+void symref_setsymbolfromtable(symref_t* node, CbSymtab* symtab)
 {
 	symbol_t* table_sym = node->table_sym;
 	
 	// get symbol-reference
-	symbol_t* dummy = symtab_lookup(symtab, node->sym_id);
+	symbol_t* dummy = cb_symtab_lookup(symtab, node->sym_id);
 	
 	// if there is no such a symbol -> error
 	if (!dummy)

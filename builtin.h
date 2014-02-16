@@ -16,9 +16,9 @@ typedef CbValue* (*func_ref_t) (stack_t*);
 
 
 // interface functions
-int register_builtin_func(symtab_t* symtab, char* identifier,
+int register_builtin_func(CbSymtab* symtab, char* identifier,
 						  func_ref_t func, int expected_param_count);
-int register_builtin_all(symtab_t* symtab);
+int register_builtin_all(CbSymtab* symtab);
 
 
 #endif // BUILTIN_H

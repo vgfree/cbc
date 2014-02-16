@@ -16,7 +16,7 @@
 // codeblock_t struct
 typedef struct
 {
-	symtab_t* global_symtab;	// reference to the global symbol-table
+	CbSymtab* global_symtab;	// reference to the global symbol-table
 	CbSyntree* ast;				// abstract syntax-tree -- the code to execute
 	CbValue* result;			// the result, after executing the codeblock
 } codeblock_t;

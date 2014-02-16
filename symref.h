@@ -24,7 +24,7 @@ typedef struct
 
 // interface functions
 CbSyntree* symref_create(char* identifier);
-void symref_setsymbolfromtable(symref_t* node, symtab_t* symtab);
+void symref_setsymbolfromtable(symref_t* node, CbSymtab* symtab);
 
 
 #endif // SYMREF_H
