@@ -1,0 +1,7 @@
+// Testcase for category 'functions'
+
+function Add(num1, num2)
+   Result := num1 + num2,
+end,
+
+Add(5, 10),

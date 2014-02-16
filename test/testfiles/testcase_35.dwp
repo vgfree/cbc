@@ -1,0 +1,14 @@
+// Testcase for category 'data-types'
+
+| foo, bar, baz |
+
+foo := 1,
+bar := 2,
+
+if foo < bar then
+   baz := True,
+else
+   baz := False,
+endif,
+
+baz,

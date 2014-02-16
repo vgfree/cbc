@@ -1,0 +1,6 @@
+// Testcase for category 'symbols'
+
+| foo |
+
+foo := 12345,
+foo,

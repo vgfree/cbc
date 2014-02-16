@@ -1,0 +1,12 @@
+// Testcase for category 'functions'
+
+| foo |
+
+function bar()
+   foo := foo + 2,
+   Result := foo,
+end,
+
+foo := 10,
+bar(),
+bar(),

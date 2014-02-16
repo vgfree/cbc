@@ -1,0 +1,6 @@
+// Testcase for category 'data-types'
+
+| foo |
+
+foo := 'foobarbaz',
+foo = 'foobarbaz',

@@ -1,0 +1,11 @@
+// Testcase for category 'control-flow'
+
+| foo |
+
+foo := 10,
+
+while foo > 0 do
+   foo := foo -1,
+end,
+
+foo,

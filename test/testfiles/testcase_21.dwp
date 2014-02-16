@@ -1,0 +1,11 @@
+// Testcase for category 'control-flow'
+
+| foo |
+
+foo := 1,
+
+if foo > 5 then
+   5,
+else
+   1,
+endif,

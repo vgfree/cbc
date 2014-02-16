@@ -1,0 +1,13 @@
+// Testcase for category 'functions'
+
+function Dec(nNumber)
+   nNumber := nNumber - 1,
+   
+   if nNumber > 0 then
+      nNumber := Dec(nNumber),
+   endif,
+   
+   Result := nNumber,
+end,
+
+Dec(10),

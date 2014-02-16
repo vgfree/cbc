@@ -1,0 +1,9 @@
+// Testcase for category 'data-types'
+| foo,
+bar,
+baz | foo := 1,
+bar := 2,
+if foo < bar then baz := 'string1',
+else baz := 'string2',
+endif,
+baz,

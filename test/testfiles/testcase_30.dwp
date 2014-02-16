@@ -1,0 +1,7 @@
+// Testcase for category 'functions'
+
+function Inc(num)
+   Result := num + 1,
+end,
+
+Inc(1),

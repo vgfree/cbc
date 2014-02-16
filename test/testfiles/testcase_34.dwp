@@ -1,0 +1,11 @@
+// Testcase for category 'functions'
+
+function MainFunc(cParam1, cParam2)
+   function Quote(cStr)
+      Result := '"' + cStr + '"',
+   end,
+   
+   Result := Quote(cParam1) + ', ' + Quote(cParam2),
+end,
+
+MainFunc('foo', 'bar'),
