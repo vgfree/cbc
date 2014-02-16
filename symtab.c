@@ -18,7 +18,7 @@ CbSymtab* cb_symtab_create()
 	st->last		= NULL;
 	st->current		= NULL;
 	st->size		= 0;
-	st->scope_stack = stack_create();
+	st->scope_stack = cb_stack_create();
 	
 	return st;
 }
@@ -38,7 +38,7 @@ void cb_symtab_free(CbSymtab* st)
 		cb_symbol_free(temp);
 	}
 	
-	stack_free(st->scope_stack);
+	cb_stack_free(st->scope_stack);
 	free(st);
 }
 
@@ -60,7 +60,7 @@ CbSymbol* cb_symtab_append(CbSymtab* st, CbSymbol* s)
 	else
 		cb_symbol_connect(st->last, s);
 	
-	cb_symbol_set_scope(s, stack_get_top_item(st->scope_stack));
+	cb_symbol_set_scope(s, cb_stack_get_top_item(st->scope_stack));
 	st->last = s;
 	st->size++;
 	
@@ -138,7 +138,7 @@ CbSymbol* cb_symtab_lookup(CbSymtab* st, const char* id)
 		if (strcmp(id, cb_symbol_get_id(current)) == 0)
 		{
 			if (scope_equals(cb_symbol_get_scope(current),
-							 stack_get_top_item(st->scope_stack)))
+							 cb_stack_get_top_item(st->scope_stack)))
 			{
 				result = current;
 				break;	// Correct symbol was found -> break
@@ -206,7 +206,7 @@ bool cb_symtab_is_empty(CbSymtab* st)
 void cb_symtab_enter_scope(CbSymtab* st, char* context)
 {
 	scope_t* new_scope = scope_create(context, st->scope_stack->count + 1);
-	stack_push(st->scope_stack, new_scope);
+	cb_stack_push(st->scope_stack, new_scope);
 }
 
 // -----------------------------------------------------------------------------
@@ -224,7 +224,7 @@ void cb_symtab_leave_scope(CbSymtab* st)
 		current		   = cb_symbol_get_previous(current);
 		
 		if (scope_equals(cb_symbol_get_scope(temp),
-						 (scope_t*) stack_get_top_item(st->scope_stack)))
+						 (scope_t*) cb_stack_get_top_item(st->scope_stack)))
 			// TODO: Use a different method to dispatch and remove the symbol.
 			// Since symtab_dispatch() calls symtab_lookup() this could be a
 			// quite slow operation!
@@ -232,6 +232,6 @@ void cb_symtab_leave_scope(CbSymtab* st)
 	}
 	
 	scope_t* current_scope;
-	stack_pop(st->scope_stack, (void*) &current_scope);	// pop and
+	cb_stack_pop(st->scope_stack, (void*) &current_scope);	// pop and
 	scope_free(current_scope);							// free current scope
 }

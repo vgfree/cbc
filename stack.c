@@ -1,5 +1,5 @@
 /*******************************************************************************
- * stack_t -- Generic implementation of a stack structure, using a linked list.
+ * CbStack -- Generic implementation of a stack structure, using a linked list.
  ******************************************************************************/
 
 #include <stdlib.h>
@@ -11,9 +11,9 @@
 // #############################################################################
 
 // item in the stack_t structure
-struct stack_item_t
+struct CbStackItem
 {
-	struct stack_item_t* prior;	// pointer to the prior item on the stack
+	struct CbStackItem* prior;	// pointer to the prior item on the stack
 	const void* data;			// pointer to any kind of data
 };
 
@@ -25,11 +25,11 @@ struct stack_item_t
 // -----------------------------------------------------------------------------
 // constructor
 // -----------------------------------------------------------------------------
-stack_t* stack_create()
+CbStack* cb_stack_create()
 {
-	stack_t* stack	= (stack_t*) malloc(sizeof(stack_t));
-	stack->top		= NULL;
-	stack->count	= 0;
+	CbStack* stack = (CbStack*) malloc(sizeof(CbStack));
+	stack->top	   = NULL;
+	stack->count   = 0;
 	
 	return stack;
 }
@@ -37,7 +37,7 @@ stack_t* stack_create()
 // -----------------------------------------------------------------------------
 // destructur
 // -----------------------------------------------------------------------------
-void stack_free(stack_t* stack)
+void cb_stack_free(CbStack* stack)
 {
 	// TODO: Print warning, if stack is not empty
 	free(stack);
@@ -46,11 +46,11 @@ void stack_free(stack_t* stack)
 // -----------------------------------------------------------------------------
 // push an item on the stack
 // -----------------------------------------------------------------------------
-void stack_push(stack_t* stack, const void* item)
+void cb_stack_push(CbStack* stack, const void* item)
 {
-	stack_item_t* stack_item	= (stack_item_t*) malloc(sizeof(stack_item_t));
-	stack_item->data			= item;
-	stack_item->prior			= stack->top;
+	CbStackItem* stack_item = (CbStackItem*) malloc(sizeof(CbStackItem));
+	stack_item->data		= item;
+	stack_item->prior		= stack->top;
 	
 	stack->top = stack_item;
 	stack->count++;
@@ -59,21 +59,21 @@ void stack_push(stack_t* stack, const void* item)
 // -----------------------------------------------------------------------------
 // pop an item off the stack
 // -----------------------------------------------------------------------------
-int stack_pop(stack_t* stack, void** dest)
+int cb_stack_pop(CbStack* stack, void** dest)
 {
-	if (!stack_is_empty(stack))
+	if (!cb_stack_is_empty(stack))
 	{
 		if (dest != NULL)	// only set destinaion, if it is a valid address
-			*dest			= (void*) stack->top->data;
+			*dest = (void*) stack->top->data;
 		
-		stack_item_t* temp	= stack->top;
-		stack->top			= stack->top->prior;	// move top to prior item
-		free(temp);									// free former top-item
+		CbStackItem* temp = stack->top;
+		stack->top		  = stack->top->prior;	// move top to prior item
+		free(temp);								// free former top-item
 		
 		stack->count--;
 	}
 	else
-		return EXIT_FAILURE;						// stack-underflow
+		return EXIT_FAILURE;	// stack-underflow
 	
 	return EXIT_SUCCESS;
 }
@@ -81,7 +81,7 @@ int stack_pop(stack_t* stack, void** dest)
 // -----------------------------------------------------------------------------
 // get the pointer to the data-member of the top-item
 // -----------------------------------------------------------------------------
-const void* stack_get_top_item(const stack_t* stack)
+const void* cb_stack_get_top_item(const CbStack* stack)
 {
 	const void* result = NULL;
 	if (stack->top)
@@ -93,7 +93,7 @@ const void* stack_get_top_item(const stack_t* stack)
 // -----------------------------------------------------------------------------
 // check whether the stack is empty
 // -----------------------------------------------------------------------------
-bool stack_is_empty(const stack_t* stack)
+bool cb_stack_is_empty(const CbStack* stack)
 {
 	return stack->count == 0;
 }

@@ -107,8 +107,8 @@ CbValue* function_call(function_t* f, CbStrlist* args, CbSymtab* symtab)
 		exit(EXIT_FAILURE);
 	}
 	
-	stack_t* arg_stack   = stack_create();
-	stack_t* param_stack = stack_create();
+	CbStack* arg_stack   = cb_stack_create();
+	CbStack* param_stack = cb_stack_create();
 	// evaluate argument values
 	if (count_params > 0)
 	{
@@ -117,13 +117,13 @@ CbValue* function_call(function_t* f, CbStrlist* args, CbSymtab* symtab)
 		while (curr_arg)
 		{
 			if (curr_param)
-				stack_push(param_stack, curr_param->string); // push param name
+				cb_stack_push(param_stack, curr_param->string); // push param name
 			
 			// obtain argument value
 			CbValue* arg_value = cb_syntree_eval(	((CbSyntree*) curr_arg->data),
 												symtab);
 			// push argument value on the stack
-			stack_push(arg_stack, arg_value);
+			cb_stack_push(arg_stack, arg_value);
 			// process next item
 			curr_arg = curr_arg->next;
 			if (curr_param)
@@ -145,12 +145,12 @@ CbValue* function_call(function_t* f, CbStrlist* args, CbSymtab* symtab)
 		// declare all arguments
 		if (count_params > 0)	// TODO: If-statement is not necessary here.
 		{
-			while (!stack_is_empty(param_stack))
+			while (!cb_stack_is_empty(param_stack))
 			{
 				CbValue* arg_value;
-				stack_pop(arg_stack, (void*) &arg_value);
+				cb_stack_pop(arg_stack, (void*) &arg_value);
 				char* param_id;
-				stack_pop(param_stack, (void*) &param_id);
+				cb_stack_pop(param_stack, (void*) &param_id);
 				CbSymbol* arg = cb_symbol_create_variable(param_id);
 				cb_symbol_variable_assign_value(arg, arg_value);
 				cb_value_free(arg_value);
@@ -159,8 +159,8 @@ CbValue* function_call(function_t* f, CbStrlist* args, CbSymtab* symtab)
 			}
 		}
 	
-		stack_free(arg_stack);
-		stack_free(param_stack);
+		cb_stack_free(arg_stack);
+		cb_stack_free(param_stack);
 		
 #ifdef _CBC_DEFAULT_FUNC_RESULT_SYMBOL
 		cb_value_free(cb_syntree_eval(f->body, symtab));
@@ -174,8 +174,8 @@ CbValue* function_call(function_t* f, CbStrlist* args, CbSymtab* symtab)
 	else
 	{
 		f->result = f->func_ref(arg_stack);
-		stack_free(arg_stack);
-		stack_free(param_stack);
+		cb_stack_free(arg_stack);
+		cb_stack_free(param_stack);
 	}
 	
 	// leave function-scope:

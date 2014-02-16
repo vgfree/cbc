@@ -22,12 +22,12 @@
 // -----------------------------------------------------------------------------
 // WriteLn() -- Print value
 // -----------------------------------------------------------------------------
-CbValue* bif_writeln(stack_t* arg_stack)
+CbValue* bif_writeln(CbStack* arg_stack)
 {
 	assert(arg_stack->count == 1);
 	
 	CbValue* arg;
-	stack_pop(arg_stack, (void*) &arg);
+	cb_stack_pop(arg_stack, (void*) &arg);
 	
 	cb_value_print(arg);
 	cb_value_free(arg);
@@ -40,14 +40,14 @@ CbValue* bif_writeln(stack_t* arg_stack)
 // -----------------------------------------------------------------------------
 // Mod() -- Modulo
 // -----------------------------------------------------------------------------
-CbValue* bif_mod(stack_t* arg_stack)
+CbValue* bif_mod(CbStack* arg_stack)
 {
 	assert(arg_stack->count == 2);
 	
 	CbValue* arg1;
 	CbValue* arg2;
-	stack_pop(arg_stack, (void*) &arg2);	// first pop -> last argument
-	stack_pop(arg_stack, (void*) &arg1);
+	cb_stack_pop(arg_stack, (void*) &arg2);	// first pop -> last argument
+	cb_stack_pop(arg_stack, (void*) &arg1);
 	
 	CbValue* result = cb_numeric_create(arg1->value % arg2->value);
 	
@@ -60,12 +60,12 @@ CbValue* bif_mod(stack_t* arg_stack)
 // -----------------------------------------------------------------------------
 // ValType() -- Type of a value as character
 // -----------------------------------------------------------------------------
-CbValue* bif_valtype(stack_t* arg_stack)
+CbValue* bif_valtype(CbStack* arg_stack)
 {
 	assert(arg_stack->count == 1);
 	
 	CbValue* arg;
-	stack_pop(arg_stack, (void*) &arg);
+	cb_stack_pop(arg_stack, (void*) &arg);
 	
 	CbValue* result;
 	switch (arg->type)
@@ -96,12 +96,12 @@ CbValue* bif_valtype(stack_t* arg_stack)
 // -----------------------------------------------------------------------------
 // Str() -- Convert any value to string
 // -----------------------------------------------------------------------------
-CbValue* bif_str(stack_t* arg_stack)
+CbValue* bif_str(CbStack* arg_stack)
 {
 	assert(arg_stack->count == 1);
 	
 	CbValue* arg;
-	stack_pop(arg_stack, (void*) &arg);
+	cb_stack_pop(arg_stack, (void*) &arg);
 	
 	CbValue* result = cb_string_create(cb_value_to_string(arg));
 	
@@ -113,12 +113,12 @@ CbValue* bif_str(stack_t* arg_stack)
 // -----------------------------------------------------------------------------
 // Eval() -- Evaluate a codeblock string
 // -----------------------------------------------------------------------------
-CbValue* bif_eval(stack_t* arg_stack)
+CbValue* bif_eval(CbStack* arg_stack)
 {
 	assert(arg_stack->count == 1);
 	
 	CbValue* arg;
-	stack_pop(arg_stack, (void*) &arg);
+	cb_stack_pop(arg_stack, (void*) &arg);
 	
 	assert(cb_value_is_type(arg, VT_STRING));
 	
@@ -146,12 +146,12 @@ CbValue* bif_eval(stack_t* arg_stack)
 // -----------------------------------------------------------------------------
 // Meld() -- Display a Message-Box
 // -----------------------------------------------------------------------------
-CbValue* bif_meld(stack_t* arg_stack)
+CbValue* bif_meld(CbStack* arg_stack)
 {
 	assert(arg_stack->count == 1);
 	
 	CbValue* arg;
-	stack_pop(arg_stack, (void*) &arg);
+	cb_stack_pop(arg_stack, (void*) &arg);
 	
 	assert(cb_value_is_type(arg, VT_STRING));
 	

@@ -21,7 +21,7 @@ struct symbol_table
 	CbSymbol* last;
 	CbSymbol* current;
 	size_t size;
-	stack_t* scope_stack;
+	CbStack* scope_stack;
 };
 
 

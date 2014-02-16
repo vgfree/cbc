@@ -1,5 +1,5 @@
 /*******************************************************************************
- * stack_t -- Generic implementation of a stack structure, using a linked list.
+ * CbStack -- Generic implementation of a stack structure, using a linked list.
  ******************************************************************************/
 
 #ifndef STACK_H
@@ -10,23 +10,23 @@
 #include <stdbool.h>
 
 // stack_item_t struct
-typedef struct stack_item_t stack_item_t;
+typedef struct CbStackItem CbStackItem;
 
 // stack_t struct
 typedef struct
 {
-	stack_item_t* top;
+	CbStackItem* top;
 	size_t count;
-} stack_t;
+} CbStack;
 
 
 // interface functions
-stack_t* stack_create();
-void stack_free(stack_t* stack);
-void stack_push(stack_t* stack, const void* item);
-int stack_pop(stack_t* stack, void** dest);
-const void* stack_get_top_item(const stack_t* stack);
-bool stack_is_empty(const stack_t* stack);
+CbStack* cb_stack_create();
+void cb_stack_free(CbStack* stack);
+void cb_stack_push(CbStack* stack, const void* item);
+int cb_stack_pop(CbStack* stack, void** dest);
+const void* cb_stack_get_top_item(const CbStack* stack);
+bool cb_stack_is_empty(const CbStack* stack);
 
 
 #endif // STACK_H

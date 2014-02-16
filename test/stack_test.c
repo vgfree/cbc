@@ -17,14 +17,14 @@
 // -----------------------------------------------------------------------------
 void test_stack(CuTest *tc)
 {
-	stack_t* stack = stack_create();
+	CbStack* stack = cb_stack_create();
 	
 	CuAssertIntEquals(tc, 0, stack->count);
 	CuAssertPtrEquals(tc, NULL, stack->top);
 	
 	int i = 0;
 	for (; i < 10; i++)
-		stack_push(stack, &i);
+		cb_stack_push(stack, &i);
 	
 	CuAssertIntEquals(tc, 10, stack->count);
 	CuAssertPtrNotNull(tc, stack->top);
@@ -32,14 +32,14 @@ void test_stack(CuTest *tc)
 	for (; i > 0; i--)
 	{
 		int* dummy;
-		stack_pop(stack, (void*) &dummy);
+		cb_stack_pop(stack, (void*) &dummy);
 		CuAssertPtrEquals(tc, &i, dummy);
 	}
 	
 	CuAssertIntEquals(tc, 0, stack->count);
 	CuAssertPtrEquals(tc, NULL, stack->top);
 	
-	stack_free(stack);
+	cb_stack_free(stack);
 }
 
 // -----------------------------------------------------------------------------
@@ -47,14 +47,14 @@ void test_stack(CuTest *tc)
 // -----------------------------------------------------------------------------
 void test_stack_complex(CuTest *tc)
 {
-	stack_t* stack = stack_create();
+	CbStack* stack = cb_stack_create();
 	
 	int i = 0;
 	for (; i < 10; i++)
 	{
 		scope_t* dummy = scope_create("scope", i + 1);
-		stack_push(stack, dummy);
-		CuAssertPtrEquals(tc, dummy, (scope_t*) stack_get_top_item(stack));
+		cb_stack_push(stack, dummy);
+		CuAssertPtrEquals(tc, dummy, (scope_t*) cb_stack_get_top_item(stack));
 	}
 	
 	CuAssertIntEquals(tc, 10, stack->count);
@@ -63,7 +63,7 @@ void test_stack_complex(CuTest *tc)
 	for (; i > 0; i--)
 	{
 		scope_t* dummy;
-		stack_pop(stack, (void*) &dummy);
+		cb_stack_pop(stack, (void*) &dummy);
 		CuAssertStrEquals(tc, "scope", dummy->context);
 		CuAssertIntEquals(tc, i, dummy->level);
 		
@@ -73,7 +73,7 @@ void test_stack_complex(CuTest *tc)
 	CuAssertIntEquals(tc, 0, stack->count);
 	CuAssertPtrEquals(tc, NULL, stack->top);
 	
-	stack_free(stack);
+	cb_stack_free(stack);
 }
 
 // -----------------------------------------------------------------------------
@@ -81,24 +81,24 @@ void test_stack_complex(CuTest *tc)
 // -----------------------------------------------------------------------------
 void test_stack_error(CuTest *tc)
 {
-	stack_t* stack = stack_create();
+	CbStack* stack = cb_stack_create();
 	
 	CuAssertIntEquals(tc, 0, stack->count);						// no items on the stack
-	CuAssertIntEquals(tc, EXIT_FAILURE, stack_pop(stack, NULL));// -> stack underflow
+	CuAssertIntEquals(tc, EXIT_FAILURE, cb_stack_pop(stack, NULL));// -> stack underflow
 	
 	int i = 0;
 	for (; i < 10; i++)
-		stack_push(stack, NULL);
+		cb_stack_push(stack, NULL);
 	
 	CuAssertIntEquals(tc, 10, stack->count);
 	
 	for (; i > 0; i--)
-		stack_pop(stack, NULL);
+		cb_stack_pop(stack, NULL);
 	
 	CuAssertIntEquals(tc, 0, stack->count);
-	CuAssertIntEquals(tc, EXIT_FAILURE, stack_pop(stack, NULL));// -> stack underflow
+	CuAssertIntEquals(tc, EXIT_FAILURE, cb_stack_pop(stack, NULL));// -> stack underflow
 	
-	stack_free(stack);
+	cb_stack_free(stack);
 }
 
 
