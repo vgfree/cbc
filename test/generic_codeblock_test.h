@@ -6,6 +6,7 @@
  *                             - symbols
  *                             - control-flow
  *                             - functions
+ *                             - builtin-functions
  *                             - data-types
  *                             - misc
  ******************************************************************************/

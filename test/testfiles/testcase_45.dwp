@@ -1,0 +1,5 @@
+// Testcase for category 'builtin-functions'
+
+| foo |
+
+ValType(True) + ValType(123) + ValType('foobar') + ValType(foo),

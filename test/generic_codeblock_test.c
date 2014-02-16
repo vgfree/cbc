@@ -61,7 +61,11 @@ const value_t expected_results[] = {
 	{VT_BOOLEAN, false},
 	{VT_BOOLEAN, true},
 	{VT_STRING, (cbnumeric) "string1"},	// Testcase 40
-	{VT_NUMERIC, 118}
+	{VT_NUMERIC, 118},
+	{VT_NUMERIC, 8},
+	{VT_NUMERIC, 0},
+	{VT_STRING, (cbnumeric) "1234567890"},
+	{VT_STRING, (cbnumeric) "LNCU"}		// Testcase 45
 };
 
 
