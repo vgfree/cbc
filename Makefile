@@ -11,12 +11,13 @@ INC_LEXER		:= $(TARGET)_lex.h
 PARSER			:= $(TARGET)_parse.c
 INC_PARSER		:= $(PARSER:%.c=%.h)
 
-SRC				:= 	main.c codeblock.c symbol.c symtab.c function.c value.c \
-					strlist.c syntree.c symref.c funccall.c funcdecl.c scope.c \
-					stack.c builtin.c cblib.c
+SRC				:= 	$(LEXER) $(PARSER) \
+					codeblock.c symbol.c symtab.c function.c value.c strlist.c \
+					syntree.c symref.c funccall.c funcdecl.c scope.c stack.c \
+					builtin.c cblib.c
 OBJ				:= $(SRC:%.c=%.o)
 
-SRC_CBC			:= $(LEXER) $(PARSER) $(SRC)
+SRC_CBC			:= main.c $(SRC)
 OBJ_CBC			:= $(SRC_CBC:%.c=%.o)
 
 CFLAGS			:=	-g \

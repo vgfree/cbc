@@ -22,7 +22,6 @@ void test_codeblock_execute(CuTest *tc)
 {
 	codeblock_t* cb		= codeblock_create();
 	cb->ast				= conststr_create("test");
-	cb->global_symtab	= symtab_create();
 	
 	codeblock_execute(cb);	// execute codeblock once
 	
@@ -35,7 +34,6 @@ void test_codeblock_execute(CuTest *tc)
 	CuAssertStrEquals(tc, "test",	cb->result->string);
 	
 	syntree_free(cb->ast);
-	symtab_free(cb->global_symtab);
 	codeblock_free(cb);
 }
 
@@ -49,7 +47,6 @@ void test_codeblock_execute_complex(CuTest *tc)
 	strlist_t* args		= strlist_create("");
 	args->data			= symref_create("foo");
 	
-	cb->global_symtab	= symtab_create();
 	cb->ast				= 	syntree_create(
 								SNT_STATEMENTLIST,
 								syntree_create(SNT_DECLARATION, symref_create("foo"), NULL),
@@ -96,7 +93,6 @@ void test_codeblock_execute_complex(CuTest *tc)
 	CuAssertStrEquals(tc, "foo is 100",	cb->result->string);
 	
 	syntree_free(cb->ast);
-	symtab_free(cb->global_symtab);
 	codeblock_free(cb);
 }
 
