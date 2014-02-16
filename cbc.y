@@ -160,7 +160,7 @@ expr:
 									free($1);	// free duplicated string
 								}
 	| IDENTIFIER '(' args ')'	{
-									$$ = funccall_create($1, $3);
+									$$ = cb_funccall_create($1, $3);
 									free($1);	// free duplicated string
 								}
 	| IDENTIFIER ASSIGN expr	{

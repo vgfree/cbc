@@ -160,7 +160,7 @@ void cb_syntree_free(CbSyntree* node)
 		
 		case SNT_FUNC_CALL:
 		{
-			CbStrlist* args = ((funccall_t*) node)->args;
+			CbStrlist* args = ((CbFuncCallNode*) node)->args;
 			if (args)
 			{
 				CbStrlist* current = args;
@@ -176,7 +176,7 @@ void cb_syntree_free(CbSyntree* node)
 				cb_strlist_free(args);
 			}
 			
-			free(((funccall_t*) node)->sym_id);
+			free(((CbFuncCallNode*) node)->sym_id);
 			
 			break;
 		}
@@ -287,7 +287,7 @@ CbValue* cb_syntree_eval(CbSyntree* node, CbSymtab* symtab)
 		
 		case SNT_FUNC_CALL:
 		{
-			funccall_t* fncall = (funccall_t*) node;
+			CbFuncCallNode* fncall = (CbFuncCallNode*) node;
 			symref_setsymbolfromtable((symref_t*) fncall, symtab);
 			CbFunction* f = cb_symbol_function_get_function(fncall->table_sym);
 			

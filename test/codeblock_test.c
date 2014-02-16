@@ -73,7 +73,7 @@ void test_codeblock_execute_complex(CuTest *tc)
 												cb_syntree_create(
 													SNT_ASSIGNMENT,
 													symref_create("foo"),
-													funccall_create("Inc", args)
+													cb_funccall_create("Inc", args)
 												), NULL
 											),
 											cb_flow_create(

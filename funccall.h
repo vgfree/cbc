@@ -1,7 +1,7 @@
 /*******************************************************************************
- * funccall_t -- 'syntree_t'-node, that creates a function-call.
+ * CbFuncCallNode -- 'CbSyntree'-node, that creates a function-call.
  * 
- *  	This structure is part of the abstract syntax-tree 'syntree_t'.
+ *  	This structure is part of the abstract syntax-tree 'CbSyntree'.
  ******************************************************************************/
 
 #ifndef FUNCCALL_H
@@ -20,11 +20,11 @@ typedef struct
 	char* sym_id;				// function identifier
 	CbSymbol* table_sym;		// reference to the instance in the symbol-table
 	CbStrlist* args;			// a list of arguments
-} funccall_t;
+} CbFuncCallNode;
 
 
 // interface functions
-CbSyntree* funccall_create(char* identifier, CbStrlist* args);
+CbSyntree* cb_funccall_create(char* identifier, CbStrlist* args);
 
 
 #endif // FUNCCALL_H
