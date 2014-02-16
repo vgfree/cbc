@@ -52,7 +52,7 @@ void test_codeblock_execute_complex(CuTest *tc)
 								cb_syntree_create(SNT_DECLARATION, symref_create("foo"), NULL),
 								cb_syntree_create(
 									SNT_STATEMENTLIST,
-									funcdecl_create(
+									cb_funcdecl_create(
 										"Inc",
 										cb_syntree_create(
 											SNT_ASSIGNMENT,

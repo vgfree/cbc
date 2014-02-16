@@ -138,7 +138,7 @@ void cb_syntree_free(CbSyntree* node)
 		
 		case SNT_FUNC_DECL:
 		{
-			funcdecl_t* fndecl = ((funcdecl_t*) node);
+			CbFuncDeclarationNode* fndecl = ((CbFuncDeclarationNode*) node);
 			free(fndecl->sym_id);
 			cb_syntree_free(fndecl->body);
 			cb_strlist_free(fndecl->params);
@@ -255,7 +255,7 @@ CbValue* cb_syntree_eval(CbSyntree* node, CbSymtab* symtab)
 		
 		case SNT_FUNC_DECL:
 		{
-			funcdecl_t* fndecl = (funcdecl_t*) node;
+			CbFuncDeclarationNode* fndecl = (CbFuncDeclarationNode*) node;
 			
 			// prepare function-object
 			CbFunction* func = cb_function_create_user_defined(fndecl->sym_id,

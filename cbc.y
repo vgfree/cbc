@@ -119,7 +119,7 @@ stmt:
 	|	FUNCTION IDENTIFIER '(' params ')'
 			stmtlist
 		END						{
-									$$ = funcdecl_create($2, $6, $4);
+									$$ = cb_funcdecl_create($2, $6, $4);
 									free($2);	// free duplicated string
 								}
 	| PRINT expr				{ $$ = cb_syntree_create(SNT_PRINT, $2, NULL); }

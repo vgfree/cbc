@@ -1,7 +1,8 @@
 /*******************************************************************************
- * funcdecl_t -- 'syntree_t'-node, that contains information about a function.
+ * CbFuncDeclarationNode -- 'CbSyntree'-node, that contains information about a
+ *                          function.
  * 
- *  	This structure is part of the abstract syntax-tree 'syntree_t'.
+ *  	This structure is part of the abstract syntax-tree 'CbSyntree'.
  *  	It either uses the node-type SNT_FUNC_DECL.
  ******************************************************************************/
 
@@ -19,17 +20,17 @@
 typedef struct
 {
 	enum cb_syntree_node_type type;	// node-type is SNT_FUNC_DECL
-	char* sym_id;				// function-identifier
-	CbSyntree* body;			// contains the code of the function
-	CbStrlist* params;			// formal parameters
-	CbSymtab* symtab;			// pointer to the symbol-table that should be
-								// used
-} funcdecl_t;
+	char* sym_id;					// function-identifier
+	CbSyntree* body;				// contains the code of the function
+	CbStrlist* params;				// formal parameters
+	CbSymtab* symtab;				// pointer to the symbol-table that should
+									// be used
+} CbFuncDeclarationNode;
 
 
 // interface functions
-CbSyntree* funcdecl_create(	char* identifier, CbSyntree* body,
-							CbStrlist* params);
+CbSyntree* cb_funcdecl_create(char* identifier, CbSyntree* body,
+							  CbStrlist* params);
 
 
 #endif // FUNCDECL_H

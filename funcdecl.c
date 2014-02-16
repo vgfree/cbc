@@ -1,5 +1,6 @@
 /*******************************************************************************
- * funcdecl_t -- 'syntree_t'-node, that contains information about a function.
+ * CbFuncDeclarationNode -- 'CbSyntree'-node, that contains information about a
+ *                          function.
  ******************************************************************************/
 
 #include <stdlib.h>
@@ -17,14 +18,14 @@
 // -----------------------------------------------------------------------------
 // constructor
 // -----------------------------------------------------------------------------
-CbSyntree* funcdecl_create(	char* identifier, CbSyntree* body,
-							CbStrlist* params)
+CbSyntree* cb_funcdecl_create(char* identifier, CbSyntree* body,
+							  CbStrlist* params)
 {
-	funcdecl_t* node= malloc(sizeof(funcdecl_t));
-	node->type		= SNT_FUNC_DECL;
-	node->sym_id	= strdup(identifier);
-	node->body		= body;
-	node->params	= params;
+	CbFuncDeclarationNode* node = malloc(sizeof(CbFuncDeclarationNode));
+	node->type	 = SNT_FUNC_DECL;
+	node->sym_id = strdup(identifier);
+	node->body	 = body;
+	node->params = params;
 	
 	return (CbSyntree*) node;
 }
