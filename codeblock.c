@@ -26,10 +26,10 @@ void codeblock_reset(Codeblock* cb);
 // -----------------------------------------------------------------------------
 Codeblock* codeblock_create()
 {
-	Codeblock* cb		= (Codeblock*) malloc(sizeof(Codeblock));
-	cb->global_symtab	= cb_symtab_create();
-	cb->ast				= NULL;
-	cb->result			= NULL;
+	Codeblock* cb = (Codeblock*) malloc(sizeof(Codeblock));
+	cb->symtab	  = cb_symtab_create();
+	cb->ast		  = NULL;
+	cb->result	  = NULL;
 	
 	return cb;
 }
@@ -40,7 +40,7 @@ Codeblock* codeblock_create()
 void codeblock_free(Codeblock* cb)
 {
 	codeblock_reset(cb);
-	cb_symtab_free(cb->global_symtab);
+	cb_symtab_free(cb->symtab);
 	
 	free(cb);
 }
@@ -50,7 +50,7 @@ void codeblock_free(Codeblock* cb)
 // -----------------------------------------------------------------------------
 CbValue* codeblock_execute(Codeblock* cb)
 {
-	assert(cb->global_symtab);
+	assert(cb->symtab);
 	
 	if (!cb->ast)
 	{
@@ -64,10 +64,10 @@ CbValue* codeblock_execute(Codeblock* cb)
 	codeblock_reset(cb);
 	
 	// register builtin symbols
-	register_builtin_all(cb->global_symtab);
+	register_builtin_all(cb->symtab);
 	
 	// execute codeblock
-	cb->result = cb_syntree_eval(cb->ast, cb->global_symtab);
+	cb->result = cb_syntree_eval(cb->ast, cb->symtab);
 	
 	return cb->result;
 }

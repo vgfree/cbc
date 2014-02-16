@@ -13,12 +13,11 @@
 #include "syntree_if.h"
 #include "value.h"
 
-// codeblock_t struct
 typedef struct
 {
-	CbSymtab* global_symtab;	// reference to the global symbol-table
-	CbSyntree* ast;				// abstract syntax-tree -- the code to execute
-	CbValue* result;			// the result, after executing the codeblock
+	CbSymtab* symtab;	// reference to the global symbol-table
+	CbSyntree* ast;		// abstract syntax-tree -- the code to execute
+	CbValue* result;	// the result, after executing the codeblock
 } Codeblock;
 
 
