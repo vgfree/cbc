@@ -16,7 +16,7 @@
 // function-call node
 typedef struct
 {
-	enum syn_nodetype_t type;	// node-type is SNT_FUNC_CALL
+	enum cb_syntree_node_type type;	// node-type is SNT_FUNC_CALL
 	char* sym_id;				// function identifier
 	symbol_t* table_sym;		// reference to the instance in the symbol-table
 	strlist_t* args;			// a list of arguments
@@ -24,7 +24,7 @@ typedef struct
 
 
 // interface functions
-syntree_t* funccall_create(char* identifier, strlist_t* args);
+CbSyntree* funccall_create(char* identifier, strlist_t* args);
 
 
 #endif // FUNCCALL_H

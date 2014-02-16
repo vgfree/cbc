@@ -21,7 +21,7 @@
 void test_codeblock_execute(CuTest *tc)
 {
 	codeblock_t* cb		= codeblock_create();
-	cb->ast				= conststr_create("test");
+	cb->ast				= cb_conststr_create("test");
 	
 	codeblock_execute(cb);	// execute codeblock once
 	
@@ -33,7 +33,7 @@ void test_codeblock_execute(CuTest *tc)
 	CuAssertIntEquals(tc, VT_STRING,cb->result->type);
 	CuAssertStrEquals(tc, "test",	cb->result->string);
 	
-	syntree_free(cb->ast);
+	cb_syntree_free(cb->ast);
 	codeblock_free(cb);
 }
 
@@ -47,40 +47,40 @@ void test_codeblock_execute_complex(CuTest *tc)
 	strlist_t* args		= strlist_create("");
 	args->data			= symref_create("foo");
 	
-	cb->ast				= 	syntree_create(
+	cb->ast				= 	cb_syntree_create(
 								SNT_STATEMENTLIST,
-								syntree_create(SNT_DECLARATION, symref_create("foo"), NULL),
-								syntree_create(
+								cb_syntree_create(SNT_DECLARATION, symref_create("foo"), NULL),
+								cb_syntree_create(
 									SNT_STATEMENTLIST,
 									funcdecl_create(
 										"Inc",
-										syntree_create(
+										cb_syntree_create(
 											SNT_ASSIGNMENT,
 											symref_create("Result"),
-											syntree_create('+', symref_create("nNumber"), constval_create(1))
+											cb_syntree_create('+', symref_create("nNumber"), cb_constval_create(1))
 										)
 										,
 										strlist_create("nNumber")
 									),
-									syntree_create(
+									cb_syntree_create(
 										SNT_STATEMENTLIST,
-										syntree_create(SNT_ASSIGNMENT, symref_create("foo"), constval_create(0)),
-										syntree_create(
+										cb_syntree_create(SNT_ASSIGNMENT, symref_create("foo"), cb_constval_create(0)),
+										cb_syntree_create(
 											SNT_STATEMENTLIST,
-											flow_create(
+											cb_flow_create(
 												SNT_FLOW_WHILE,
-												comparison_create(CMP_LT, symref_create("foo"), constval_create(100)),
-												syntree_create(
+												cb_comparison_create(CMP_LT, symref_create("foo"), cb_constval_create(100)),
+												cb_syntree_create(
 													SNT_ASSIGNMENT,
 													symref_create("foo"),
 													funccall_create("Inc", args)
 												), NULL
 											),
-											flow_create(
+											cb_flow_create(
 												SNT_FLOW_IF,
-												comparison_create(CMP_EQ, symref_create("foo"), constval_create(100)),
-												conststr_create("foo is 100"),
-												conststr_create("foo is not 100")
+												cb_comparison_create(CMP_EQ, symref_create("foo"), cb_constval_create(100)),
+												cb_conststr_create("foo is 100"),
+												cb_conststr_create("foo is not 100")
 											)
 										)
 									)
@@ -92,7 +92,7 @@ void test_codeblock_execute_complex(CuTest *tc)
 	CuAssertIntEquals(tc, VT_STRING,	cb->result->type);
 	CuAssertStrEquals(tc, "foo is 100",	cb->result->string);
 	
-	syntree_free(cb->ast);
+	cb_syntree_free(cb->ast);
 	codeblock_free(cb);
 }
 

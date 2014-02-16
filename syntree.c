@@ -1,10 +1,11 @@
 /*******************************************************************************
- * syntree_t -- Implementation of an abstract syntax tree structure.
+ * CbSyntree -- Implementation of an abstract syntax tree structure.
  ******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 #include "syntree.h"
 #include "symbol.h"
 #include "symref.h"
@@ -19,10 +20,10 @@
 // -----------------------------------------------------------------------------
 // create a syntax-tree node
 // -----------------------------------------------------------------------------
-syntree_t* syntree_create(	enum syn_nodetype_t type, syntree_t* left_node,
-							syntree_t* right_node)
+CbSyntree* cb_syntree_create(enum cb_syntree_node_type type,
+							 CbSyntree* left_node, CbSyntree* right_node)
 {
-	syntree_t* node	= malloc(sizeof(syntree_t));
+	CbSyntree* node	= malloc(sizeof(CbSyntree));
 	node->type		= type;
 	node->l			= left_node;
 	node->r			= right_node;
@@ -33,44 +34,44 @@ syntree_t* syntree_create(	enum syn_nodetype_t type, syntree_t* left_node,
 // -----------------------------------------------------------------------------
 // create a syntax-tree value-node
 // -----------------------------------------------------------------------------
-syntree_t* constval_create(CbNumeric value)
+CbSyntree* cb_constval_create(CbNumeric value)
 {
-	constval_t* node= malloc(sizeof(constval_t));
-	node->type		= SNT_CONSTVAL;
-	node->value		= cb_numeric_create(value);
+	CbConstvalNode* node = malloc(sizeof(CbConstvalNode));
+	node->type			 = SNT_CONSTVAL;
+	node->value			 = cb_numeric_create(value);
 	
-	return (syntree_t*) node;
+	return (CbSyntree*) node;
 }
 
 // -----------------------------------------------------------------------------
 // create a string-node
 // -----------------------------------------------------------------------------
-syntree_t* conststr_create(CbString string)
+CbSyntree* cb_conststr_create(CbString string)
 {
-	constval_t* node= malloc(sizeof(constval_t));
-	node->type		= SNT_CONSTSTR;
-	node->value		= cb_string_create(strdup(string));
+	CbConstvalNode* node = malloc(sizeof(CbConstvalNode));
+	node->type			 = SNT_CONSTSTR;
+	node->value			 = cb_string_create(strdup(string));
 	
-	return (syntree_t*) node;
+	return (CbSyntree*) node;
 }
 
 // -----------------------------------------------------------------------------
 // create a boolean-node
 // -----------------------------------------------------------------------------
-syntree_t* constbool_create(CbBoolean boolean)
+CbSyntree* cb_constbool_create(CbBoolean boolean)
 {
-	constval_t* node= malloc(sizeof(constval_t));
-	node->type		= SNT_CONSTBOOL;
-	node->value		= cb_boolean_create(boolean);
+	CbConstvalNode* node = malloc(sizeof(CbConstvalNode));
+	node->type			 = SNT_CONSTBOOL;
+	node->value			 = cb_boolean_create(boolean);
 	
-	return (syntree_t*) node;
+	return (CbSyntree*) node;
 }
 
 // -----------------------------------------------------------------------------
 // create a control-flow-node
 // -----------------------------------------------------------------------------
-syntree_t* flow_create(	enum syn_nodetype_t type, syntree_t* condition,
-						syntree_t* then_branch, syntree_t* else_branch)
+CbSyntree* cb_flow_create(enum cb_syntree_node_type type, CbSyntree* condition,
+						  CbSyntree* then_branch, CbSyntree* else_branch)
 {
 	// check if passed type is valid for this node
 	if (type != SNT_FLOW_IF && type != SNT_FLOW_WHILE)
@@ -80,34 +81,34 @@ syntree_t* flow_create(	enum syn_nodetype_t type, syntree_t* condition,
 		exit(EXIT_FAILURE);
 	}
 	
-	flow_t* node= malloc(sizeof(flow_t));
-	node->type	= type;
-	node->cond	= condition;
-	node->tb	= then_branch;
-	node->fb	= else_branch;
+	CbFlowNode* node = malloc(sizeof(CbFlowNode));
+	node->type		 = type;
+	node->cond		 = condition;
+	node->tb		 = then_branch;
+	node->fb		 = else_branch;
 	
-	return (syntree_t*) node;
+	return (CbSyntree*) node;
 }
 
 // -----------------------------------------------------------------------------
 // create a comparison-node
 // -----------------------------------------------------------------------------
-syntree_t* comparison_create(	enum cb_comparison_type type,
-								syntree_t* left_node, syntree_t* right_node)
+CbSyntree* cb_comparison_create(enum cb_comparison_type type,
+								CbSyntree* left_node, CbSyntree* right_node)
 {
-	comparison_t* node	= malloc(sizeof(comparison_t));
-	node->type			= SNT_COMPARISON;
-	node->cmp_type		= type;
-	node->l				= left_node;
-	node->r				= right_node;
+	CbComparisonNode* node = malloc(sizeof(CbComparisonNode));
+	node->type			   = SNT_COMPARISON;
+	node->cmp_type		   = type;
+	node->l				   = left_node;
+	node->r				   = right_node;
 	
-	return (syntree_t*) node;
+	return (CbSyntree*) node;
 }
 
 // -----------------------------------------------------------------------------
 // free a syntax-tree
 // -----------------------------------------------------------------------------
-void syntree_free(syntree_t* node)
+void cb_syntree_free(CbSyntree* node)
 {
 	switch (node->type)
 	{
@@ -118,28 +119,28 @@ void syntree_free(syntree_t* node)
 		case '/':
 		case SNT_ASSIGNMENT:
 		case SNT_STATEMENTLIST:
-			syntree_free(node->r);
+			cb_syntree_free(node->r);
 			// no break here to free left child-node as well
 		
 		// one child-node (left one)
 		case SNT_UNARYMINUS:
 		case SNT_DECLARATION:
 		case SNT_PRINT:
-			syntree_free(node->l);
+			cb_syntree_free(node->l);
 			break;
 		
 		// special nodes
 		case SNT_LIST:
-			syntree_free(node->r);
+			cb_syntree_free(node->r);
 			if (node->l)
-				syntree_free(node->l);
+				cb_syntree_free(node->l);
 			break;
 		
 		case SNT_FUNC_DECL:
 		{
 			funcdecl_t* fndecl = ((funcdecl_t*) node);
 			free(fndecl->sym_id);
-			syntree_free(fndecl->body);
+			cb_syntree_free(fndecl->body);
 			strlist_free(fndecl->params);
 			break;
 		}
@@ -150,11 +151,11 @@ void syntree_free(syntree_t* node)
 		
 		case SNT_FLOW_IF:
 		case SNT_FLOW_WHILE:
-			syntree_free(((flow_t*) node)->cond);
-			if (((flow_t*) node)->tb)	// true-branch
-				syntree_free(((flow_t*) node)->tb);
-			if (((flow_t*) node)->fb)	// false-branch
-				syntree_free(((flow_t*) node)->fb);
+			cb_syntree_free(((CbFlowNode*) node)->cond);
+			if (((CbFlowNode*) node)->tb)	// true-branch
+				cb_syntree_free(((CbFlowNode*) node)->tb);
+			if (((CbFlowNode*) node)->fb)	// false-branch
+				cb_syntree_free(((CbFlowNode*) node)->fb);
 			break;
 		
 		case SNT_FUNC_CALL:
@@ -169,7 +170,7 @@ void syntree_free(syntree_t* node)
 				{
 					strlist_t* temp = current;
 					current = current->next;
-					syntree_free(temp->data);
+					cb_syntree_free(temp->data);
 				}
 				
 				strlist_free(args);
@@ -183,16 +184,17 @@ void syntree_free(syntree_t* node)
 		case SNT_CONSTVAL:
 		case SNT_CONSTBOOL:
 		case SNT_CONSTSTR:
-			cb_value_free(((constval_t*) node)->value);
+			cb_value_free(((CbConstvalNode*) node)->value);
 			break;
 		
 		case SNT_COMPARISON:
-			syntree_free(((comparison_t*) node)->l);
-			syntree_free(((comparison_t*) node)->r);
+			cb_syntree_free(((CbComparisonNode*) node)->l);
+			cb_syntree_free(((CbComparisonNode*) node)->r);
 			break;
 			
 		default:
-			fprintf(stderr, "syntax-tree node-type not recognized: %d", node->type);
+			fprintf(stderr, "syntax-tree node-type not recognized: %d",
+					node->type);
 			exit(EXIT_FAILURE);
 	}
 	// always free node itself at the end
@@ -202,7 +204,7 @@ void syntree_free(syntree_t* node)
 // -----------------------------------------------------------------------------
 // evaluate a complete syntax tree and return its result
 // -----------------------------------------------------------------------------
-CbValue* syntree_eval(syntree_t* node, symtab_t* symtab)
+CbValue* cb_syntree_eval(CbSyntree* node, symtab_t* symtab)
 {
 	CbValue* result = NULL;
 	
@@ -211,7 +213,7 @@ CbValue* syntree_eval(syntree_t* node, symtab_t* symtab)
 		case SNT_CONSTVAL:
 		case SNT_CONSTBOOL:
 		case SNT_CONSTSTR:
-			result = cb_value_copy(((constval_t*) node)->value);
+			result = cb_value_copy(((CbConstvalNode*) node)->value);
 			break;
 		
 		case SNT_SYMREF:
@@ -226,7 +228,7 @@ CbValue* syntree_eval(syntree_t* node, symtab_t* symtab)
 		{
 			// evaluate right-hand-side first, since it could contain a
 			// function-call, which could change the order in the symbol-table!
-			CbValue* rhs = syntree_eval(node->r, symtab);
+			CbValue* rhs = cb_syntree_eval(node->r, symtab);
 			
 			// after that, set symbol from the symbol-table
 			symref_t* sr = (symref_t*) node->l;
@@ -256,9 +258,9 @@ CbValue* syntree_eval(syntree_t* node, symtab_t* symtab)
 			funcdecl_t* fndecl = (funcdecl_t*) node;
 			
 			// prepare function-object
-			function_t* func	  = function_create_user_defined(fndecl->sym_id,
-																 fndecl->body);
-			func->params		  = fndecl->params;
+			function_t* func = function_create_user_defined(fndecl->sym_id,
+															fndecl->body);
+			func->params	 = fndecl->params;
 			if (!func->params)
 				func->param_count = 0;
 			else
@@ -273,7 +275,7 @@ CbValue* syntree_eval(syntree_t* node, symtab_t* symtab)
 		
 		case SNT_PRINT:
 		{
-			CbValue* temp = syntree_eval(node->l, symtab);
+			CbValue* temp = cb_syntree_eval(node->l, symtab);
 			cb_value_print(temp);
 			cb_value_free(temp);
 			// print newline
@@ -298,23 +300,21 @@ CbValue* syntree_eval(syntree_t* node, symtab_t* symtab)
 		
 		case SNT_FLOW_IF:
 		{
-			CbValue* condition = syntree_eval(((flow_t*) node)->cond, symtab);
-			if (!cb_value_is_type(condition, VT_BOOLEAN))
-			{
-				fprintf(stderr, "expecting boolean expression");
-				exit(EXIT_FAILURE);
-			}
+			CbValue* condition = cb_syntree_eval(((CbFlowNode*) node)->cond, symtab);
+			assert(cb_value_is_type(condition, VT_BOOLEAN));
 			
 			// evaluate condition and check its result
 			if (condition->boolean)
-				result = syntree_eval(((flow_t*) node)->tb, symtab);// condition is ture:
-																	// take the true-branch
+				// condition is ture -> evaluate the true-branch
+				result = cb_syntree_eval(((CbFlowNode*) node)->tb, symtab);
 			else
 			{
-				// condition is false: take the false-branch, if there is one
-				if (((flow_t*) node)->fb)
-					result = syntree_eval(((flow_t*) node)->fb, symtab);
+				// condition is false -> evaluate the false-branch,
+				// if there is one
+				if (((CbFlowNode*) node)->fb)
+					result = cb_syntree_eval(((CbFlowNode*) node)->fb, symtab);
 				else
+					// otherwise, return an empty value
 					result = cb_value_create();
 			}
 			
@@ -324,12 +324,8 @@ CbValue* syntree_eval(syntree_t* node, symtab_t* symtab)
 		
 		case SNT_FLOW_WHILE:
 		{
-			CbValue* temp = syntree_eval(((flow_t*) node)->cond, symtab);
-			if (!cb_value_is_type(temp, VT_BOOLEAN))
-			{
-				fprintf(stderr, "expecting boolean expression");
-				exit(EXIT_FAILURE);
-			}
+			CbValue* temp = cb_syntree_eval(((CbFlowNode*) node)->cond, symtab);
+			assert(cb_value_is_type(temp, VT_BOOLEAN));
 			
 			// default result (in case the while-loop won't be entered)
 			result = cb_value_create();
@@ -342,8 +338,8 @@ CbValue* syntree_eval(syntree_t* node, symtab_t* symtab)
 							//			assigend before, so it can't be NULL.
 					cb_value_free(result);
 				
-				result	= syntree_eval(((flow_t*) node)->tb, symtab);
-				temp	= syntree_eval(((flow_t*) node)->cond, symtab);
+				result = cb_syntree_eval(((CbFlowNode*) node)->tb, symtab);
+				temp   = cb_syntree_eval(((CbFlowNode*) node)->cond, symtab);
 			}
 			
 			// free last dummy-value
@@ -353,41 +349,43 @@ CbValue* syntree_eval(syntree_t* node, symtab_t* symtab)
 		
 		case SNT_COMPARISON:
 		{
-			comparison_t* cmp = ((comparison_t*) node);
-			result = cb_value_compare(	cmp->cmp_type, syntree_eval(cmp->l, symtab),
-									syntree_eval(cmp->r, symtab));
+			CbComparisonNode* cmp = ((CbComparisonNode*) node);
+			result = cb_value_compare(cmp->cmp_type,
+									  cb_syntree_eval(cmp->l, symtab),
+									  cb_syntree_eval(cmp->r, symtab));
 			break;
 		}
 		
 		case SNT_STATEMENTLIST:
-			cb_value_free(syntree_eval(node->l, symtab));
-			result = syntree_eval(node->r, symtab);
+			cb_value_free(cb_syntree_eval(node->l, symtab));
+			result = cb_syntree_eval(node->r, symtab);
 			break;
 		
 		case '+':
-			result = cb_value_add(syntree_eval(node->l, symtab),
-							   syntree_eval(node->r, symtab));
+			result = cb_value_add(cb_syntree_eval(node->l, symtab),
+								  cb_syntree_eval(node->r, symtab));
 			break;
 		case '-':
-			result = cb_numeric_sub(	syntree_eval(node->l, symtab),
-									syntree_eval(node->r, symtab));
+			result = cb_numeric_sub(cb_syntree_eval(node->l, symtab),
+									cb_syntree_eval(node->r, symtab));
 			break;
 		case '*':
-			result = cb_numeric_mul(	syntree_eval(node->l, symtab),
-									syntree_eval(node->r, symtab));
+			result = cb_numeric_mul(cb_syntree_eval(node->l, symtab),
+									cb_syntree_eval(node->r, symtab));
 			break;
 		case '/':
-			result = cb_numeric_div(	syntree_eval(node->l, symtab),
-									syntree_eval(node->r, symtab));
+			result = cb_numeric_div(cb_syntree_eval(node->l, symtab),
+									cb_syntree_eval(node->r, symtab));
 			break;
 		
 		case SNT_UNARYMINUS:
-			result			= syntree_eval(node->l, symtab);
+			result			= cb_syntree_eval(node->l, symtab);
 			result->value	= - result->value;
 			break;
 		
 		default:
-			fprintf(stderr, "syntax-tree node-type not recognized: %d", node->type);
+			fprintf(stderr, "syntax-tree node-type not recognized: %d",
+					node->type);
 			exit(EXIT_FAILURE);
 	}
 	

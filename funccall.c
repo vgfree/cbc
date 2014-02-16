@@ -15,7 +15,7 @@
 // -----------------------------------------------------------------------------
 // constructor
 // -----------------------------------------------------------------------------
-syntree_t* funccall_create(char* identifier, strlist_t* args)
+CbSyntree* funccall_create(char* identifier, strlist_t* args)
 {
 	funccall_t* node= malloc(sizeof(funccall_t));
 	node->type		= SNT_FUNC_CALL;
@@ -23,5 +23,5 @@ syntree_t* funccall_create(char* identifier, strlist_t* args)
 	node->table_sym	= NULL;
 	node->args		= args;
 	
-	return (syntree_t*) node;
+	return (CbSyntree*) node;
 }

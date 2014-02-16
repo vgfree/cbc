@@ -11,7 +11,7 @@
 }
 
 %union {
-	syntree_t* ast;
+	CbSyntree* ast;
 	char* id;
 	CbString str;
 	CbBoolean boolval;
@@ -40,7 +40,7 @@
 %type <list>	params paramlist exprlist args
 
 /* Output parameter: Abstract syntax tree of the parsed codeblock */
-%parse-param {syntree_t** result_tree}
+%parse-param {CbSyntree** result_tree}
 
 %%	/* RULES ---------------------------------------------------------------- */
 
@@ -55,8 +55,8 @@ prog:
 decllist:
 	decl						{ $$ = $1; }
 	| decl ',' decllist			{
-									$$ = syntree_create(SNT_STATEMENTLIST,
-														$1, $3);
+									$$ = cb_syntree_create(SNT_STATEMENTLIST,
+														   $1, $3);
 								}
 	;
 
@@ -78,9 +78,9 @@ paramlist:
 
 decl:
 	IDENTIFIER					{
-									$$ = syntree_create(SNT_DECLARATION,
-														symref_create($1),
-														NULL);
+									$$ = cb_syntree_create(SNT_DECLARATION,
+														   symref_create($1),
+														   NULL);
 									free($1);	// free duplicated string
 								}
 	;
@@ -90,15 +90,15 @@ stmtlist:
 									if ($4 == NULL)
 										$$ = $2;
 									else
-										$$ = syntree_create(SNT_STATEMENTLIST,
-															$2, $4);
+										$$ = cb_syntree_create(SNT_STATEMENTLIST,
+															   $2, $4);
 								}
 	| stmt ',' stmtlist			{
 									if ($3 == NULL)
 										$$ = $1;
 									else
-										$$ = syntree_create(SNT_STATEMENTLIST,
-															$1, $3);
+										$$ = cb_syntree_create(SNT_STATEMENTLIST,
+															   $1, $3);
 								}
 	|							{ $$ = NULL; }
 	;
@@ -106,13 +106,14 @@ stmtlist:
 stmt:
 	expr						{ $$ = $1; }
 	| IF expr THEN stmtlist ENDIF {
-									$$ = flow_create(SNT_FLOW_IF, $2, $4, NULL);
+									$$ = cb_flow_create(SNT_FLOW_IF, $2, $4,
+														NULL);
 								}
 	| IF expr THEN stmtlist ELSE stmtlist ENDIF {
-									$$ = flow_create(SNT_FLOW_IF, $2, $4, $6);
+									$$ = cb_flow_create(SNT_FLOW_IF, $2, $4, $6);
 								}
 	| WHILE expr DO stmtlist END {
-									$$ = flow_create(	SNT_FLOW_WHILE, $2, $4,
+									$$ = cb_flow_create(SNT_FLOW_WHILE, $2, $4,
 														NULL);
 								}
 	|	FUNCTION IDENTIFIER '(' params ')'
@@ -121,7 +122,7 @@ stmt:
 									$$ = funcdecl_create($2, $6, $4);
 									free($2);	// free duplicated string
 								}
-	| PRINT expr				{ $$ = syntree_create(SNT_PRINT, $2, NULL); }
+	| PRINT expr				{ $$ = cb_syntree_create(SNT_PRINT, $2, NULL); }
 	;
 
 args:
@@ -148,10 +149,10 @@ exprlist:
 	;
 
 expr:
-	NUMBER						{ $$ = constval_create($1); }
-	| BOOLEAN					{ $$ = constbool_create($1); }
+	NUMBER						{ $$ = cb_constval_create($1); }
+	| BOOLEAN					{ $$ = cb_constbool_create($1); }
 	| STRING					{
-									$$ = conststr_create($1);
+									$$ = cb_conststr_create($1);
 									free($1);
 								}
 	| IDENTIFIER				{
@@ -163,19 +164,19 @@ expr:
 									free($1);	// free duplicated string
 								}
 	| IDENTIFIER ASSIGN expr	{
-									$$ = syntree_create(SNT_ASSIGNMENT,
-														symref_create($1), $3);
+									$$ = cb_syntree_create(SNT_ASSIGNMENT,
+														   symref_create($1), $3);
 									free($1);	// free duplicated string
 								}
-	| expr '+' expr				{ $$ = syntree_create('+', $1, $3); }
-	| expr '-' expr				{ $$ = syntree_create('-', $1, $3); }
-	| expr '*' expr				{ $$ = syntree_create('*', $1, $3); }
-	| expr '/' expr				{ $$ = syntree_create('/', $1, $3); }
-	| expr COMPARE expr			{ $$ = comparison_create($2, $1, $3); }
+	| expr '+' expr				{ $$ = cb_syntree_create('+', $1, $3); }
+	| expr '-' expr				{ $$ = cb_syntree_create('-', $1, $3); }
+	| expr '*' expr				{ $$ = cb_syntree_create('*', $1, $3); }
+	| expr '/' expr				{ $$ = cb_syntree_create('/', $1, $3); }
+	| expr COMPARE expr			{ $$ = cb_comparison_create($2, $1, $3); }
 	| '(' expr ')'				{ $$ = $2; }
 	| '-' expr					{
-									$$ = syntree_create(SNT_UNARYMINUS, $2,
-														NULL);
+									$$ = cb_syntree_create(SNT_UNARYMINUS, $2,
+														   NULL);
 								}
 	;
 

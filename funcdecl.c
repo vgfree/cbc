@@ -17,7 +17,7 @@
 // -----------------------------------------------------------------------------
 // constructor
 // -----------------------------------------------------------------------------
-syntree_t* funcdecl_create(	char* identifier, syntree_t* body,
+CbSyntree* funcdecl_create(	char* identifier, CbSyntree* body,
 							strlist_t* params)
 {
 	funcdecl_t* node= malloc(sizeof(funcdecl_t));
@@ -26,5 +26,5 @@ syntree_t* funcdecl_create(	char* identifier, syntree_t* body,
 	node->body		= body;
 	node->params	= params;
 	
-	return (syntree_t*) node;
+	return (CbSyntree*) node;
 }

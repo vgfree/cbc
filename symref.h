@@ -16,14 +16,14 @@
 // symbol-reference node
 typedef struct
 {
-	enum syn_nodetype_t type;	// node-type is SNT_SYMREF
+	enum cb_syntree_node_type type;	// node-type is SNT_SYMREF
 	char* sym_id;				// symbol identifier
 	symbol_t* table_sym;		// reference to the instance in the symbol-table
 } symref_t;
 
 
 // interface functions
-syntree_t* symref_create(char* identifier);
+CbSyntree* symref_create(char* identifier);
 void symref_setsymbolfromtable(symref_t* node, symtab_t* symtab);
 
 

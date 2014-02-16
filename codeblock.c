@@ -67,7 +67,7 @@ CbValue* codeblock_execute(codeblock_t* cb)
 	register_builtin_all(cb->global_symtab);
 	
 	// execute codeblock
-	cb->result = syntree_eval(cb->ast, cb->global_symtab);
+	cb->result = cb_syntree_eval(cb->ast, cb->global_symtab);
 	
 	return cb->result;
 }

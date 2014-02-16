@@ -18,14 +18,14 @@
 // -----------------------------------------------------------------------------
 // constructor
 // -----------------------------------------------------------------------------
-syntree_t* symref_create(char* identifier)
+CbSyntree* symref_create(char* identifier)
 {
 	symref_t* node	= malloc(sizeof(symref_t));
 	node->type		= SNT_SYMREF;
 	node->sym_id	= strdup(identifier);
 	node->table_sym	= NULL;
 	
-	return (syntree_t*) node;
+	return (CbSyntree*) node;
 }
 
 // -----------------------------------------------------------------------------

@@ -49,7 +49,7 @@ function_t* function_create_builtin(char* identifier, int param_count,
 // -----------------------------------------------------------------------------
 // constructor (user-defined function)
 // -----------------------------------------------------------------------------
-function_t* function_create_user_defined(char* identifier, syntree_t* body)
+function_t* function_create_user_defined(char* identifier, CbSyntree* body)
 {
 	function_t* f	= function_create(identifier);
 	f->type			= FUNC_TYPE_USER_DEFINED;
@@ -120,7 +120,7 @@ CbValue* function_call(function_t* f, strlist_t* args, symtab_t* symtab)
 				stack_push(param_stack, curr_param->string); // push param name
 			
 			// obtain argument value
-			CbValue* arg_value = syntree_eval(	((syntree_t*) curr_arg->data),
+			CbValue* arg_value = cb_syntree_eval(	((CbSyntree*) curr_arg->data),
 												symtab);
 			// push argument value on the stack
 			stack_push(arg_stack, arg_value);
@@ -163,11 +163,11 @@ CbValue* function_call(function_t* f, strlist_t* args, symtab_t* symtab)
 		stack_free(param_stack);
 		
 #ifdef _CBC_DEFAULT_FUNC_RESULT_SYMBOL
-		cb_value_free(syntree_eval(f->body, symtab));
+		cb_value_free(cb_syntree_eval(f->body, symtab));
 		// result is value of the "Result"-symbol
 		f->result = cb_value_copy(symbol_variable_get_value(default_result));
 #else
-		f->result = syntree_eval(f->body, symtab);	// result is the last
+		f->result = cb_syntree_eval(f->body, symtab);	// result is the last
 													// expression in the function
 #endif // _CBC_DEFAULT_FUNC_RESULT_SYMBOL
 	}

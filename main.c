@@ -72,7 +72,7 @@ int main(int argc, char* argv[])
 #endif // _CBC_TRACK_EXECUTION_TIME
 	
 	// cleanup
-	syntree_free(cb->ast);
+	cb_syntree_free(cb->ast);
 	codeblock_free(cb);
 	
 	return 0;

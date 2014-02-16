@@ -120,7 +120,7 @@ static void test_codeblock_file(CuTest *tc, const char* test_file_name,
 			break;
 	}
 	
-	syntree_free(cb->ast);
+	cb_syntree_free(cb->ast);
 	codeblock_free(cb);
 }
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * syntree_t -- Interface of the abstract syntax-tree structure.
+ * CbSyntree -- Interface of the abstract syntax-tree structure.
  ******************************************************************************/
 
 #ifndef SYNTREE_IF_H
@@ -7,7 +7,7 @@
 
 
 // syntax-node types
-enum syn_nodetype_t
+enum cb_syntree_node_type
 {
 	// all node-types up to the following have two child-nodes
 	SNT_ASSIGNMENT = 256,
@@ -30,10 +30,10 @@ enum syn_nodetype_t
 };
 
 // forward-declarations
-typedef struct syntree_node		syntree_t;
-typedef struct constval_node	constval_t;
-typedef struct flow_node		flow_t;
-typedef struct comparison_node	comparison_t;
+typedef struct syntree_node		CbSyntree;
+typedef struct constval_node	CbConstvalNode;
+typedef struct flow_node		CbFlowNode;
+typedef struct comparison_node	CbComparisonNode;
 
 
 #endif // SYNTREE_IF_H

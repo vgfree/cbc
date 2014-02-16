@@ -136,7 +136,7 @@ CbValue* bif_eval(stack_t* arg_stack)
 	
 	CbValue* result = cb_value_copy(cb->result);
 	
-	syntree_free(cb->ast);
+	cb_syntree_free(cb->ast);
 	codeblock_free(cb);
 	
 	return result;
