@@ -21,7 +21,7 @@ typedef struct
 	enum cb_syntree_node_type type;	// node-type is SNT_FUNC_DECL
 	char* sym_id;				// function-identifier
 	CbSyntree* body;			// contains the code of the function
-	strlist_t* params;			// formal parameters
+	CbStrlist* params;			// formal parameters
 	CbSymtab* symtab;			// pointer to the symbol-table that should be
 								// used
 } funcdecl_t;
@@ -29,7 +29,7 @@ typedef struct
 
 // interface functions
 CbSyntree* funcdecl_create(	char* identifier, CbSyntree* body,
-							strlist_t* params);
+							CbStrlist* params);
 
 
 #endif // FUNCDECL_H

@@ -44,7 +44,7 @@ void test_codeblock_execute_complex(CuTest *tc)
 {
 	codeblock_t* cb		= codeblock_create();
 	
-	strlist_t* args		= strlist_create("");
+	CbStrlist* args		= cb_strlist_create("");
 	args->data			= symref_create("foo");
 	
 	cb->ast				= 	cb_syntree_create(
@@ -60,7 +60,7 @@ void test_codeblock_execute_complex(CuTest *tc)
 											cb_syntree_create('+', symref_create("nNumber"), cb_constval_create(1))
 										)
 										,
-										strlist_create("nNumber")
+										cb_strlist_create("nNumber")
 									),
 									cb_syntree_create(
 										SNT_STATEMENTLIST,

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * strlist_t -- Implementation of a list-structure
+ * CbStrlist -- Implementation of a list-structure.
  *
  *  	The purpose of this list is to store a variable amount of strings.
  *  	Through the 'data'-attribute it is possible to additionally store any
@@ -23,11 +23,11 @@ typedef struct strlist_item
 				// This allows to store any type of data in the list.
 				// NOTE:	The stored data won't be freed, when the list is
 				//  		beeing destroyed!
-} strlist_t;
+} CbStrlist;
 
-strlist_t* strlist_create();
-void strlist_free(strlist_t* list);
-strlist_t* strlist_append(strlist_t* list, char* string);
+CbStrlist* cb_strlist_create();
+void cb_strlist_free(CbStrlist* list);
+CbStrlist* cb_strlist_append(CbStrlist* list, char* string);
 
 
 #endif // STRLIST_H

@@ -141,7 +141,7 @@ void cb_syntree_free(CbSyntree* node)
 			funcdecl_t* fndecl = ((funcdecl_t*) node);
 			free(fndecl->sym_id);
 			cb_syntree_free(fndecl->body);
-			strlist_free(fndecl->params);
+			cb_strlist_free(fndecl->params);
 			break;
 		}
 		
@@ -160,20 +160,20 @@ void cb_syntree_free(CbSyntree* node)
 		
 		case SNT_FUNC_CALL:
 		{
-			strlist_t* args = ((funccall_t*) node)->args;
+			CbStrlist* args = ((funccall_t*) node)->args;
 			if (args)
 			{
-				strlist_t* current = args;
+				CbStrlist* current = args;
 				// free argument-nodes,
 				// since they won't be freed by 'strlist_free()'
 				while (current)
 				{
-					strlist_t* temp = current;
+					CbStrlist* temp = current;
 					current = current->next;
 					cb_syntree_free(temp->data);
 				}
 				
-				strlist_free(args);
+				cb_strlist_free(args);
 			}
 			
 			free(((funccall_t*) node)->sym_id);

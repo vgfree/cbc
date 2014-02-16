@@ -17,7 +17,7 @@
 	CbBoolean boolval;
 	CbNumeric val;
 	enum cb_comparison_type cmp;
-	strlist_t* list;
+	CbStrlist* list;
 };
 
 %token				ENDOFFILE
@@ -66,11 +66,11 @@ params:
 
 paramlist:
 	IDENTIFIER					{
-									$$ = strlist_create($1);
+									$$ = cb_strlist_create($1);
 									free($1);	// free duplicated string
 								}
 	| paramlist ',' IDENTIFIER	{
-									strlist_append($1, $3);
+									cb_strlist_append($1, $3);
 									free($3);	// free duplicated string
 									$$ = $1;
 								}
@@ -133,7 +133,7 @@ args:
 exprlist:
 	expr						{
 									// create empty strlist-item
-									strlist_t* args	= strlist_create("");
+									CbStrlist* args	= cb_strlist_create("");
 									// fill data-attribute with
 									// argument-expression
 									args->data		= $1;
@@ -141,7 +141,7 @@ exprlist:
 								}
 	| exprlist ',' expr			{
 									// capture new item
-									strlist_t* item	= strlist_append($1, "");
+									CbStrlist* item	= cb_strlist_append($1, "");
 									// fill data-attribute
 									item->data		= $3;
 									$$ = $1;

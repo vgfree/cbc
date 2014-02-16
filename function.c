@@ -78,9 +78,9 @@ void function_addparam(function_t* f, char* param_id)
 	
 	if (!f->params)
 		// create string-list if it does not exist yet
-		f->params = strlist_create(param_id);
+		f->params = cb_strlist_create(param_id);
 	else
-		strlist_append(f->params, param_id);
+		cb_strlist_append(f->params, param_id);
 	
 	f->param_count = f->params->count;
 }
@@ -89,7 +89,7 @@ void function_addparam(function_t* f, char* param_id)
 // call function
 // if the function has no parameters, pass a NULL-value as arguments.
 // -----------------------------------------------------------------------------
-CbValue* function_call(function_t* f, strlist_t* args, CbSymtab* symtab)
+CbValue* function_call(function_t* f, CbStrlist* args, CbSymtab* symtab)
 {
 	// reset function-result
 	// this is necessary in case the function was already called.
@@ -112,8 +112,8 @@ CbValue* function_call(function_t* f, strlist_t* args, CbSymtab* symtab)
 	// evaluate argument values
 	if (count_params > 0)
 	{
-		strlist_t* curr_arg   = args;
-		strlist_t* curr_param = f->params;
+		CbStrlist* curr_arg   = args;
+		CbStrlist* curr_param = f->params;
 		while (curr_arg)
 		{
 			if (curr_param)

@@ -18,7 +18,7 @@
 // constructor
 // -----------------------------------------------------------------------------
 CbSyntree* funcdecl_create(	char* identifier, CbSyntree* body,
-							strlist_t* params)
+							CbStrlist* params)
 {
 	funcdecl_t* node= malloc(sizeof(funcdecl_t));
 	node->type		= SNT_FUNC_DECL;

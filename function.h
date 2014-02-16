@@ -35,7 +35,7 @@ typedef struct
 	
 	// type-specific attributes: FUNC_TYPE_USER_DEFINED
 	CbSyntree* body;	// contains actual function-code
-	strlist_t* params;	// list of identifiers that represent formal parameters
+	CbStrlist* params;	// list of identifiers that represent formal parameters
 	
 	// TODO:	Implement a state-attribute that indicates whether a function
 	//			was already called.
@@ -49,7 +49,7 @@ function_t* function_create_builtin(char* identifier, int param_count,
 function_t* function_create_user_defined(char* identifier, CbSyntree* body);
 void function_free(function_t* f);
 void function_addparam(function_t* f, char* param_id);
-CbValue* function_call(function_t* f, strlist_t* args, CbSymtab* symtab);
+CbValue* function_call(function_t* f, CbStrlist* args, CbSymtab* symtab);
 void function_reset(function_t* f);
 
 
