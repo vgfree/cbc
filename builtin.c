@@ -22,11 +22,11 @@ typedef struct
 	char* identifier;
 	CbBuiltinFunctionRef func;
 	int param_count;
-} builtin_func_info_item_t;
+} CbBuiltinFunctionInfoItem;
 
 // registration list of all builtin functions
 // (will be registered by function 'register_builtin_all()')
-builtin_func_info_item_t builtin_func_decl_list[] = {
+CbBuiltinFunctionInfoItem builtin_func_decl_list[] = {
 	{"WriteLn", bif_writeln, 1},
 	{"Mod", bif_mod, 2},
 	{"ValType", bif_valtype, 1},
@@ -63,7 +63,7 @@ int register_builtin_func(CbSymtab* symtab, char* identifier,
 int register_builtin_all(CbSymtab* symtab)
 {
 	int lenght	= sizeof(builtin_func_decl_list) /
-				  sizeof(builtin_func_info_item_t);
+				  sizeof(CbBuiltinFunctionInfoItem);
 	int i		= 0;
 	int result	= EXIT_SUCCESS;
 	
