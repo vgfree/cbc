@@ -33,11 +33,11 @@ syntree_t* syntree_create(	enum syn_nodetype_t type, syntree_t* left_node,
 // -----------------------------------------------------------------------------
 // create a syntax-tree value-node
 // -----------------------------------------------------------------------------
-syntree_t* constval_create(cbnumeric value)
+syntree_t* constval_create(CbNumeric value)
 {
 	constval_t* node= malloc(sizeof(constval_t));
 	node->type		= SNT_CONSTVAL;
-	node->value		= cbnumeric_create(value);
+	node->value		= cb_numeric_create(value);
 	
 	return (syntree_t*) node;
 }
@@ -45,11 +45,11 @@ syntree_t* constval_create(cbnumeric value)
 // -----------------------------------------------------------------------------
 // create a string-node
 // -----------------------------------------------------------------------------
-syntree_t* conststr_create(cbstring string)
+syntree_t* conststr_create(CbString string)
 {
 	constval_t* node= malloc(sizeof(constval_t));
 	node->type		= SNT_CONSTSTR;
-	node->value		= cbstring_create(strdup(string));
+	node->value		= cb_string_create(strdup(string));
 	
 	return (syntree_t*) node;
 }
@@ -57,11 +57,11 @@ syntree_t* conststr_create(cbstring string)
 // -----------------------------------------------------------------------------
 // create a boolean-node
 // -----------------------------------------------------------------------------
-syntree_t* constbool_create(cbboolean boolean)
+syntree_t* constbool_create(CbBoolean boolean)
 {
 	constval_t* node= malloc(sizeof(constval_t));
 	node->type		= SNT_CONSTBOOL;
-	node->value		= cbboolean_create(boolean);
+	node->value		= cb_boolean_create(boolean);
 	
 	return (syntree_t*) node;
 }
@@ -92,7 +92,7 @@ syntree_t* flow_create(	enum syn_nodetype_t type, syntree_t* condition,
 // -----------------------------------------------------------------------------
 // create a comparison-node
 // -----------------------------------------------------------------------------
-syntree_t* comparison_create(	enum comparison_type_t type,
+syntree_t* comparison_create(	enum cb_comparison_type type,
 								syntree_t* left_node, syntree_t* right_node)
 {
 	comparison_t* node	= malloc(sizeof(comparison_t));
@@ -183,7 +183,7 @@ void syntree_free(syntree_t* node)
 		case SNT_CONSTVAL:
 		case SNT_CONSTBOOL:
 		case SNT_CONSTSTR:
-			value_free(((constval_t*) node)->value);
+			cb_value_free(((constval_t*) node)->value);
 			break;
 		
 		case SNT_COMPARISON:
@@ -202,23 +202,23 @@ void syntree_free(syntree_t* node)
 // -----------------------------------------------------------------------------
 // evaluate a complete syntax tree and return its result
 // -----------------------------------------------------------------------------
-value_t* syntree_eval(syntree_t* node, symtab_t* symtab)
+CbValue* syntree_eval(syntree_t* node, symtab_t* symtab)
 {
-	value_t* result = NULL;
+	CbValue* result = NULL;
 	
 	switch (node->type)
 	{
 		case SNT_CONSTVAL:
 		case SNT_CONSTBOOL:
 		case SNT_CONSTSTR:
-			result = value_copy(((constval_t*) node)->value);
+			result = cb_value_copy(((constval_t*) node)->value);
 			break;
 		
 		case SNT_SYMREF:
 		{
 			symref_t* sr = (symref_t*) node;
 			symref_setsymbolfromtable(sr, symtab);
-			result = value_copy(symbol_variable_get_value(sr->table_sym));
+			result = cb_value_copy(symbol_variable_get_value(sr->table_sym));
 			break;
 		}
 		
@@ -226,7 +226,7 @@ value_t* syntree_eval(syntree_t* node, symtab_t* symtab)
 		{
 			// evaluate right-hand-side first, since it could contain a
 			// function-call, which could change the order in the symbol-table!
-			value_t* rhs = syntree_eval(node->r, symtab);
+			CbValue* rhs = syntree_eval(node->r, symtab);
 			
 			// after that, set symbol from the symbol-table
 			symref_t* sr = (symref_t*) node->l;
@@ -234,9 +234,9 @@ value_t* syntree_eval(syntree_t* node, symtab_t* symtab)
 			
 			// assign right-hand-side expression
 			symbol_variable_assign_value(sr->table_sym, rhs);
-			value_free(rhs);
+			cb_value_free(rhs);
 			
-			result = value_copy(symbol_variable_get_value(sr->table_sym));
+			result = cb_value_copy(symbol_variable_get_value(sr->table_sym));
 			break;
 		}
 		
@@ -247,7 +247,7 @@ value_t* syntree_eval(syntree_t* node, symtab_t* symtab)
 			symbol_t* dummy = symbol_create_variable(sr->sym_id);
 			symtab_append(symtab, dummy);	// declare symbol
 			
-			result = value_create();		// return empty value
+			result = cb_value_create();		// return empty value
 			break;
 		}
 		
@@ -267,19 +267,19 @@ value_t* syntree_eval(syntree_t* node, symtab_t* symtab)
 			symbol_t* s = symbol_create_function(fndecl->sym_id, func);
 			symtab_append(symtab, s);	// declare function
 			
-			result = value_create();	// return empty value
+			result = cb_value_create();	// return empty value
 			break;
 		}
 		
 		case SNT_PRINT:
 		{
-			value_t* temp = syntree_eval(node->l, symtab);
-			value_print(temp);
-			value_free(temp);
+			CbValue* temp = syntree_eval(node->l, symtab);
+			cb_value_print(temp);
+			cb_value_free(temp);
 			// print newline
 			printf("\n");
 			// return empty value
-			result = value_create();
+			result = cb_value_create();
 			break;
 		}
 		
@@ -290,7 +290,7 @@ value_t* syntree_eval(syntree_t* node, symtab_t* symtab)
 			function_t* f = symbol_function_get_function(fncall->table_sym);
 			
 			function_call(f, fncall->args, symtab);
-			result = value_copy(f->result);
+			result = cb_value_copy(f->result);
 			function_reset(f);
 			
 			break;
@@ -298,8 +298,8 @@ value_t* syntree_eval(syntree_t* node, symtab_t* symtab)
 		
 		case SNT_FLOW_IF:
 		{
-			value_t* condition = syntree_eval(((flow_t*) node)->cond, symtab);
-			if (!value_istype(condition, VT_BOOLEAN))
+			CbValue* condition = syntree_eval(((flow_t*) node)->cond, symtab);
+			if (!cb_value_is_type(condition, VT_BOOLEAN))
 			{
 				fprintf(stderr, "expecting boolean expression");
 				exit(EXIT_FAILURE);
@@ -315,69 +315,69 @@ value_t* syntree_eval(syntree_t* node, symtab_t* symtab)
 				if (((flow_t*) node)->fb)
 					result = syntree_eval(((flow_t*) node)->fb, symtab);
 				else
-					result = value_create();
+					result = cb_value_create();
 			}
 			
-			value_free(condition);
+			cb_value_free(condition);
 			break;
 		}
 		
 		case SNT_FLOW_WHILE:
 		{
-			value_t* temp = syntree_eval(((flow_t*) node)->cond, symtab);
-			if (!value_istype(temp, VT_BOOLEAN))
+			CbValue* temp = syntree_eval(((flow_t*) node)->cond, symtab);
+			if (!cb_value_is_type(temp, VT_BOOLEAN))
 			{
 				fprintf(stderr, "expecting boolean expression");
 				exit(EXIT_FAILURE);
 			}
 			
 			// default result (in case the while-loop won't be entered)
-			result = value_create();
+			result = cb_value_create();
 			
 			// evaluate true-branch while the condition returns true
 			while (temp->boolean)
 			{
-				value_free(temp);
+				cb_value_free(temp);
 				if (result)	// TODO:	Check is not necessary since result is
 							//			assigend before, so it can't be NULL.
-					value_free(result);
+					cb_value_free(result);
 				
 				result	= syntree_eval(((flow_t*) node)->tb, symtab);
 				temp	= syntree_eval(((flow_t*) node)->cond, symtab);
 			}
 			
 			// free last dummy-value
-			value_free(temp);
+			cb_value_free(temp);
 			break;
 		}
 		
 		case SNT_COMPARISON:
 		{
 			comparison_t* cmp = ((comparison_t*) node);
-			result = value_compare(	cmp->cmp_type, syntree_eval(cmp->l, symtab),
+			result = cb_value_compare(	cmp->cmp_type, syntree_eval(cmp->l, symtab),
 									syntree_eval(cmp->r, symtab));
 			break;
 		}
 		
 		case SNT_STATEMENTLIST:
-			value_free(syntree_eval(node->l, symtab));
+			cb_value_free(syntree_eval(node->l, symtab));
 			result = syntree_eval(node->r, symtab);
 			break;
 		
 		case '+':
-			result = value_add(syntree_eval(node->l, symtab),
+			result = cb_value_add(syntree_eval(node->l, symtab),
 							   syntree_eval(node->r, symtab));
 			break;
 		case '-':
-			result = cbnumeric_sub(	syntree_eval(node->l, symtab),
+			result = cb_numeric_sub(	syntree_eval(node->l, symtab),
 									syntree_eval(node->r, symtab));
 			break;
 		case '*':
-			result = cbnumeric_mul(	syntree_eval(node->l, symtab),
+			result = cb_numeric_mul(	syntree_eval(node->l, symtab),
 									syntree_eval(node->r, symtab));
 			break;
 		case '/':
-			result = cbnumeric_div(	syntree_eval(node->l, symtab),
+			result = cb_numeric_div(	syntree_eval(node->l, symtab),
 									syntree_eval(node->r, symtab));
 			break;
 		

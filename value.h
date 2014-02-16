@@ -1,5 +1,5 @@
 /*******************************************************************************
- * value_t -- Codeblock values and types
+ * CbValue -- Codeblock values and types
  ******************************************************************************/
 
 #ifndef VALUE_H
@@ -12,7 +12,7 @@
 #define CB_BOOLEAN_FALSE_STR	"False"
 
 // value-types
-enum value_type_t
+enum cb_value_type
 {
 	VT_UNDEFINED,
 	VT_NUMERIC,
@@ -21,7 +21,7 @@ enum value_type_t
 };
 
 // operation-types
-enum operation_type_t
+enum cb_operation_type
 {
 	OPR_ADD,
 	OPR_SUB,
@@ -30,7 +30,7 @@ enum operation_type_t
 };
 
 // comparison types
-enum comparison_type_t
+enum cb_comparison_type
 {
 	CMP_EQ,	// equal
 	CMP_NE,	// not equal
@@ -41,51 +41,51 @@ enum comparison_type_t
 };
 
 // definition of codeblock-types
-typedef int		cbnumeric;
-typedef char*	cbstring;
-typedef bool	cbboolean;
+typedef int		CbNumeric;
+typedef char*	CbString;
+typedef bool	CbBoolean;
 
 // codeblock-value structure
 typedef struct
 {
 	// value-type
-	enum value_type_t type;
+	enum cb_value_type type;
 	
 	union
 	{
-		cbnumeric value;
-		cbboolean boolean;
-		cbstring string;
+		CbNumeric value;
+		CbBoolean boolean;
+		CbString string;
 	};
-} value_t;
+} CbValue;
 
 // interface functions
-value_t* value_create();
-value_t* cbnumeric_create(cbnumeric value);
-value_t* cbboolean_create(cbboolean boolean);
-value_t* cbstring_create(cbstring string);
-void value_free(value_t* val);
-bool value_istype(const value_t* val, enum value_type_t type);
-void value_assign(const value_t* source, value_t* destination);
-void value_assign_freesource(value_t* source, value_t* destination);
-value_t* value_copy(const value_t* val);
-char* value_tostring(const value_t* val);
-void value_print(const value_t* val);
-value_t* value_compare(enum comparison_type_t type, value_t* l, value_t* r);
-value_t* value_add(value_t* l, value_t* r);
-// cbnumeric interface functions
-value_t* cbnumeric_compare(	enum comparison_type_t type, const value_t* l,
-							const value_t* r);
-value_t* cbnumeric_add(value_t* l, value_t* r);
-value_t* cbnumeric_sub(value_t* l, value_t* r);
-value_t* cbnumeric_mul(value_t* l, value_t* r);
-value_t* cbnumeric_div(value_t* l, value_t* r);
-// cbstring interface functions
-value_t* cbstring_compare(	enum comparison_type_t type, const value_t* l,
-							const value_t* r);
-// cbboolean interface functions
-value_t* cbboolean_compare(	enum comparison_type_t type, const value_t* l,
-							const value_t* r);
+CbValue* cb_value_create();
+CbValue* cb_numeric_create(CbNumeric value);
+CbValue* cb_boolean_create(CbBoolean boolean);
+CbValue* cb_string_create(CbString string);
+void cb_value_free(CbValue* val);
+bool cb_value_is_type(const CbValue* val, enum cb_value_type type);
+void cb_value_assign(const CbValue* source, CbValue* destination);
+void cb_value_assign_and_free_source(CbValue* source, CbValue* destination);
+CbValue* cb_value_copy(const CbValue* val);
+char* cb_value_to_string(const CbValue* val);
+void cb_value_print(const CbValue* val);
+CbValue* cb_value_compare(enum cb_comparison_type type, CbValue* l, CbValue* r);
+CbValue* cb_value_add(CbValue* l, CbValue* r);
+// CbNumeric interface functions
+CbValue* cb_numeric_compare(enum cb_comparison_type type, const CbValue* l,
+							const CbValue* r);
+CbValue* cb_numeric_add(CbValue* l, CbValue* r);
+CbValue* cb_numeric_sub(CbValue* l, CbValue* r);
+CbValue* cb_numeric_mul(CbValue* l, CbValue* r);
+CbValue* cb_numeric_div(CbValue* l, CbValue* r);
+// CbString interface functions
+CbValue* cb_string_compare(enum cb_comparison_type type, const CbValue* l,
+						   const CbValue* r);
+// CbBoolean interface functions
+CbValue* cb_boolean_compare(enum cb_comparison_type type, const CbValue* l,
+							const CbValue* r);
 
 
 #endif // VALUE_H

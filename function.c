@@ -89,7 +89,7 @@ void function_addparam(function_t* f, char* param_id)
 // call function
 // if the function has no parameters, pass a NULL-value as arguments.
 // -----------------------------------------------------------------------------
-value_t* function_call(function_t* f, strlist_t* args, symtab_t* symtab)
+CbValue* function_call(function_t* f, strlist_t* args, symtab_t* symtab)
 {
 	// reset function-result
 	// this is necessary in case the function was already called.
@@ -120,7 +120,7 @@ value_t* function_call(function_t* f, strlist_t* args, symtab_t* symtab)
 				stack_push(param_stack, curr_param->string); // push param name
 			
 			// obtain argument value
-			value_t* arg_value = syntree_eval(	((syntree_t*) curr_arg->data),
+			CbValue* arg_value = syntree_eval(	((syntree_t*) curr_arg->data),
 												symtab);
 			// push argument value on the stack
 			stack_push(arg_stack, arg_value);
@@ -147,13 +147,13 @@ value_t* function_call(function_t* f, strlist_t* args, symtab_t* symtab)
 		{
 			while (!stack_is_empty(param_stack))
 			{
-				value_t* arg_value;
+				CbValue* arg_value;
 				stack_pop(arg_stack, (void*) &arg_value);
 				char* param_id;
 				stack_pop(param_stack, (void*) &param_id);
 				symbol_t* arg = symbol_create_variable(param_id);
 				symbol_variable_assign_value(arg, arg_value);
-				value_free(arg_value);
+				cb_value_free(arg_value);
 				symtab_append(symtab, arg);	// declare argument within function-
 											// scope
 			}
@@ -163,9 +163,9 @@ value_t* function_call(function_t* f, strlist_t* args, symtab_t* symtab)
 		stack_free(param_stack);
 		
 #ifdef _CBC_DEFAULT_FUNC_RESULT_SYMBOL
-		value_free(syntree_eval(f->body, symtab));
+		cb_value_free(syntree_eval(f->body, symtab));
 		// result is value of the "Result"-symbol
-		f->result = value_copy(symbol_variable_get_value(default_result));
+		f->result = cb_value_copy(symbol_variable_get_value(default_result));
 #else
 		f->result = syntree_eval(f->body, symtab);	// result is the last
 													// expression in the function
@@ -193,7 +193,7 @@ void function_reset(function_t* f)
 {
 	if (f->result)
 	{
-		value_free(f->result);
+		cb_value_free(f->result);
 		f->result = NULL;
 	}
 }

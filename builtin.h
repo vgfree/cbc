@@ -12,7 +12,7 @@
 #include "stack.h"
 
 // function-pointer to a generic builtin function
-typedef value_t* (*func_ref_t) (stack_t*);
+typedef CbValue* (*func_ref_t) (stack_t*);
 
 
 // interface functions

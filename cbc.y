@@ -13,10 +13,10 @@
 %union {
 	syntree_t* ast;
 	char* id;
-	cbstring str;
-	cbboolean boolval;
-	cbnumeric val;
-	enum comparison_type_t cmp;
+	CbString str;
+	CbBoolean boolval;
+	CbNumeric val;
+	enum cb_comparison_type cmp;
 	strlist_t* list;
 };
 

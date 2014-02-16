@@ -18,7 +18,7 @@
 // declarations
 // #############################################################################
 
-const value_t expected_results[] = {
+const CbValue expected_results[] = {
 	{VT_NUMERIC, 5},		// Testcase 0
 	{VT_NUMERIC, 17},
 	{VT_NUMERIC, -1},
@@ -53,19 +53,19 @@ const value_t expected_results[] = {
 	{VT_NUMERIC, 15},
 	{VT_NUMERIC, 30},
 	{VT_NUMERIC, 0},
-	{VT_STRING, (cbnumeric) "\"foo\", \"bar\""},	// Cast to cbnumeric to
+	{VT_STRING, (CbNumeric) "\"foo\", \"bar\""},	// Cast to cbnumeric to
 													// avoid compiler-warning
 	{VT_BOOLEAN, true},		// Testcase 35
 	{VT_BOOLEAN, true},
 	{VT_BOOLEAN, false},
 	{VT_BOOLEAN, false},
 	{VT_BOOLEAN, true},
-	{VT_STRING, (cbnumeric) "string1"},	// Testcase 40
+	{VT_STRING, (CbNumeric) "string1"},	// Testcase 40
 	{VT_NUMERIC, 118},
 	{VT_NUMERIC, 8},
 	{VT_NUMERIC, 0},
-	{VT_STRING, (cbnumeric) "1234567890"},
-	{VT_STRING, (cbnumeric) "LNCU"}		// Testcase 45
+	{VT_STRING, (CbNumeric) "1234567890"},
+	{VT_STRING, (CbNumeric) "LNCU"}		// Testcase 45
 };
 
 
@@ -77,7 +77,7 @@ const value_t expected_results[] = {
 // Test a specific codeblock script file (internal)
 // -----------------------------------------------------------------------------
 static void test_codeblock_file(CuTest *tc, const char* test_file_name,
-								const value_t* expected_result)
+								const CbValue* expected_result)
 {
 	extern FILE* yyin;
 	FILE* test_file = fopen(test_file_name, "r");
@@ -130,7 +130,7 @@ static void test_codeblock_file(CuTest *tc, const char* test_file_name,
 void test_codeblock_all_files(CuTest *tc)
 {
 	int testcase	   = 0;
-	int testcase_count = sizeof(expected_results) / sizeof(value_t);
+	int testcase_count = sizeof(expected_results) / sizeof(CbValue);
 	
 	for (; testcase < testcase_count; testcase++)
 	{

@@ -22,37 +22,37 @@
 // -----------------------------------------------------------------------------
 // WriteLn() -- Print value
 // -----------------------------------------------------------------------------
-value_t* bif_writeln(stack_t* arg_stack)
+CbValue* bif_writeln(stack_t* arg_stack)
 {
 	assert(arg_stack->count == 1);
 	
-	value_t* arg;
+	CbValue* arg;
 	stack_pop(arg_stack, (void*) &arg);
 	
-	value_print(arg);
-	value_free(arg);
+	cb_value_print(arg);
+	cb_value_free(arg);
 	// print newline
 	printf("\n");
 	
-	return value_create(); // return empty value
+	return cb_value_create(); // return empty value
 }
 
 // -----------------------------------------------------------------------------
 // Mod() -- Modulo
 // -----------------------------------------------------------------------------
-value_t* bif_mod(stack_t* arg_stack)
+CbValue* bif_mod(stack_t* arg_stack)
 {
 	assert(arg_stack->count == 2);
 	
-	value_t* arg1;
-	value_t* arg2;
+	CbValue* arg1;
+	CbValue* arg2;
 	stack_pop(arg_stack, (void*) &arg2);	// first pop -> last argument
 	stack_pop(arg_stack, (void*) &arg1);
 	
-	value_t* result = cbnumeric_create(arg1->value % arg2->value);
+	CbValue* result = cb_numeric_create(arg1->value % arg2->value);
 	
-	value_free(arg1);
-	value_free(arg2);
+	cb_value_free(arg1);
+	cb_value_free(arg2);
 	
 	return result;
 }
@@ -60,35 +60,35 @@ value_t* bif_mod(stack_t* arg_stack)
 // -----------------------------------------------------------------------------
 // ValType() -- Type of a value as character
 // -----------------------------------------------------------------------------
-value_t* bif_valtype(stack_t* arg_stack)
+CbValue* bif_valtype(stack_t* arg_stack)
 {
 	assert(arg_stack->count == 1);
 	
-	value_t* arg;
+	CbValue* arg;
 	stack_pop(arg_stack, (void*) &arg);
 	
-	value_t* result;
+	CbValue* result;
 	switch (arg->type)
 	{
 		case VT_BOOLEAN:
-			result = cbstring_create(strdup("L"));
+			result = cb_string_create(strdup("L"));
 			break;
 		
 		case VT_NUMERIC:
-			result = cbstring_create(strdup("N"));
+			result = cb_string_create(strdup("N"));
 			break;
 		
 		case VT_STRING:
-			result = cbstring_create(strdup("C"));
+			result = cb_string_create(strdup("C"));
 			break;
 		
 		case VT_UNDEFINED:
 		default:
-			result = cbstring_create(strdup("U"));
+			result = cb_string_create(strdup("U"));
 			break;
 	}
 	
-	value_free(arg);
+	cb_value_free(arg);
 	
 	return result;
 }
@@ -96,16 +96,16 @@ value_t* bif_valtype(stack_t* arg_stack)
 // -----------------------------------------------------------------------------
 // Str() -- Convert any value to string
 // -----------------------------------------------------------------------------
-value_t* bif_str(stack_t* arg_stack)
+CbValue* bif_str(stack_t* arg_stack)
 {
 	assert(arg_stack->count == 1);
 	
-	value_t* arg;
+	CbValue* arg;
 	stack_pop(arg_stack, (void*) &arg);
 	
-	value_t* result = cbstring_create(value_tostring(arg));
+	CbValue* result = cb_string_create(cb_value_to_string(arg));
 	
-	value_free(arg);
+	cb_value_free(arg);
 	
 	return result;
 }
@@ -113,14 +113,14 @@ value_t* bif_str(stack_t* arg_stack)
 // -----------------------------------------------------------------------------
 // Eval() -- Evaluate a codeblock string
 // -----------------------------------------------------------------------------
-value_t* bif_eval(stack_t* arg_stack)
+CbValue* bif_eval(stack_t* arg_stack)
 {
 	assert(arg_stack->count == 1);
 	
-	value_t* arg;
+	CbValue* arg;
 	stack_pop(arg_stack, (void*) &arg);
 	
-	assert(value_istype(arg, VT_STRING));
+	assert(cb_value_is_type(arg, VT_STRING));
 	
 	// Create codeblock environment
 	codeblock_t* cb = codeblock_create();
@@ -130,11 +130,11 @@ value_t* bif_eval(stack_t* arg_stack)
 	yyparse(&cb->ast);
 	yy_delete_buffer(buffer_state);
 	yylex_destroy();
-	value_free(arg);
+	cb_value_free(arg);
 	
 	codeblock_execute(cb);	// Execute codeblock
 	
-	value_t* result = value_copy(cb->result);
+	CbValue* result = cb_value_copy(cb->result);
 	
 	syntree_free(cb->ast);
 	codeblock_free(cb);
@@ -146,21 +146,21 @@ value_t* bif_eval(stack_t* arg_stack)
 // -----------------------------------------------------------------------------
 // Meld() -- Display a Message-Box
 // -----------------------------------------------------------------------------
-value_t* bif_meld(stack_t* arg_stack)
+CbValue* bif_meld(stack_t* arg_stack)
 {
 	assert(arg_stack->count == 1);
 	
-	value_t* arg;
+	CbValue* arg;
 	stack_pop(arg_stack, (void*) &arg);
 	
-	assert(value_istype(arg, VT_STRING));
+	assert(cb_value_is_type(arg, VT_STRING));
 	
 	// display message
 	// NOTE: MessageBox() causes memory-leaks in MinGW32!
 	MessageBox(NULL, arg->string, "Information", MB_ICONINFORMATION | MB_OK);
 	
-	value_free(arg);
+	cb_value_free(arg);
 	
-	return value_create();	// return empty value
+	return cb_value_create();	// return empty value
 }
 #endif // _CBC_PLAT_WNDS

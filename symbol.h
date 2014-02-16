@@ -37,8 +37,8 @@ const scope_t* symbol_get_scope(const symbol_t* s);
 void symbol_set_next(symbol_t* s, const symbol_t* next);
 void symbol_set_previous(symbol_t* s, const symbol_t* previous);
 void symbol_set_scope(symbol_t* s, const scope_t* scope);
-const value_t* symbol_variable_get_value(const symbol_t* s);
-void symbol_variable_assign_value(symbol_t* s, const value_t* new_value);
+const CbValue* symbol_variable_get_value(const symbol_t* s);
+void symbol_variable_assign_value(symbol_t* s, const CbValue* new_value);
 function_t* symbol_function_get_function(const symbol_t* s);
 
 

@@ -18,14 +18,14 @@ typedef struct
 {
 	symtab_t* global_symtab;	// reference to the global symbol-table
 	syntree_t* ast;				// abstract syntax-tree -- the code to execute
-	value_t* result;			// the result, after executing the codeblock
+	CbValue* result;			// the result, after executing the codeblock
 } codeblock_t;
 
 
 // interface-functions
 codeblock_t* codeblock_create();
 void codeblock_free(codeblock_t* cb);
-value_t* codeblock_execute(codeblock_t* cb);
+CbValue* codeblock_execute(codeblock_t* cb);
 
 
 #endif // CODEBLOCK_H

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * value_t -- Codeblock values and types
+ * CbValue -- Codeblock values and types
  ******************************************************************************/
 
 #include <stdio.h>
@@ -14,8 +14,9 @@
 // declarations
 // #############################################################################
 
-value_t* cbnumeric_operation(enum operation_type_t type, value_t* l, value_t* r);
-value_t* cbstring_concat(value_t* l, value_t* r);
+static CbValue* cb_numeric_operation(enum cb_operation_type type, CbValue* l,
+									 CbValue* r);
+static CbValue* cb_string_concat(CbValue* l, CbValue* r);
 
 
 // #############################################################################
@@ -25,18 +26,18 @@ value_t* cbstring_concat(value_t* l, value_t* r);
 // -----------------------------------------------------------------------------
 // create a codeblock-value
 // -----------------------------------------------------------------------------
-value_t* value_create()
+CbValue* cb_value_create()
 {
-	value_t* val= (value_t*) malloc(sizeof(value_t));
+	CbValue* val= (CbValue*) malloc(sizeof(CbValue));
 	val->type	= VT_UNDEFINED;
 }
 
 // -----------------------------------------------------------------------------
 // create a numeric value
 // -----------------------------------------------------------------------------
-value_t* cbnumeric_create(cbnumeric value)
+CbValue* cb_numeric_create(CbNumeric value)
 {
-	value_t* val= value_create();
+	CbValue* val= cb_value_create();
 	val->type	= VT_NUMERIC;
 	val->value	= value;
 }
@@ -44,9 +45,9 @@ value_t* cbnumeric_create(cbnumeric value)
 // -----------------------------------------------------------------------------
 // create a boolean value
 // -----------------------------------------------------------------------------
-value_t* cbboolean_create(cbboolean boolean)
+CbValue* cb_boolean_create(CbBoolean boolean)
 {
-	value_t* val= value_create();
+	CbValue* val= cb_value_create();
 	val->type	= VT_BOOLEAN;
 	val->boolean= boolean;
 }
@@ -54,9 +55,9 @@ value_t* cbboolean_create(cbboolean boolean)
 // -----------------------------------------------------------------------------
 // create a string-value
 // -----------------------------------------------------------------------------
-value_t* cbstring_create(cbstring string)
+CbValue* cb_string_create(CbString string)
 {
-	value_t* val= value_create();
+	CbValue* val= cb_value_create();
 	val->type	= VT_STRING;
 	val->string	= string;
 }
@@ -64,7 +65,7 @@ value_t* cbstring_create(cbstring string)
 // -----------------------------------------------------------------------------
 // free codeblock-value
 // -----------------------------------------------------------------------------
-void value_free(value_t* val)
+void cb_value_free(CbValue* val)
 {
 	if (val->type == VT_STRING && val->string)
 		free(val->string);
@@ -75,7 +76,7 @@ void value_free(value_t* val)
 // -----------------------------------------------------------------------------
 // check for given value-type
 // -----------------------------------------------------------------------------
-bool value_istype(const value_t* val, enum value_type_t type)
+bool cb_value_is_type(const CbValue* val, enum cb_value_type type)
 {
 	if (val->type == type)
 		return true;
@@ -86,7 +87,7 @@ bool value_istype(const value_t* val, enum value_type_t type)
 // -----------------------------------------------------------------------------
 // assign attributes from one codeblock-value struct to another
 // -----------------------------------------------------------------------------
-void value_assign(const value_t* source, value_t* destination)
+void cb_value_assign(const CbValue* source, CbValue* destination)
 {
 	switch (source->type)
 	{
@@ -114,19 +115,19 @@ void value_assign(const value_t* source, value_t* destination)
 // assign attributes from one codeblock-value struct to another and free the
 // source struct
 // -----------------------------------------------------------------------------
-void value_assign_freesource(value_t* source, value_t* destination)
+void cb_value_assign_and_free_source(CbValue* source, CbValue* destination)
 {
-	value_assign(source, destination);
-	value_free(source);
+	cb_value_assign(source, destination);
+	cb_value_free(source);
 }
 
 // -----------------------------------------------------------------------------
 // copy a codeblock-value struct
 // -----------------------------------------------------------------------------
-value_t* value_copy(const value_t* val)
+CbValue* cb_value_copy(const CbValue* val)
 {
-	value_t* copy = value_create();
-	value_assign(val, copy);
+	CbValue* copy = cb_value_create();
+	cb_value_assign(val, copy);
 	
 	return copy;
 }
@@ -136,7 +137,7 @@ value_t* value_copy(const value_t* val)
 // IMPORTANT:	the c-string must be freed after usage, since allocation occurs
 //				in this function!
 // -----------------------------------------------------------------------------
-char* value_tostring(const value_t* val)
+char* cb_value_to_string(const CbValue* val)
 {
 	char* result_buf;
 	
@@ -176,9 +177,9 @@ char* value_tostring(const value_t* val)
 // -----------------------------------------------------------------------------
 // print a codeblock-value
 // -----------------------------------------------------------------------------
-void value_print(const value_t* val)
+void cb_value_print(const CbValue* val)
 {
-	char* string = value_tostring(val);
+	char* string = cb_value_to_string(val);
 	printf("%s", string);
 	free(string);
 }
@@ -189,35 +190,35 @@ void value_print(const value_t* val)
 // NOTE:	regardless of the value-type beeing compared, every compare-function
 //			returns a cbboolean-value.
 // -----------------------------------------------------------------------------
-value_t* value_compare(enum comparison_type_t type, value_t* l, value_t* r)
+CbValue* cb_value_compare(enum cb_comparison_type type, CbValue* l, CbValue* r)
 {
-	if (!value_istype(l, r->type))
+	if (!cb_value_is_type(l, r->type))
 	{
 		fprintf(stderr, "Type mismatch: lhs-type %d differs from rhs-type %d\n",
 				l->type, r->type);
 		exit(EXIT_FAILURE);
 	}
 	
-	value_t* result = NULL;
+	CbValue* result = NULL;
 	
 	switch (l->type)
 	{
 		case VT_NUMERIC:
-			result = cbnumeric_compare(type, l, r);
+			result = cb_numeric_compare(type, l, r);
 			break;
 		
 		case VT_BOOLEAN:
-			result = cbboolean_compare(type, l, r);
+			result = cb_boolean_compare(type, l, r);
 			break;
 		
 		case VT_STRING:
-			result = cbstring_compare(type, l, r);
+			result = cb_string_compare(type, l, r);
 			break;
 	}
 	
 	// free lhs and rhs
-	value_free(l);
-	value_free(r);
+	cb_value_free(l);
+	cb_value_free(r);
 	
 	return result;
 }
@@ -225,17 +226,17 @@ value_t* value_compare(enum comparison_type_t type, value_t* l, value_t* r)
 // -----------------------------------------------------------------------------
 // numerical comparison
 // -----------------------------------------------------------------------------
-value_t* cbnumeric_compare(	enum comparison_type_t type, const value_t* l,
-							const value_t* r)
+CbValue* cb_numeric_compare(	enum cb_comparison_type type, const CbValue* l,
+							const CbValue* r)
 {
-	if (!value_istype(l, VT_NUMERIC) || !value_istype(r, VT_NUMERIC))
+	if (!cb_value_is_type(l, VT_NUMERIC) || !cb_value_is_type(r, VT_NUMERIC))
 	{
 		fprintf(stderr, "Error: Value has invalid type for this operation, "\
 						"expecting VT_NUMERIC!");
 		exit(EXIT_FAILURE);
 	}
 	
-	value_t* result = cbboolean_create(false);
+	CbValue* result = cb_boolean_create(false);
 	
 	switch (type)
 	{
@@ -253,19 +254,19 @@ value_t* cbnumeric_compare(	enum comparison_type_t type, const value_t* l,
 // -----------------------------------------------------------------------------
 // perform add-operation
 // -----------------------------------------------------------------------------
-value_t* value_add(value_t* l, value_t* r)
+CbValue* cb_value_add(CbValue* l, CbValue* r)
 {
 	switch (l->type)
 	{
 		case VT_NUMERIC:
-			return cbnumeric_operation(OPR_ADD, l, r);
+			return cb_numeric_operation(OPR_ADD, l, r);
 			break;
 		case VT_STRING:
-			return cbstring_concat(l, r);
+			return cb_string_concat(l, r);
 			break;
 		default:
 			fprintf(stderr, "Error: Unable to perform OPR_ADD on value-type: " \
-					"%d!\n", l->type);
+							"%d!\n", l->type);
 			exit(EXIT_FAILURE);
 			break;
 	}
@@ -274,42 +275,42 @@ value_t* value_add(value_t* l, value_t* r)
 // -----------------------------------------------------------------------------
 // numerical addition
 // -----------------------------------------------------------------------------
-value_t* cbnumeric_add(value_t* l, value_t* r)
+CbValue* cb_numeric_add(CbValue* l, CbValue* r)
 {
-	return cbnumeric_operation(OPR_ADD, l, r);
+	return cb_numeric_operation(OPR_ADD, l, r);
 }
 
 // -----------------------------------------------------------------------------
 // numerical subtraction
 // -----------------------------------------------------------------------------
-value_t* cbnumeric_sub(value_t* l, value_t* r)
+CbValue* cb_numeric_sub(CbValue* l, CbValue* r)
 {
-	return cbnumeric_operation(OPR_SUB, l, r);
+	return cb_numeric_operation(OPR_SUB, l, r);
 }
 
 // -----------------------------------------------------------------------------
 // numerical multiplication
 // -----------------------------------------------------------------------------
-value_t* cbnumeric_mul(value_t* l, value_t* r)
+CbValue* cb_numeric_mul(CbValue* l, CbValue* r)
 {
-	return cbnumeric_operation(OPR_MUL, l, r);
+	return cb_numeric_operation(OPR_MUL, l, r);
 }
 
 // -----------------------------------------------------------------------------
 // numerical division
 // -----------------------------------------------------------------------------
-value_t* cbnumeric_div(value_t* l, value_t* r)
+CbValue* cb_numeric_div(CbValue* l, CbValue* r)
 {
-	return cbnumeric_operation(OPR_DIV, l, r);
+	return cb_numeric_operation(OPR_DIV, l, r);
 }
 
 // -----------------------------------------------------------------------------
 // string comparison
 // -----------------------------------------------------------------------------
-value_t* cbstring_compare(	enum comparison_type_t type, const value_t* l,
-							const value_t* r)
+CbValue* cb_string_compare(enum cb_comparison_type type, const CbValue* l,
+						   const CbValue* r)
 {
-	if (!value_istype(l, VT_STRING) || !value_istype(r, VT_STRING))
+	if (!cb_value_is_type(l, VT_STRING) || !cb_value_is_type(r, VT_STRING))
 	{
 		fprintf(stderr, "Error: Value has invalid type for this operation, "\
 						"expecting VT_STRING!");
@@ -339,17 +340,17 @@ value_t* cbstring_compare(	enum comparison_type_t type, const value_t* l,
 			break;
 	}
 	
-	value_t* result_val = cbboolean_create(result);
+	CbValue* result_val = cb_boolean_create(result);
 	return result_val;
 }
 
 // -----------------------------------------------------------------------------
 // boolean comparison
 // -----------------------------------------------------------------------------
-value_t* cbboolean_compare(	enum comparison_type_t type, const value_t* l,
-							const value_t* r)
+CbValue* cb_boolean_compare(enum cb_comparison_type type, const CbValue* l,
+							const CbValue* r)
 {
-	if (!value_istype(l, VT_BOOLEAN))
+	if (!cb_value_is_type(l, VT_BOOLEAN))
 	{
 		fprintf(stderr, "Error: Value has invalid type for this operation, "\
 						"expecting VT_BOOLEAN!");
@@ -357,7 +358,7 @@ value_t* cbboolean_compare(	enum comparison_type_t type, const value_t* l,
 	}
 	
 	bool not_flag	= false;
-	cbboolean result= false;
+	CbBoolean result= false;
 	
 	switch (type)
 	{
@@ -379,7 +380,7 @@ value_t* cbboolean_compare(	enum comparison_type_t type, const value_t* l,
 			break;
 	}
 	
-	value_t* result_val = cbboolean_create(result);
+	CbValue* result_val = cb_boolean_create(result);
 	return result_val;
 }
 
@@ -391,16 +392,17 @@ value_t* cbboolean_compare(	enum comparison_type_t type, const value_t* l,
 // -----------------------------------------------------------------------------
 // numerical operation (internal)
 // -----------------------------------------------------------------------------
-value_t* cbnumeric_operation(enum operation_type_t type, value_t* l, value_t* r)
+static CbValue* cb_numeric_operation(enum cb_operation_type type, CbValue* l,
+									 CbValue* r)
 {
-	if (!value_istype(l, VT_NUMERIC))
+	if (!cb_value_is_type(l, VT_NUMERIC))
 	{
 		fprintf(stderr, "Error: Value has invalid type for this operation, "\
 						"expecting VT_NUMERIC!");
 		exit(EXIT_FAILURE);
 	}
 	
-	value_t* result	= cbnumeric_create(0);
+	CbValue* result	= cb_numeric_create(0);
 	
 	switch (type)
 	{
@@ -420,8 +422,8 @@ value_t* cbnumeric_operation(enum operation_type_t type, value_t* l, value_t* r)
 	}
 	
 	// free lhs and rhs
-	value_free(l);
-	value_free(r);
+	cb_value_free(l);
+	cb_value_free(r);
 	
 	return result;
 }
@@ -429,9 +431,9 @@ value_t* cbnumeric_operation(enum operation_type_t type, value_t* l, value_t* r)
 // -----------------------------------------------------------------------------
 // concatenate string (internal)
 // -----------------------------------------------------------------------------
-value_t* cbstring_concat(value_t* l, value_t* r)
+static CbValue* cb_string_concat(CbValue* l, CbValue* r)
 {
-	if (!value_istype(l, VT_STRING) || !value_istype(r, VT_STRING))
+	if (!cb_value_is_type(l, VT_STRING) || !cb_value_is_type(r, VT_STRING))
 	{
 		fprintf(stderr, "Error: Value has invalid type for this operation, "\
 						"expecting VT_STRING!");
@@ -443,11 +445,11 @@ value_t* cbstring_concat(value_t* l, value_t* r)
 	*buffer = '\0';	// terminate string
 	strcat(buffer, l->string);
 	strcat(buffer, r->string);
-	value_t* result = cbstring_create(buffer);
+	CbValue* result = cb_string_create(buffer);
 	
 	// free lhs and rhs
-	value_free(l);
-	value_free(r);
+	cb_value_free(l);
+	cb_value_free(r);
 	
 	return result;
 }

@@ -65,7 +65,7 @@ int main(int argc, char* argv[])
 	float diff = ((float) end - (float) begin);
 #endif // _CBC_TRACK_EXECUTION_TIME
 	
-	value_print(cb->result);	// and print result
+	cb_value_print(cb->result);	// and print result
 	
 #ifdef _CBC_TRACK_EXECUTION_TIME
 	printf("\nExecution duration: %f seconds", diff / CLOCKS_PER_SEC);

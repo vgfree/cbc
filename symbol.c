@@ -24,7 +24,7 @@ struct symbol_t
 	
 	union
 	{
-		value_t* value;			// symbol-value, is used if the symbol is a variable
+		CbValue* value;			// symbol-value, is used if the symbol is a variable
 		function_t* function;	// function, is used if the symbol is a function
 	};
 };
@@ -61,7 +61,7 @@ symbol_t* symbol_create_variable(char* identifier)
 {
 	symbol_t* s	= symbol_create(identifier);
 	s->type		= SYM_TYPE_VARIABLE;
-	s->value	= value_create();
+	s->value	= cb_value_create();
 	
 	return s;
 }
@@ -88,7 +88,7 @@ void symbol_free(symbol_t* s)
 	switch (s->type)
 	{
 		case SYM_TYPE_VARIABLE:
-			value_free(s->value);
+			cb_value_free(s->value);
 			break;
 		
 		case SYM_TYPE_FUNCTION:
@@ -172,7 +172,7 @@ void symbol_set_scope(symbol_t* s, const scope_t* scope)
 // -----------------------------------------------------------------------------
 // get value-object of an variable-symbol (variables only!)
 // -----------------------------------------------------------------------------
-const value_t* symbol_variable_get_value(const symbol_t* s)
+const CbValue* symbol_variable_get_value(const symbol_t* s)
 {
 	assert(s->type == SYM_TYPE_VARIABLE);
 	
@@ -182,11 +182,11 @@ const value_t* symbol_variable_get_value(const symbol_t* s)
 // -----------------------------------------------------------------------------
 // assign new value to the symbol-value (variables only!)
 // -----------------------------------------------------------------------------
-void symbol_variable_assign_value(symbol_t* s, const value_t* new_value)
+void symbol_variable_assign_value(symbol_t* s, const CbValue* new_value)
 {
 	assert(s->type == SYM_TYPE_VARIABLE);
 	
-	value_assign(new_value, s->value);
+	cb_value_assign(new_value, s->value);
 }
 
 // -----------------------------------------------------------------------------

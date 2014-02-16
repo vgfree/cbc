@@ -28,7 +28,7 @@ typedef struct
 	enum function_type_t type;
 	char* id;			// name of the function
 	int param_count;	// count of expected parameters
-	value_t* result;	// result of the function after calling it
+	CbValue* result;	// result of the function after calling it
 	
 	// type-specific attributes: FUNC_TYPE_BUILTIN
 	func_ref_t func_ref;
@@ -49,7 +49,7 @@ function_t* function_create_builtin(char* identifier, int param_count,
 function_t* function_create_user_defined(char* identifier, syntree_t* body);
 void function_free(function_t* f);
 void function_addparam(function_t* f, char* param_id);
-value_t* function_call(function_t* f, strlist_t* args, symtab_t* symtab);
+CbValue* function_call(function_t* f, strlist_t* args, symtab_t* symtab);
 void function_reset(function_t* f);
 
 

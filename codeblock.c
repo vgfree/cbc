@@ -48,7 +48,7 @@ void codeblock_free(codeblock_t* cb)
 // -----------------------------------------------------------------------------
 // execute codeblock
 // -----------------------------------------------------------------------------
-value_t* codeblock_execute(codeblock_t* cb)
+CbValue* codeblock_execute(codeblock_t* cb)
 {
 	assert(cb->global_symtab);
 	
@@ -84,7 +84,7 @@ void codeblock_reset(codeblock_t* cb)
 {
 	if (cb->result)
 	{
-		value_free(cb->result);
+		cb_value_free(cb->result);
 		cb->result = NULL;
 	}
 }
