@@ -123,7 +123,7 @@ CbValue* bif_eval(CbStack* arg_stack)
 	assert(cb_value_is_type(arg, VT_STRING));
 	
 	// Create codeblock environment
-	codeblock_t* cb = codeblock_create();
+	Codeblock* cb = codeblock_create();
 	
 	// Process codeblock
 	YY_BUFFER_STATE buffer_state = yy_scan_string(arg->string);

@@ -89,7 +89,7 @@ static void test_codeblock_file(CuTest *tc, const char* test_file_name,
 	
 	yyin = test_file;
 	
-	codeblock_t* cb = codeblock_create();
+	Codeblock* cb = codeblock_create();
 	
 	yyparse(&cb->ast);
 	yylex_destroy();

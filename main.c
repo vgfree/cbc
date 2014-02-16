@@ -42,7 +42,7 @@ int main(int argc, char* argv[])
 		yyin = input;
 	}
 
-	codeblock_t* cb = codeblock_create();
+	Codeblock* cb = codeblock_create();
 	
 	yyparse(&cb->ast);	// parse codeblock-code
 	

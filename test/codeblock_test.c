@@ -20,7 +20,7 @@
 // -----------------------------------------------------------------------------
 void test_codeblock_execute(CuTest *tc)
 {
-	codeblock_t* cb		= codeblock_create();
+	Codeblock* cb		= codeblock_create();
 	cb->ast				= cb_conststr_create("test");
 	
 	codeblock_execute(cb);	// execute codeblock once
@@ -42,7 +42,7 @@ void test_codeblock_execute(CuTest *tc)
 // -----------------------------------------------------------------------------
 void test_codeblock_execute_complex(CuTest *tc)
 {
-	codeblock_t* cb		= codeblock_create();
+	Codeblock* cb		= codeblock_create();
 	
 	CbStrlist* args		= cb_strlist_create("");
 	args->data			= symref_create("foo");

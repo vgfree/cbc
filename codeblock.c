@@ -1,5 +1,5 @@
 /*******************************************************************************
- * codeblock -- Codeblock execution-environment
+ * Codeblock -- Implementation of the codeblock execution-environment.
  ******************************************************************************/
 
 #include <stdio.h>
@@ -14,7 +14,7 @@
 // declarations
 // #############################################################################
 
-void codeblock_reset(codeblock_t* cb);
+void codeblock_reset(Codeblock* cb);
 
 
 // #############################################################################
@@ -24,9 +24,9 @@ void codeblock_reset(codeblock_t* cb);
 // -----------------------------------------------------------------------------
 // constructor
 // -----------------------------------------------------------------------------
-codeblock_t* codeblock_create()
+Codeblock* codeblock_create()
 {
-	codeblock_t* cb		= (codeblock_t*) malloc(sizeof(codeblock_t));
+	Codeblock* cb		= (Codeblock*) malloc(sizeof(Codeblock));
 	cb->global_symtab	= cb_symtab_create();
 	cb->ast				= NULL;
 	cb->result			= NULL;
@@ -37,7 +37,7 @@ codeblock_t* codeblock_create()
 // -----------------------------------------------------------------------------
 // destructor
 // -----------------------------------------------------------------------------
-void codeblock_free(codeblock_t* cb)
+void codeblock_free(Codeblock* cb)
 {
 	codeblock_reset(cb);
 	cb_symtab_free(cb->global_symtab);
@@ -48,7 +48,7 @@ void codeblock_free(codeblock_t* cb)
 // -----------------------------------------------------------------------------
 // execute codeblock
 // -----------------------------------------------------------------------------
-CbValue* codeblock_execute(codeblock_t* cb)
+CbValue* codeblock_execute(Codeblock* cb)
 {
 	assert(cb->global_symtab);
 	
@@ -80,7 +80,7 @@ CbValue* codeblock_execute(codeblock_t* cb)
 // -----------------------------------------------------------------------------
 // reset codeblock (internal)
 // -----------------------------------------------------------------------------
-void codeblock_reset(codeblock_t* cb)
+void codeblock_reset(Codeblock* cb)
 {
 	if (cb->result)
 	{
