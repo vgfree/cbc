@@ -137,7 +137,7 @@ CbSymbol* cb_symtab_lookup(CbSymtab* st, const char* id)
 	{
 		if (strcmp(id, cb_symbol_get_id(current)) == 0)
 		{
-			if (scope_equals(cb_symbol_get_scope(current),
+			if (cb_scope_equals(cb_symbol_get_scope(current),
 							 cb_stack_get_top_item(st->scope_stack)))
 			{
 				result = current;
@@ -205,7 +205,7 @@ bool cb_symtab_is_empty(CbSymtab* st)
 // -----------------------------------------------------------------------------
 void cb_symtab_enter_scope(CbSymtab* st, char* context)
 {
-	scope_t* new_scope = scope_create(context, st->scope_stack->count + 1);
+	CbScope* new_scope = cb_scope_create(context, st->scope_stack->count + 1);
 	cb_stack_push(st->scope_stack, new_scope);
 }
 
@@ -223,15 +223,15 @@ void cb_symtab_leave_scope(CbSymtab* st)
 		CbSymbol* temp = current;
 		current		   = cb_symbol_get_previous(current);
 		
-		if (scope_equals(cb_symbol_get_scope(temp),
-						 (scope_t*) cb_stack_get_top_item(st->scope_stack)))
+		if (cb_scope_equals(cb_symbol_get_scope(temp),
+						 (CbScope*) cb_stack_get_top_item(st->scope_stack)))
 			// TODO: Use a different method to dispatch and remove the symbol.
 			// Since symtab_dispatch() calls symtab_lookup() this could be a
 			// quite slow operation!
 			cb_symtab_remove(st, cb_symbol_get_id(temp));
 	}
 	
-	scope_t* current_scope;
+	CbScope* current_scope;
 	cb_stack_pop(st->scope_stack, (void*) &current_scope);	// pop and
-	scope_free(current_scope);							// free current scope
+	cb_scope_free(current_scope);							// free current scope
 }

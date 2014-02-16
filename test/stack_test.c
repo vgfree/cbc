@@ -52,9 +52,9 @@ void test_stack_complex(CuTest *tc)
 	int i = 0;
 	for (; i < 10; i++)
 	{
-		scope_t* dummy = scope_create("scope", i + 1);
+		CbScope* dummy = cb_scope_create("scope", i + 1);
 		cb_stack_push(stack, dummy);
-		CuAssertPtrEquals(tc, dummy, (scope_t*) cb_stack_get_top_item(stack));
+		CuAssertPtrEquals(tc, dummy, (CbScope*) cb_stack_get_top_item(stack));
 	}
 	
 	CuAssertIntEquals(tc, 10, stack->count);
@@ -62,12 +62,12 @@ void test_stack_complex(CuTest *tc)
 	
 	for (; i > 0; i--)
 	{
-		scope_t* dummy;
+		CbScope* dummy;
 		cb_stack_pop(stack, (void*) &dummy);
 		CuAssertStrEquals(tc, "scope", dummy->context);
 		CuAssertIntEquals(tc, i, dummy->level);
 		
-		scope_free(dummy);
+		cb_scope_free(dummy);
 	}
 	
 	CuAssertIntEquals(tc, 0, stack->count);

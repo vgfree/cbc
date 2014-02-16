@@ -20,7 +20,7 @@ struct CbSymbol
 	char* id;					// identifier
 	struct CbSymbol* next;		// reference to the next symbol (in case of a list)
 	struct CbSymbol* previous;	// reference to the previous symbol (in case of a list)
-	const scope_t* scope;		// scope, in which the symbol is valid
+	const CbScope* scope;		// scope, in which the symbol is valid
 	
 	union
 	{
@@ -140,7 +140,7 @@ CbSymbol* cb_symbol_get_previous(const CbSymbol* s)
 // -----------------------------------------------------------------------------
 // get scope
 // -----------------------------------------------------------------------------
-const scope_t* cb_symbol_get_scope(const CbSymbol* s)
+const CbScope* cb_symbol_get_scope(const CbSymbol* s)
 {
 	return s->scope;
 }
@@ -164,7 +164,7 @@ void cb_symbol_set_previous(CbSymbol* s, const CbSymbol* previous)
 // -----------------------------------------------------------------------------
 // set scope
 // -----------------------------------------------------------------------------
-void cb_symbol_set_scope(CbSymbol* s, const scope_t* scope)
+void cb_symbol_set_scope(CbSymbol* s, const CbScope* scope)
 {
 	s->scope = scope;
 }

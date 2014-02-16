@@ -1,5 +1,5 @@
 /*******************************************************************************
- * scope_t -- Stores information about the current codeblock execution-scope
+ * CbScope -- Stores information about the current codeblock execution-scope.
  ******************************************************************************/
 
 #ifndef SCOPE_H
@@ -13,13 +13,13 @@ typedef struct
 {
 	char* context;	// scope context -- e.g. function-name
 	int level;		// scope level
-} scope_t;
+} CbScope;
 
 
 // interface functions
-scope_t* scope_create(char* context, int level);
-void scope_free(scope_t* scope);
-bool scope_equals(const scope_t* scope1, const scope_t* scope2);
+CbScope* cb_scope_create(char* context, int level);
+void cb_scope_free(CbScope* scope);
+bool cb_scope_equals(const CbScope* scope1, const CbScope* scope2);
 
 
 #endif // SCOPE_H

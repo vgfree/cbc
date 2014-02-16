@@ -1,5 +1,5 @@
 /*******************************************************************************
- * scope_t -- Stores information about the current codeblock execution-scope
+ * CbScope -- Stores information about the current codeblock execution-scope.
  ******************************************************************************/
 
 #include <stdlib.h>
@@ -14,11 +14,11 @@
 // -----------------------------------------------------------------------------
 // constructor
 // -----------------------------------------------------------------------------
-scope_t* scope_create(char* context, int level)
+CbScope* cb_scope_create(char* context, int level)
 {
-	scope_t* scope	= malloc(sizeof(scope_t));
-	scope->context	= strdup(context);
-	scope->level	= level;
+	CbScope* scope = malloc(sizeof(CbScope));
+	scope->context = strdup(context);
+	scope->level   = level;
 	
 	return scope;
 }
@@ -26,7 +26,7 @@ scope_t* scope_create(char* context, int level)
 // -----------------------------------------------------------------------------
 // destructur
 // -----------------------------------------------------------------------------
-void scope_free(scope_t* scope)
+void cb_scope_free(CbScope* scope)
 {
 	free(scope->context);
 	free(scope);
@@ -35,7 +35,7 @@ void scope_free(scope_t* scope)
 // -----------------------------------------------------------------------------
 // compare scopes
 // -----------------------------------------------------------------------------
-bool scope_equals(const scope_t* scope1, const scope_t* scope2)
+bool cb_scope_equals(const CbScope* scope1, const CbScope* scope2)
 {
 	if (scope1 == NULL || scope2 == NULL)
 		return false;	// if either of the arguments is NULL
