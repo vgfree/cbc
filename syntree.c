@@ -258,7 +258,7 @@ CbValue* cb_syntree_eval(CbSyntree* node, CbSymtab* symtab)
 			funcdecl_t* fndecl = (funcdecl_t*) node;
 			
 			// prepare function-object
-			function_t* func = function_create_user_defined(fndecl->sym_id,
+			CbFunction* func = cb_function_create_user_defined(fndecl->sym_id,
 															fndecl->body);
 			func->params	 = fndecl->params;
 			if (!func->params)
@@ -289,11 +289,11 @@ CbValue* cb_syntree_eval(CbSyntree* node, CbSymtab* symtab)
 		{
 			funccall_t* fncall = (funccall_t*) node;
 			symref_setsymbolfromtable((symref_t*) fncall, symtab);
-			function_t* f = cb_symbol_function_get_function(fncall->table_sym);
+			CbFunction* f = cb_symbol_function_get_function(fncall->table_sym);
 			
-			function_call(f, fncall->args, symtab);
+			cb_function_call(f, fncall->args, symtab);
 			result = cb_value_copy(f->result);
-			function_reset(f);
+			cb_function_reset(f);
 			
 			break;
 		}

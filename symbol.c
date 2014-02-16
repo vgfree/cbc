@@ -25,7 +25,7 @@ struct CbSymbol
 	union
 	{
 		CbValue* value;			// symbol-value, is used if the symbol is a variable
-		function_t* function;	// function, is used if the symbol is a function
+		CbFunction* function;	// function, is used if the symbol is a function
 	};
 };
 
@@ -69,7 +69,7 @@ CbSymbol* cb_symbol_create_variable(char* identifier)
 // -----------------------------------------------------------------------------
 // constructor (function)
 // -----------------------------------------------------------------------------
-CbSymbol* cb_symbol_create_function(char* identifier, function_t* func_object)
+CbSymbol* cb_symbol_create_function(char* identifier, CbFunction* func_object)
 {
 	CbSymbol* s	= symbol_create(identifier);
 	s->type		= SYM_TYPE_FUNCTION;
@@ -92,7 +92,7 @@ void cb_symbol_free(CbSymbol* s)
 			break;
 		
 		case SYM_TYPE_FUNCTION:
-			function_free(s->function);
+			cb_function_free(s->function);
 			break;
 	}
 	
@@ -192,7 +192,7 @@ void cb_symbol_variable_assign_value(CbSymbol* s, const CbValue* new_value)
 // -----------------------------------------------------------------------------
 // get function-object of an function-symbol (functions only!)
 // -----------------------------------------------------------------------------
-function_t* cb_symbol_function_get_function(const CbSymbol* s)
+CbFunction* cb_symbol_function_get_function(const CbSymbol* s)
 {
 	assert(s->type == SYM_TYPE_FUNCTION);
 	

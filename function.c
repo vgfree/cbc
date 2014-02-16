@@ -1,5 +1,5 @@
 /*******************************************************************************
- * function_t -- Implementation of a function-structure
+ * CbFunction -- Implementation of a function-structure.
  ******************************************************************************/
 
 #include <stdio.h>
@@ -20,16 +20,16 @@
 // -----------------------------------------------------------------------------
 // constructor (internal)
 // -----------------------------------------------------------------------------
-function_t* function_create(char* identifier)
+CbFunction* function_create(char* identifier)
 {
-	function_t* f	= (function_t*) malloc(sizeof(function_t));
-	f->id			= strdup(identifier);
-	f->param_count	= 0;
-	f->result		= NULL;
+	CbFunction* f  = (CbFunction*) malloc(sizeof(CbFunction));
+	f->id		   = strdup(identifier);
+	f->param_count = 0;
+	f->result	   = NULL;
 	
-	f->func_ref		= NULL;
-	f->params		= NULL;
-	f->body			= NULL;
+	f->func_ref	   = NULL;
+	f->params	   = NULL;
+	f->body		   = NULL;
 	
 	return f;
 }
@@ -37,31 +37,31 @@ function_t* function_create(char* identifier)
 // -----------------------------------------------------------------------------
 // constructor (builtin function)
 // -----------------------------------------------------------------------------
-function_t* function_create_builtin(char* identifier, int param_count,
+CbFunction* cb_function_create_builtin(char* identifier, int param_count,
 									func_ref_t func_ref)
 {
-	function_t* f	= function_create(identifier);
-	f->type			= FUNC_TYPE_BUILTIN;
-	f->func_ref		= func_ref;
-	f->param_count	= param_count;
+	CbFunction* f  = function_create(identifier);
+	f->type		   = FUNC_TYPE_BUILTIN;
+	f->func_ref	   = func_ref;
+	f->param_count = param_count;
 }
 
 // -----------------------------------------------------------------------------
 // constructor (user-defined function)
 // -----------------------------------------------------------------------------
-function_t* function_create_user_defined(char* identifier, CbSyntree* body)
+CbFunction* cb_function_create_user_defined(char* identifier, CbSyntree* body)
 {
-	function_t* f	= function_create(identifier);
-	f->type			= FUNC_TYPE_USER_DEFINED;
-	f->body			= body;
+	CbFunction* f = function_create(identifier);
+	f->type		  = FUNC_TYPE_USER_DEFINED;
+	f->body		  = body;
 }
 
 // -----------------------------------------------------------------------------
 // destructor
 // -----------------------------------------------------------------------------
-void function_free(function_t* f)
+void cb_function_free(CbFunction* f)
 {
-	function_reset(f);
+	cb_function_reset(f);
 	
 	if (f->id)	// free identifier, if necessary
 		free(f->id);
@@ -72,7 +72,7 @@ void function_free(function_t* f)
 // -----------------------------------------------------------------------------
 // add param to function-definition
 // -----------------------------------------------------------------------------
-void function_addparam(function_t* f, char* param_id)
+void cb_function_add_param(CbFunction* f, char* param_id)
 {
 	assert(param_id);	// anonymus parameters are not allowed!
 	
@@ -89,11 +89,11 @@ void function_addparam(function_t* f, char* param_id)
 // call function
 // if the function has no parameters, pass a NULL-value as arguments.
 // -----------------------------------------------------------------------------
-CbValue* function_call(function_t* f, CbStrlist* args, CbSymtab* symtab)
+CbValue* cb_function_call(CbFunction* f, CbStrlist* args, CbSymtab* symtab)
 {
 	// reset function-result
 	// this is necessary in case the function was already called.
-	function_reset(f);
+	cb_function_reset(f);
 	
 	// determine parameter- and argument-count
 	size_t count_params	= f->param_count;
@@ -120,8 +120,8 @@ CbValue* function_call(function_t* f, CbStrlist* args, CbSymtab* symtab)
 				cb_stack_push(param_stack, curr_param->string); // push param name
 			
 			// obtain argument value
-			CbValue* arg_value = cb_syntree_eval(	((CbSyntree*) curr_arg->data),
-												symtab);
+			CbValue* arg_value = cb_syntree_eval(((CbSyntree*) curr_arg->data),
+												 symtab);
 			// push argument value on the stack
 			cb_stack_push(arg_stack, arg_value);
 			// process next item
@@ -168,7 +168,7 @@ CbValue* function_call(function_t* f, CbStrlist* args, CbSymtab* symtab)
 		f->result = cb_value_copy(cb_symbol_variable_get_value(default_result));
 #else
 		f->result = cb_syntree_eval(f->body, symtab);	// result is the last
-													// expression in the function
+														// expression in the function
 #endif // _CBC_DEFAULT_FUNC_RESULT_SYMBOL
 	}
 	else
@@ -189,7 +189,7 @@ CbValue* function_call(function_t* f, CbStrlist* args, CbSymtab* symtab)
 // -----------------------------------------------------------------------------
 // reset function
 // -----------------------------------------------------------------------------
-void function_reset(function_t* f)
+void cb_function_reset(CbFunction* f)
 {
 	if (f->result)
 	{

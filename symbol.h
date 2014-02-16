@@ -27,7 +27,7 @@ typedef struct CbSymbol CbSymbol;
 
 // interface-functions
 CbSymbol* cb_symbol_create_variable(char* identifier);
-CbSymbol* cb_symbol_create_function(char* identifier, function_t* func_object);
+CbSymbol* cb_symbol_create_function(char* identifier, CbFunction* func_object);
 void cb_symbol_free(CbSymbol* s);
 void cb_symbol_connect(CbSymbol* s1, CbSymbol* s2);
 const char* cb_symbol_get_id(const CbSymbol* s);
@@ -39,7 +39,7 @@ void cb_symbol_set_previous(CbSymbol* s, const CbSymbol* previous);
 void cb_symbol_set_scope(CbSymbol* s, const CbScope* scope);
 const CbValue* cb_symbol_variable_get_value(const CbSymbol* s);
 void cb_symbol_variable_assign_value(CbSymbol* s, const CbValue* new_value);
-function_t* cb_symbol_function_get_function(const CbSymbol* s);
+CbFunction* cb_symbol_function_get_function(const CbSymbol* s);
 
 
 #endif // SYMBOL_H

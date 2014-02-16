@@ -1,5 +1,5 @@
 /*******************************************************************************
- * function_t -- Implementation of a function-structure
+ * CbFunction -- Implementation of a function-structure.
  * 
  *  	This struct stores all information about a function, such as parameters,
  *  	function-code and result.
@@ -16,7 +16,7 @@
 #include "syntree_if.h"
 #include "builtin.h"
 
-enum function_type_t
+enum cb_function_type
 {
 	FUNC_TYPE_BUILTIN,
 	FUNC_TYPE_USER_DEFINED
@@ -25,7 +25,7 @@ enum function_type_t
 // function_t struct
 typedef struct
 {
-	enum function_type_t type;
+	enum cb_function_type type;
 	char* id;			// name of the function
 	int param_count;	// count of expected parameters
 	CbValue* result;	// result of the function after calling it
@@ -40,17 +40,17 @@ typedef struct
 	// TODO:	Implement a state-attribute that indicates whether a function
 	//			was already called.
 	
-} function_t;
+} CbFunction;
 
 
 // interface-functions
-function_t* function_create_builtin(char* identifier, int param_count,
-									func_ref_t func_ref);
-function_t* function_create_user_defined(char* identifier, CbSyntree* body);
-void function_free(function_t* f);
-void function_addparam(function_t* f, char* param_id);
-CbValue* function_call(function_t* f, CbStrlist* args, CbSymtab* symtab);
-void function_reset(function_t* f);
+CbFunction* cb_function_create_builtin(char* identifier, int param_count,
+									   func_ref_t func_ref);
+CbFunction* cb_function_create_user_defined(char* identifier, CbSyntree* body);
+void cb_function_free(CbFunction* f);
+void cb_function_add_param(CbFunction* f, char* param_id);
+CbValue* cb_function_call(CbFunction* f, CbStrlist* args, CbSymtab* symtab);
+void cb_function_reset(CbFunction* f);
 
 
 #endif // FUNCTION_H
