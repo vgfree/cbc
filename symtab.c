@@ -126,28 +126,6 @@ void cb_symtab_remove(CbSymtab* st, const char* id)
 }
 
 // -----------------------------------------------------------------------------
-// Dispatch all symbols in the symbol-table (TODO)
-// -----------------------------------------------------------------------------
-void symtab_dispatch_all(CbSymtab* st)
-{
-	//~ // TODO: Move at the beginning of table
-	
-	//~ while (st->size > 0)
-	//~ {
-		//~ symtab_next(st);
-		//~ symbol_free(st->current);
-	//~ }
-}
-
-// -----------------------------------------------------------------------------
-// Remove all symbols in the symbol-table (TODO)
-// -----------------------------------------------------------------------------
-void symtab_clear(CbSymtab* st)
-{
-	// TODO
-}
-
-// -----------------------------------------------------------------------------
 // Lookup a symbol by id
 // -----------------------------------------------------------------------------
 symbol_t* cb_symtab_lookup(CbSymtab* st, const char* id)

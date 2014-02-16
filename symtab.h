@@ -31,8 +31,6 @@ void cb_symtab_free(CbSymtab* st);
 symbol_t* cb_symtab_append(CbSymtab* st, symbol_t* s);
 symbol_t* cb_symtab_dispatch(CbSymtab* st, const char* id);
 void cb_symtab_remove(CbSymtab* st, const char* id);
-void symtab_dispatch_all(CbSymtab* st);
-void symtab_clear(CbSymtab* st);
 symbol_t* cb_symtab_lookup(CbSymtab* st, const char* id);
 symbol_t* cb_symtab_next(CbSymtab* st);
 symbol_t* cb_symtab_current(CbSymtab* st);
