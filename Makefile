@@ -14,24 +14,20 @@ INC_PARSER		:= $(PARSER:%.c=%.h)
 SRC				:= 	$(LEXER) $(PARSER) \
 					codeblock.c symbol.c symtab.c function.c value.c strlist.c \
 					syntree.c symref.c funccall.c funcdecl.c scope.c stack.c \
-					builtin.c cblib.c
+					builtin.c cblib.c cbgui.c
 OBJ				:= $(SRC:%.c=%.o)
 
 SRC_CBC			:= main.c $(SRC)
 OBJ_CBC			:= $(SRC_CBC:%.c=%.o)
 
-CFLAGS			:=	-g \
-					-D _CBC_DEBUG \
-					-D _CBC_NOLOG \
+CFLAGS_COMMON	:=	-D _CBC_NOLOG \
 					-D _CBC_DEFAULT_FUNC_RESULT_SYMBOL
 ifeq ($(OS), Windows_NT)
-CFLAGS			:= $(CFLAGS) -D _CBC_PLAT_WNDSS
+CFLAGS_COMMON	:= $(CFLAGS_COMMON) -D _CBC_PLAT_WNDS
 endif
-CFLAGS_RELEASE	:=	-D _CBC_TRACK_EXECUTION_TIME \
-					-D _CBC_DEFAULT_FUNC_RESULT_SYMBOL
-ifeq ($(OS), Windows_NT)
-CFLAGS_RELEASE	:= $(CFLAGS_RELEASE) -D _CBC_PLAT_WNDS
-endif
+
+CFLAGS			:=	-g -D _CBC_DEBUG $(CFLAGS_COMMON)
+CFLAGS_RELEASE	:=	-D _CBC_TRACK_EXECUTION_TIME $(CFLAGS_COMMON)
 LDFLAGS			:= 
 
 LEX				:= flex
