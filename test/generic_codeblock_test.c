@@ -79,7 +79,6 @@ const CbValue expected_results[] = {
 static void test_codeblock_file(CuTest *tc, const char* test_file_name,
 								const CbValue* expected_result)
 {
-	extern FILE* yyin;
 	FILE* test_file = fopen(test_file_name, "r");
 	if (!test_file)
 	{
@@ -87,12 +86,9 @@ static void test_codeblock_file(CuTest *tc, const char* test_file_name,
 		CuAssertTrue(tc, false);
 	}
 	
-	yyin = test_file;
-	
 	Codeblock* cb = codeblock_create();
+	codeblock_parse_file(cb, test_file);
 	
-	yyparse(&cb->ast);
-	yylex_destroy();
 	fclose(test_file);
 	
 	codeblock_execute(cb);
@@ -120,7 +116,6 @@ static void test_codeblock_file(CuTest *tc, const char* test_file_name,
 			break;
 	}
 	
-	cb_syntree_free(cb->ast);
 	codeblock_free(cb);
 }
 

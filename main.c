@@ -1,22 +1,17 @@
 /*******************************************************************************
  * main -- Running the parser and executing the abstract syntax tree.
  *         Also checking command line arguments:
- *           - If a file-name was passed, the file will be parsed and executed
+ *           - if a file-name was passed, the file will be parsed and executed
  *           - if no argument was passed, stdin will be parsed and executed
  * 
  *         Used macros:
- *           - _CBC_TRACK_EXECUTION_TIME: Determines whether to print the run-
- *                                        time of the interpreter.
+ *           - _CBC_TRACK_EXECUTION_TIME: Determines whether to print the 
+ *                                        execution run-time.
  ******************************************************************************/
-
-#ifdef _CBC_TRACK_EXECUTION_TIME
-#include <time.h>
-#endif // _CBC_TRACK_EXECUTION_TIME
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include "cbc_parse.h"
 #include "value.h"
 #include "codeblock.h"
 #include "symtab.h"
@@ -27,53 +22,36 @@
 // -----------------------------------------------------------------------------
 int main(int argc, char* argv[])
 {
-	extern FILE* yyin;
 	bool parse_file = argc > 1;	// determine whether to parse a file
+	FILE* input		= NULL;
 	
 	if (parse_file)
 	{
-		FILE* input = fopen(argv[1], "r");
+		input = fopen(argv[1], "r");
 		if (!input)
 		{
-			printf("Error: Unable to open file `%s'!\n", argv[1]);
+			fprintf(stderr, "Error: Unable to open file `%s'!\n", argv[1]);
 			exit(EXIT_FAILURE);
 		}
-		
-		yyin = input;
 	}
 
-	Codeblock* cb = codeblock_create();
+	Codeblock* cb	  = codeblock_create();
+	int parser_result = codeblock_parse_file(cb, input);
 	
-	yyparse(&cb->ast);	// parse codeblock-code
+	if (parse_file)		// if a file was parsed
+		fclose(input);	// -> close file stream
 	
-	if (parse_file)		// if parsed stream is not stdin
-		fclose(yyin);	// -> close file stream
-	
-	// cleanup lexer
-	yylex_destroy();
-	
+	if (parser_result == EXIT_SUCCESS)
+	{
+		codeblock_execute(cb);		// execute ...
+		cb_value_print(cb->result);	// and print result
+		
 #ifdef _CBC_TRACK_EXECUTION_TIME
-	clock_t begin;
-	begin = clock();
+		printf("\nExecution duration: %f seconds", cb->duration);
 #endif // _CBC_TRACK_EXECUTION_TIME
+	}
 	
-	codeblock_execute(cb);		// execute ...
-	
-#ifdef _CBC_TRACK_EXECUTION_TIME
-	clock_t end;
-	end = clock();
-	float diff = ((float) end - (float) begin);
-#endif // _CBC_TRACK_EXECUTION_TIME
-	
-	cb_value_print(cb->result);	// and print result
-	
-#ifdef _CBC_TRACK_EXECUTION_TIME
-	printf("\nExecution duration: %f seconds", diff / CLOCKS_PER_SEC);
-#endif // _CBC_TRACK_EXECUTION_TIME
-	
-	// cleanup
-	cb_syntree_free(cb->ast);
-	codeblock_free(cb);
+	codeblock_free(cb);	// cleanup
 	
 	return 0;
 }

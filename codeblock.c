@@ -4,8 +4,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include <assert.h>
 #include "codeblock.h"
+#include "cbc_lex.h"
+#include "cbc_parse.h"
 #include "syntree.h"
 #include "builtin.h"
 
@@ -14,7 +17,9 @@
 // declarations
 // #############################################################################
 
-void codeblock_reset(Codeblock* cb);
+static void codeblock_reset(Codeblock* cb);
+static void codeblock_reset_result(Codeblock* cb);
+static int codeblock_parse_internal(Codeblock* cb);
 
 
 // #############################################################################
@@ -27,7 +32,7 @@ void codeblock_reset(Codeblock* cb);
 Codeblock* codeblock_create()
 {
 	Codeblock* cb = (Codeblock*) malloc(sizeof(Codeblock));
-	cb->symtab	  = cb_symtab_create();
+	cb->symtab	  = NULL;
 	cb->ast		  = NULL;
 	cb->result	  = NULL;
 	
@@ -40,9 +45,47 @@ Codeblock* codeblock_create()
 void codeblock_free(Codeblock* cb)
 {
 	codeblock_reset(cb);
-	cb_symtab_free(cb->symtab);
+	codeblock_reset_result(cb);
 	
 	free(cb);
+}
+
+// -----------------------------------------------------------------------------
+// parse a file stream
+// -----------------------------------------------------------------------------
+int codeblock_parse_file(Codeblock* cb, FILE* input)
+{
+	extern FILE* yyin;
+	int result = EXIT_SUCCESS;
+	
+	if (input)	// determine input stream
+		yyin = input;
+	else
+		yyin = stdin;
+	
+	result = codeblock_parse_internal(cb);
+	
+	yylex_destroy();	// cleanup lexer
+	
+	return result;
+}
+
+// -----------------------------------------------------------------------------
+// parse a string
+// -----------------------------------------------------------------------------
+int codeblock_parse_string(Codeblock* cb, const char* string)
+{
+	int result = EXIT_SUCCESS;
+	
+	YY_BUFFER_STATE buffer_state = yy_scan_string(string);
+	result = codeblock_parse_internal(cb);
+	
+	// cleanup
+	// NOTE: Delete the buffer BEFORE calling yylex_destroy() !
+	yy_delete_buffer(buffer_state);
+	yylex_destroy();
+	
+	return result;
 }
 
 // -----------------------------------------------------------------------------
@@ -51,23 +94,21 @@ void codeblock_free(Codeblock* cb)
 CbValue* codeblock_execute(Codeblock* cb)
 {
 	assert(cb->symtab);
+	assert(cb->ast);
 	
-	if (!cb->ast)
-	{
-		fprintf(stderr, "Error: Empty codeblock is not allowed!\n");
-		exit(EXIT_FAILURE);
-	}
-	
-	// reset codeblock-result
-	// this is necessary in case the codeblock was already executed and prduced
-	// a result.
-	codeblock_reset(cb);
+	cb->duration = 0;
+	codeblock_reset_result(cb);
 	
 	// register builtin symbols
 	register_builtin_all(cb->symtab);
 	
+	clock_t begin = clock();	// begin execution
+	
 	// execute codeblock
 	cb->result = cb_syntree_eval(cb->ast, cb->symtab);
+	
+	clock_t end  = clock();		// end execution
+	cb->duration = ((double) end - (double) begin) / CLOCKS_PER_SEC;
 	
 	return cb->result;
 }
@@ -80,11 +121,59 @@ CbValue* codeblock_execute(Codeblock* cb)
 // -----------------------------------------------------------------------------
 // reset codeblock (internal)
 // -----------------------------------------------------------------------------
-void codeblock_reset(Codeblock* cb)
+static void codeblock_reset(Codeblock* cb)
+{
+	if (cb->ast)
+	{
+		cb_syntree_free(cb->ast);
+		cb->ast = NULL;
+	}
+	
+	if (cb->symtab)
+	{
+		cb_symtab_free(cb->symtab);
+		cb->symtab = NULL;
+	}
+}
+
+// -----------------------------------------------------------------------------
+// reset codeblock result (internal)
+// -----------------------------------------------------------------------------
+static void codeblock_reset_result(Codeblock* cb)
 {
 	if (cb->result)
 	{
 		cb_value_free(cb->result);
 		cb->result = NULL;
 	}
+}
+
+// -----------------------------------------------------------------------------
+// parse codeblock (internal)
+// -----------------------------------------------------------------------------
+static int codeblock_parse_internal(Codeblock* cb)
+{
+	int result = EXIT_SUCCESS;
+	
+	// reset codeblock, this is necessary in case the codeblock was already
+	// parsed or executed before.
+	codeblock_reset(cb);
+	
+	// recreate symbol table
+	cb->symtab = cb_symtab_create();
+	
+	switch (yyparse(&cb->ast))
+	{
+		case 1:
+			fprintf(stderr, "Error: Parsing failed due to invalid input.\n");
+			result = EXIT_FAILURE;
+			break;
+		
+		case 2:
+			fprintf(stderr, "Error: Parsing failed due to memory exhaustion.\n");
+			result = EXIT_FAILURE;
+			break;
+	}
+	
+	return result;
 }

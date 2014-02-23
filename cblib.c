@@ -6,8 +6,6 @@
 #include <string.h>
 #include <assert.h>
 #include "cblib.h"
-#include "cbc_lex.h"
-#include "cbc_parse.h"
 #include "codeblock.h"
 
 
@@ -118,21 +116,17 @@ CbValue* bif_eval(CbStack* arg_stack)
 	
 	assert(cb_value_is_type(arg, VT_STRING));
 	
-	// Create codeblock environment
 	Codeblock* cb = codeblock_create();
 	
-	// Process codeblock
-	YY_BUFFER_STATE buffer_state = yy_scan_string(arg->string);
-	yyparse(&cb->ast);
-	yy_delete_buffer(buffer_state);
-	yylex_destroy();
+	// Parse codeblock string
+	codeblock_parse_string(cb, arg->string);
 	cb_value_free(arg);
 	
-	codeblock_execute(cb);	// Execute codeblock
+	// Execute codeblock
+	codeblock_execute(cb);
 	
 	CbValue* result = cb_value_copy(cb->result);
 	
-	cb_syntree_free(cb->ast);
 	codeblock_free(cb);
 	
 	return result;

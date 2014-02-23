@@ -9,6 +9,7 @@
 #define CODEBLOCK_H
 
 
+#include <stdio.h>
 #include "symtab.h"
 #include "syntree_if.h"
 #include "value.h"
@@ -18,12 +19,15 @@ typedef struct
 	CbSymtab* symtab;	// reference to the global symbol-table
 	CbSyntree* ast;		// abstract syntax-tree -- the code to execute
 	CbValue* result;	// the result, after executing the codeblock
+	double duration;	// execution duration
 } Codeblock;
 
 
 // interface-functions
 Codeblock* codeblock_create();
 void codeblock_free(Codeblock* cb);
+int codeblock_parse_file(Codeblock* cb, FILE* input);
+int codeblock_parse_string(Codeblock* cb, const char* string);
 CbValue* codeblock_execute(Codeblock* cb);
 
 

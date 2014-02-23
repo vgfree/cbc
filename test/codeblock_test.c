@@ -20,8 +20,9 @@
 // -----------------------------------------------------------------------------
 void test_codeblock_execute(CuTest *tc)
 {
-	Codeblock* cb		= codeblock_create();
-	cb->ast				= cb_conststr_create("test");
+	Codeblock* cb = codeblock_create();
+	cb->ast		  = cb_conststr_create("test");
+	cb->symtab	  = cb_symtab_create();
 	
 	codeblock_execute(cb);	// execute codeblock once
 	
@@ -33,7 +34,6 @@ void test_codeblock_execute(CuTest *tc)
 	CuAssertIntEquals(tc, VT_STRING,cb->result->type);
 	CuAssertStrEquals(tc, "test",	cb->result->string);
 	
-	cb_syntree_free(cb->ast);
 	codeblock_free(cb);
 }
 
@@ -87,12 +87,13 @@ void test_codeblock_execute_complex(CuTest *tc)
 								)
 							);
 	
+	cb->symtab = cb_symtab_create();
+	
 	codeblock_execute(cb);	// execute codeblock once
 	
 	CuAssertIntEquals(tc, VT_STRING,	cb->result->type);
 	CuAssertStrEquals(tc, "foo is 100",	cb->result->string);
 	
-	cb_syntree_free(cb->ast);
 	codeblock_free(cb);
 }
 
