@@ -13,7 +13,7 @@
 #define _CBC_LOG_FILENAME "cbc.log"
 #endif // _CBC_NOLOG
 
-void yyerror(const char* format, ...);
+void yyerror(void* param, const char* format, ...);
 
 %}
 
@@ -106,7 +106,7 @@ void yyerror(const char* format, ...);
 [ \t\n]+	{ ; }	// ignore
 			
 			/* anything else */
-.			{ yyerror("unexpected character `%c'.", *yytext); }
+.			{ yyerror(NULL, "Unexpected character `%c'.", *yytext); }
 
 
 %%	/* ROUTINES ------------------------------------------------------------- */
@@ -122,7 +122,7 @@ int yywrap(void)
 // -----------------------------------------------------------------------------
 void fyyerror(FILE* fd, const char* format, va_list* args)
 {
-	fprintf(fd, "%d: error: ", yylineno);
+	fprintf(fd, "%d: Error: ", yylineno);
 	vfprintf(fd, format, *args);
 	fprintf(fd, "\n");
 }
@@ -130,7 +130,7 @@ void fyyerror(FILE* fd, const char* format, va_list* args)
 // -----------------------------------------------------------------------------
 // general error output
 // -----------------------------------------------------------------------------
-void yyerror(const char* format, ...)
+void yyerror(void* param, const char* format, ...)
 {
 	va_list arglist;
 	va_start(arglist, format);

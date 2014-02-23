@@ -41,6 +41,7 @@
 
 /* Output parameter: Abstract syntax tree of the parsed codeblock */
 %parse-param {CbSyntree** result_tree}
+%error-verbose
 
 %%	/* RULES ---------------------------------------------------------------- */
 
