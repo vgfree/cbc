@@ -9,6 +9,9 @@
 #include "strlist.h"
 #include "error_handling.h"
 
+extern int yychar;
+const char* yy_get_token_string(int* token_id);
+
 }
 
 %union {
@@ -184,3 +187,13 @@ expr:
 
 
 %%	/* ROUTINES ------------------------------------------------------------- */
+
+
+// -----------------------------------------------------------------------------
+// This simple hack allows functions - that are not located in this file - to
+// access the token names as string by its token id.
+// -----------------------------------------------------------------------------
+const char* yy_get_token_string(int* token_id)
+{
+	return yytname[YYTRANSLATE(*token_id)];
+}

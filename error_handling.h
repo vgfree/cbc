@@ -1,5 +1,6 @@
 /*******************************************************************************
- * error_handling -- Error handling utilities.
+ * error_handling -- Collection of error handling utilities.
+ *                   This also includes the yyerror()-function for flex & bison.
  ******************************************************************************/
 
 #ifndef ERROR_HANDLING_H

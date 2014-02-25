@@ -1,5 +1,11 @@
 /*******************************************************************************
- * error_handling -- Error handling utilities.
+ * error_handling -- Collection of error handling utilities.
+ *                   This also includes the yyerror()-function for flex & bison.
+ * 
+ *    Used macros:
+ *      - _CBC_USE_CUSTOM_YYERROR_MESSAGE:
+ *            Enables custom parser and syntax error messages.
+ *            If this is not set, standard bison error messages will be used.
  ******************************************************************************/
 
 #include <stdlib.h>
@@ -33,6 +39,12 @@ void yyerror(void* param, const char* format, ...)
 {
 	extern int yylineno;
 	
+#ifdef _CBC_USE_CUSTOM_YYERROR_MESSAGE
+	#include "cbc_parse.h"	// this is necessary for yy_get_token_string() !
+	
+	cb_print_error(CB_ERR_SYNTAX, yylineno, "Unexpected token %s",
+				   yy_get_token_string(&yychar));
+#else
 	// allocate base buffer
 	size_t base_len = strlen(format) + 1;
 	char* buffer = (char*) malloc(base_len);
@@ -54,6 +66,7 @@ void yyerror(void* param, const char* format, ...)
 	free(buffer);	// always free the allocated buffer
 	
 	va_end(arglist);
+#endif // _CBC_USE_CUSTOM_YYERROR_MESSAGE
 }
 
 
