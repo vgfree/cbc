@@ -15,6 +15,7 @@
 #include "value.h"
 #include "codeblock.h"
 #include "symtab.h"
+#include "error_handling.h"
 
 
 // -----------------------------------------------------------------------------
@@ -30,7 +31,7 @@ int main(int argc, char* argv[])
 		input = fopen(argv[1], "r");
 		if (!input)
 		{
-			fprintf(stderr, "Error: Unable to open file `%s'!\n", argv[1]);
+			cb_print_error_msg("Error: Unable to open file `%s'!\n", argv[1]);
 			exit(EXIT_FAILURE);
 		}
 	}

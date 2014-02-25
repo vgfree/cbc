@@ -9,12 +9,6 @@
 #include <stdarg.h>
 #include "cbc_parse.h"
 
-#ifndef _CBC_NOLOG
-#define _CBC_LOG_FILENAME "cbc.log"
-#endif // _CBC_NOLOG
-
-void yyerror(void* param, const char* format, ...);
-
 %}
 
 
@@ -115,34 +109,4 @@ void yyerror(void* param, const char* format, ...);
 int yywrap(void)
 {
 	return 1;
-}
-
-// -----------------------------------------------------------------------------
-// write error message to file (internal)
-// -----------------------------------------------------------------------------
-void fyyerror(FILE* fd, const char* format, va_list* args)
-{
-	fprintf(fd, "%d: Error: ", yylineno);
-	vfprintf(fd, format, *args);
-	fprintf(fd, "\n");
-}
-
-// -----------------------------------------------------------------------------
-// general error output
-// -----------------------------------------------------------------------------
-void yyerror(void* param, const char* format, ...)
-{
-	va_list arglist;
-	va_start(arglist, format);
-#ifdef _CBC_DEBUG
-	// actual output to stderr
-	fyyerror(stderr, format, &arglist);
-#endif // _CBC_DEBUG
-#ifndef _CBC_NOLOG
-	// log to file
-	FILE* log_file = fopen(_CBC_LOG_FILENAME, "a+");
-	fyyerror(log_file, format, &arglist);
-	fclose(log_file);
-#endif // _CBC_NOLOG
-	va_end(arglist);
 }

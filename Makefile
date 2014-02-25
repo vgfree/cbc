@@ -14,14 +14,13 @@ INC_PARSER		:= $(PARSER:%.c=%.h)
 SRC				:= 	$(LEXER) $(PARSER) \
 					codeblock.c symbol.c symtab.c function.c value.c strlist.c \
 					syntree.c symref.c funccall.c funcdecl.c scope.c stack.c \
-					builtin.c cblib.c cbgui.c
+					builtin.c cblib.c cbgui.c error_handling.c
 OBJ				:= $(SRC:%.c=%.o)
 
 SRC_CBC			:= main.c $(SRC)
 OBJ_CBC			:= $(SRC_CBC:%.c=%.o)
 
-CFLAGS_COMMON	:=	-D _CBC_NOLOG \
-					-D _CBC_DEFAULT_FUNC_RESULT_SYMBOL
+CFLAGS_COMMON	:=	-D _CBC_DEFAULT_FUNC_RESULT_SYMBOL
 ifeq ($(OS), Windows_NT)
 CFLAGS_COMMON	:= $(CFLAGS_COMMON) -D _CBC_PLAT_WNDS
 endif

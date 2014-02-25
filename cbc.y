@@ -7,6 +7,7 @@
 #include "funccall.h"
 #include "funcdecl.h"
 #include "strlist.h"
+#include "error_handling.h"
 
 }
 
