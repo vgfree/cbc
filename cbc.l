@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include "cbc_parse.h"
+#include "error_handling.h"
 
 %}
 
@@ -100,7 +101,10 @@
 [ \t\n]+	{ ; }	// ignore
 			
 			/* anything else */
-.			{ yyerror(NULL, "Unexpected character `%c'.", *yytext); }
+.			{
+				yyerror((void*) CB_YYERROR_CC_FLEX,
+						"Unexpected character `%c'.", *yytext);
+			}
 
 
 %%	/* ROUTINES ------------------------------------------------------------- */

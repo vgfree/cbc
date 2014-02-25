@@ -21,9 +21,15 @@ typedef enum cb_error_code
 	CB_ERR_CODE_NOERROR
 } cb_error_code;
 
+typedef enum cb_yyerror_call_context
+{
+	CB_YYERROR_CC_BISON = 0,
+	CB_YYERROR_CC_FLEX
+} cb_yyerror_call_context;
+
 
 // interface functions for flex & bison
-void yyerror(void* param, const char* format, ...);
+void yyerror(void* call_context, const char* format, ...);
 
 // interface functions
 void cb_print_error(enum cb_error_type type, int line, const char* message, ...);
