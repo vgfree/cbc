@@ -31,7 +31,7 @@ int main(int argc, char* argv[])
 		input = fopen(argv[1], "r");
 		if (!input)
 		{
-			cb_print_error_msg("Error: Unable to open file `%s'!\n", argv[1]);
+			cb_print_error_msg("Unable to open file `%s'!\n", argv[1]);
 			exit(EXIT_FAILURE);
 		}
 	}
