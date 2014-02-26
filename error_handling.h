@@ -32,7 +32,7 @@ typedef enum cb_yyerror_call_context
 void yyerror(void* call_context, const char* format, ...);
 
 // interface functions
-void cb_print_error(enum cb_error_type type, int line, const char* message, ...);
+void cb_print_error(cb_error_type type, int line, const char* message, ...);
 void cb_print_error_msg(const char* format, ...);
 void cb_set_error_output(FILE* error_ouput);
 

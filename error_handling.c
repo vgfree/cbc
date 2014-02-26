@@ -98,7 +98,7 @@ void yyerror(void* call_context, const char* format, ...)
 // -----------------------------------------------------------------------------
 // Print error message and specific error information
 // -----------------------------------------------------------------------------
-void cb_print_error(enum cb_error_type type, int line, const char* format, ...)
+void cb_print_error(cb_error_type type, int line, const char* format, ...)
 {
 	cb_appropriately_set_default_error_output_internal();
 	
