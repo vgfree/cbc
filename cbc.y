@@ -10,6 +10,7 @@
 #include "error_handling.h"
 
 extern int yychar;
+extern int yylineno;
 const char* yy_get_token_string(int* token_id);
 
 }
@@ -62,6 +63,7 @@ decllist:
 	| decl ',' decllist			{
 									$$ = cb_syntree_create(SNT_STATEMENTLIST,
 														   $1, $3);
+									$$->line_no = yylineno;
 								}
 	;
 
@@ -83,9 +85,11 @@ paramlist:
 
 decl:
 	IDENTIFIER					{
-									$$ = cb_syntree_create(SNT_DECLARATION,
-														   cb_symref_create($1),
+									CbSyntree* sr = cb_symref_create($1);
+									sr->line_no   = yylineno;
+									$$ = cb_syntree_create(SNT_DECLARATION, sr,
 														   NULL);
+									$$->line_no = yylineno;
 									free($1);	// free duplicated string
 								}
 	;
@@ -95,15 +99,21 @@ stmtlist:
 									if ($4 == NULL)
 										$$ = $2;
 									else
+									{
 										$$ = cb_syntree_create(SNT_STATEMENTLIST,
 															   $2, $4);
+										$$->line_no = yylineno;
+									}
 								}
 	| stmt ',' stmtlist			{
 									if ($3 == NULL)
 										$$ = $1;
 									else
+									{
 										$$ = cb_syntree_create(SNT_STATEMENTLIST,
 															   $1, $3);
+										$$->line_no = yylineno;
+									}
 								}
 	|							{ $$ = NULL; }
 	;
@@ -113,21 +123,30 @@ stmt:
 	| IF expr THEN stmtlist ENDIF {
 									$$ = cb_flow_create(SNT_FLOW_IF, $2, $4,
 														NULL);
+									$$->line_no = yylineno;
 								}
 	| IF expr THEN stmtlist ELSE stmtlist ENDIF {
 									$$ = cb_flow_create(SNT_FLOW_IF, $2, $4, $6);
+									$$->line_no = yylineno;
 								}
 	| WHILE expr DO stmtlist END {
 									$$ = cb_flow_create(SNT_FLOW_WHILE, $2, $4,
 														NULL);
+									$$->line_no = yylineno;
 								}
 	|	FUNCTION IDENTIFIER '(' params ')'
 			stmtlist
 		END						{
 									$$ = cb_funcdecl_create($2, $6, $4);
+									$$->line_no = yylineno;
 									free($2);	// free duplicated string
 								}
-	| PRINT expr				{ $$ = cb_syntree_create(SNT_PRINT, $2, NULL); }
+	| PRINT expr				{
+									// TODO: THE PRINT COMMAND IS OBSOLETE
+									//       -> REMOVE IT FROM SYNTAX
+									$$ = cb_syntree_create(SNT_PRINT, $2, NULL);
+									$$->line_no = yylineno;
+								}
 	;
 
 args:
@@ -154,34 +173,62 @@ exprlist:
 	;
 
 expr:
-	NUMBER						{ $$ = cb_constval_create($1); }
-	| BOOLEAN					{ $$ = cb_constbool_create($1); }
+	NUMBER						{
+									$$ = cb_constval_create($1);
+									$$->line_no = yylineno;
+								}
+	| BOOLEAN					{
+									$$ = cb_constbool_create($1);
+									$$->line_no = yylineno;
+								}
 	| STRING					{
 									$$ = cb_conststr_create($1);
+									$$->line_no = yylineno;
 									free($1);
 								}
 	| IDENTIFIER				{
 									$$ = cb_symref_create($1);
+									$$->line_no = yylineno;
 									free($1);	// free duplicated string
 								}
 	| IDENTIFIER '(' args ')'	{
 									$$ = cb_funccall_create($1, $3);
+									$$->line_no = yylineno;
 									free($1);	// free duplicated string
 								}
 	| IDENTIFIER ASSIGN expr	{
-									$$ = cb_syntree_create(SNT_ASSIGNMENT,
-														   cb_symref_create($1), $3);
+									CbSyntree* sr = cb_symref_create($1);
+									sr->line_no   = yylineno;
+									$$ = cb_syntree_create(SNT_ASSIGNMENT, sr,
+														   $3);
+									$$->line_no = yylineno;
 									free($1);	// free duplicated string
 								}
-	| expr '+' expr				{ $$ = cb_syntree_create('+', $1, $3); }
-	| expr '-' expr				{ $$ = cb_syntree_create('-', $1, $3); }
-	| expr '*' expr				{ $$ = cb_syntree_create('*', $1, $3); }
-	| expr '/' expr				{ $$ = cb_syntree_create('/', $1, $3); }
-	| expr COMPARE expr			{ $$ = cb_comparison_create($2, $1, $3); }
+	| expr '+' expr				{
+									$$ = cb_syntree_create('+', $1, $3);
+									$$->line_no = yylineno;
+								}
+	| expr '-' expr				{
+									$$ = cb_syntree_create('-', $1, $3);
+									$$->line_no = yylineno;
+								}
+	| expr '*' expr				{
+									$$ = cb_syntree_create('*', $1, $3);
+									$$->line_no = yylineno;
+								}
+	| expr '/' expr				{
+									$$ = cb_syntree_create('/', $1, $3);
+									$$->line_no = yylineno;
+								}
+	| expr COMPARE expr			{
+									$$ = cb_comparison_create($2, $1, $3);
+									$$->line_no = yylineno;
+								}
 	| '(' expr ')'				{ $$ = $2; }
 	| '-' expr					{
 									$$ = cb_syntree_create(SNT_UNARYMINUS, $2,
 														   NULL);
+									$$->line_no = yylineno;
 								}
 	;
 

@@ -23,6 +23,7 @@ CbSyntree* cb_funcdecl_create(char* identifier, CbSyntree* body,
 {
 	CbFuncDeclarationNode* node = malloc(sizeof(CbFuncDeclarationNode));
 	node->type	 = SNT_FUNC_DECL;
+	node->line_no= 0;
 	node->sym_id = strdup(identifier);
 	node->body	 = body;
 	node->params = params;

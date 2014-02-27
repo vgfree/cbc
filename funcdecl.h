@@ -20,6 +20,7 @@
 typedef struct
 {
 	enum cb_syntree_node_type type;	// node-type is SNT_FUNC_DECL
+	int line_no;					// line number
 	char* sym_id;					// function-identifier
 	CbSyntree* body;				// contains the code of the function
 	CbStrlist* params;				// formal parameters

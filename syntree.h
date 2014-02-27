@@ -14,6 +14,7 @@
 struct syntree_node
 {
 	enum cb_syntree_node_type type;	// type of the node
+	int line_no;					// line number in the source file/stream
 	CbSyntree* l;					// left tree-node
 	CbSyntree* r;					// right tree-node
 };
@@ -22,6 +23,7 @@ struct syntree_node
 struct constval_node
 {
 	enum cb_syntree_node_type type;	// node-type is SNT_CONSTVAL
+	int line_no;					// line number
 	CbValue* value;					// value
 };
 
@@ -30,6 +32,7 @@ struct flow_node
 {
 	enum cb_syntree_node_type type;	// node-type is either SNT_FLOW_IF or
 									// SNT_FLOW_WHILE
+	int line_no;					// line number
 	CbSyntree* cond;				// condition
 	CbSyntree* tb;					// true-branch
 	CbSyntree* fb;					// false-branch
@@ -39,6 +42,7 @@ struct flow_node
 struct comparison_node
 {
 	enum cb_syntree_node_type type;		// node-type is SNT_COMPARISON
+	int line_no;						// line number
 	enum cb_comparison_type cmp_type;	// comparison-type
 	CbSyntree* l;						// left tree-node
 	CbSyntree* r;						// right tree-node

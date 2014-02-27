@@ -22,6 +22,7 @@ CbSyntree* cb_symref_create(char* identifier)
 {
 	CbSymref* node	= malloc(sizeof(CbSymref));
 	node->type		= SNT_SYMREF;
+	node->line_no	= 0;
 	node->sym_id	= strdup(identifier);
 	node->table_sym	= NULL;
 	

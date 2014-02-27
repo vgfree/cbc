@@ -17,8 +17,9 @@
 typedef struct
 {
 	enum cb_syntree_node_type type;	// node-type is SNT_SYMREF
-	char* sym_id;				// symbol identifier
-	CbSymbol* table_sym;		// reference to the instance in the symbol-table
+	int line_no;					// line number
+	char* sym_id;					// symbol identifier
+	CbSymbol* table_sym;			// reference to the instance in the symbol-table
 } CbSymref;
 
 

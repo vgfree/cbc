@@ -25,6 +25,7 @@ CbSyntree* cb_syntree_create(enum cb_syntree_node_type type,
 {
 	CbSyntree* node	= malloc(sizeof(CbSyntree));
 	node->type		= type;
+	node->line_no	= 0;
 	node->l			= left_node;
 	node->r			= right_node;
 	
@@ -38,6 +39,7 @@ CbSyntree* cb_constval_create(CbNumeric value)
 {
 	CbConstvalNode* node = malloc(sizeof(CbConstvalNode));
 	node->type			 = SNT_CONSTVAL;
+	node->line_no		 = 0;
 	node->value			 = cb_numeric_create(value);
 	
 	return (CbSyntree*) node;
@@ -50,6 +52,7 @@ CbSyntree* cb_conststr_create(CbString string)
 {
 	CbConstvalNode* node = malloc(sizeof(CbConstvalNode));
 	node->type			 = SNT_CONSTSTR;
+	node->line_no		 = 0;
 	node->value			 = cb_string_create(strdup(string));
 	
 	return (CbSyntree*) node;
@@ -62,6 +65,7 @@ CbSyntree* cb_constbool_create(CbBoolean boolean)
 {
 	CbConstvalNode* node = malloc(sizeof(CbConstvalNode));
 	node->type			 = SNT_CONSTBOOL;
+	node->line_no		 = 0;
 	node->value			 = cb_boolean_create(boolean);
 	
 	return (CbSyntree*) node;
@@ -73,6 +77,8 @@ CbSyntree* cb_constbool_create(CbBoolean boolean)
 CbSyntree* cb_flow_create(enum cb_syntree_node_type type, CbSyntree* condition,
 						  CbSyntree* then_branch, CbSyntree* else_branch)
 {
+	// TODO: REPLACE THE FOLLOWING CHECK WIHT AN ASSERT
+	
 	// check if passed type is valid for this node
 	if (type != SNT_FLOW_IF && type != SNT_FLOW_WHILE)
 	{
@@ -83,6 +89,7 @@ CbSyntree* cb_flow_create(enum cb_syntree_node_type type, CbSyntree* condition,
 	
 	CbFlowNode* node = malloc(sizeof(CbFlowNode));
 	node->type		 = type;
+	node->line_no	 = 0;
 	node->cond		 = condition;
 	node->tb		 = then_branch;
 	node->fb		 = else_branch;
@@ -98,6 +105,7 @@ CbSyntree* cb_comparison_create(enum cb_comparison_type type,
 {
 	CbComparisonNode* node = malloc(sizeof(CbComparisonNode));
 	node->type			   = SNT_COMPARISON;
+	node->line_no		   = 0;
 	node->cmp_type		   = type;
 	node->l				   = left_node;
 	node->r				   = right_node;
