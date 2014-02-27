@@ -8,7 +8,7 @@ DEP_FILE	:= test.dep
 OBJ_DEP		:= 
 
 SRC			:=	cbc_test.c codeblock_test.c scope_test.c stack_test.c \
-				symtab_test.c generic_codeblock_test.c
+				symtab_test.c generic_codeblock_test.c syntree_test.c
 CUTEST_SRC	:= cutest/CuTest.c
 OBJ			:= $(SRC:%.c=%.o) $(CUTEST_SRC:%.c=%.o)
 

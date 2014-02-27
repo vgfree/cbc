@@ -9,6 +9,7 @@
 #include "stack_test.h"
 #include "symtab_test.h"
 #include "generic_codeblock_test.h"
+#include "syntree_test.h"
 
 
 // #############################################################################
@@ -42,6 +43,7 @@ int main(int argc, char *argv[])
 	CuSuiteAddSuite_Custom(suite, make_suite_symtab());
 	CuSuiteAddSuite_Custom(suite, make_suite_symtab());
 	CuSuiteAddSuite_Custom(suite, make_suite_codeblock_generic());
+	CuSuiteAddSuite_Custom(suite, make_suite_syntree());
 	
 	// run tests
 	CuSuiteRun(suite);
