@@ -84,7 +84,7 @@ paramlist:
 decl:
 	IDENTIFIER					{
 									$$ = cb_syntree_create(SNT_DECLARATION,
-														   symref_create($1),
+														   cb_symref_create($1),
 														   NULL);
 									free($1);	// free duplicated string
 								}
@@ -161,7 +161,7 @@ expr:
 									free($1);
 								}
 	| IDENTIFIER				{
-									$$ = symref_create($1);
+									$$ = cb_symref_create($1);
 									free($1);	// free duplicated string
 								}
 	| IDENTIFIER '(' args ')'	{
@@ -170,7 +170,7 @@ expr:
 								}
 	| IDENTIFIER ASSIGN expr	{
 									$$ = cb_syntree_create(SNT_ASSIGNMENT,
-														   symref_create($1), $3);
+														   cb_symref_create($1), $3);
 									free($1);	// free duplicated string
 								}
 	| expr '+' expr				{ $$ = cb_syntree_create('+', $1, $3); }

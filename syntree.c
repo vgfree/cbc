@@ -146,7 +146,7 @@ void cb_syntree_free(CbSyntree* node)
 		}
 		
 		case SNT_SYMREF:
-			free(((symref_t*) node)->sym_id);
+			free(((CbSymref*) node)->sym_id);
 			break;
 		
 		case SNT_FLOW_IF:
@@ -218,8 +218,8 @@ CbValue* cb_syntree_eval(CbSyntree* node, CbSymtab* symtab)
 		
 		case SNT_SYMREF:
 		{
-			symref_t* sr = (symref_t*) node;
-			symref_setsymbolfromtable(sr, symtab);
+			CbSymref* sr = (CbSymref*) node;
+			cb_symref_set_symbol_from_table(sr, symtab);
 			result = cb_value_copy(cb_symbol_variable_get_value(sr->table_sym));
 			break;
 		}
@@ -231,8 +231,8 @@ CbValue* cb_syntree_eval(CbSyntree* node, CbSymtab* symtab)
 			CbValue* rhs = cb_syntree_eval(node->r, symtab);
 			
 			// after that, set symbol from the symbol-table
-			symref_t* sr = (symref_t*) node->l;
-			symref_setsymbolfromtable(sr, symtab);
+			CbSymref* sr = (CbSymref*) node->l;
+			cb_symref_set_symbol_from_table(sr, symtab);
 			
 			// assign right-hand-side expression
 			cb_symbol_variable_assign_value(sr->table_sym, rhs);
@@ -244,7 +244,7 @@ CbValue* cb_syntree_eval(CbSyntree* node, CbSymtab* symtab)
 		
 		case SNT_DECLARATION:
 		{
-			symref_t* sr = (symref_t*) node->l;
+			CbSymref* sr = (CbSymref*) node->l;
 			
 			CbSymbol* dummy = cb_symbol_create_variable(sr->sym_id);
 			cb_symtab_append(symtab, dummy);	// declare symbol
@@ -288,7 +288,7 @@ CbValue* cb_syntree_eval(CbSyntree* node, CbSymtab* symtab)
 		case SNT_FUNC_CALL:
 		{
 			CbFuncCallNode* fncall = (CbFuncCallNode*) node;
-			symref_setsymbolfromtable((symref_t*) fncall, symtab);
+			cb_symref_set_symbol_from_table((CbSymref*) fncall, symtab);
 			CbFunction* f = cb_symbol_function_get_function(fncall->table_sym);
 			
 			cb_function_call(f, fncall->args, symtab);

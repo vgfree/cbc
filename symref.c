@@ -18,9 +18,9 @@
 // -----------------------------------------------------------------------------
 // constructor
 // -----------------------------------------------------------------------------
-CbSyntree* symref_create(char* identifier)
+CbSyntree* cb_symref_create(char* identifier)
 {
-	symref_t* node	= malloc(sizeof(symref_t));
+	CbSymref* node	= malloc(sizeof(CbSymref));
 	node->type		= SNT_SYMREF;
 	node->sym_id	= strdup(identifier);
 	node->table_sym	= NULL;
@@ -33,7 +33,7 @@ CbSyntree* symref_create(char* identifier)
 // global symbol-table.
 // if there is no such a symbol, an error will be raised.
 // -----------------------------------------------------------------------------
-void symref_setsymbolfromtable(symref_t* node, CbSymtab* symtab)
+void cb_symref_set_symbol_from_table(CbSymref* node, CbSymtab* symtab)
 {
 	CbSymbol* table_sym = node->table_sym;
 	
