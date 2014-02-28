@@ -49,7 +49,7 @@ int yylineno_temp = -1;
 
 %nonassoc	<cmp>	COMPARE
 
-%type <ast>		decllist decl stmtlist stmt expr
+%type <ast>		decllist decl stmtlist stmt expr symref
 %type <list>	params paramlist exprlist args
 
 /* Output parameter: Abstract syntax tree of the parsed codeblock */
@@ -92,13 +92,10 @@ paramlist:
 	;
 
 decl:
-	IDENTIFIER					{
-									CbSyntree* sr = cb_symref_create($1);
-									sr->line_no   = yylineno;
-									$$ = cb_syntree_create(SNT_DECLARATION, sr,
+	symref						{
+									$$ = cb_syntree_create(SNT_DECLARATION, $1,
 														   NULL);
 									$$->line_no = yylineno;
-									free($1);	// free duplicated string
 								}
 	;
 
@@ -140,6 +137,15 @@ while_keyword:
 	;
 if_keyword:
 	IF							{ yylineno_push(yylineno); }
+	;
+
+/* Symbol reference */
+symref:
+	IDENTIFIER					{
+									$$ = cb_symref_create($1);
+									$$->line_no = yylineno;
+									free($1);	// free duplicated string
+								}
 	;
 
 stmt:
@@ -210,23 +216,16 @@ expr:
 									$$->line_no = yylineno;
 									free($1);
 								}
-	| IDENTIFIER				{
-									$$ = cb_symref_create($1);
-									$$->line_no = yylineno;
-									free($1);	// free duplicated string
-								}
+	| symref					{ $$ = $1; }
 	| IDENTIFIER '(' args ')'	{
 									$$ = cb_funccall_create($1, $3);
 									$$->line_no = yylineno;
 									free($1);	// free duplicated string
 								}
-	| IDENTIFIER ASSIGN expr	{
-									CbSyntree* sr = cb_symref_create($1);
-									sr->line_no   = yylineno;
-									$$ = cb_syntree_create(SNT_ASSIGNMENT, sr,
+	| symref ASSIGN expr		{
+									$$ = cb_syntree_create(SNT_ASSIGNMENT, $1,
 														   $3);
 									$$->line_no = yylineno;
-									free($1);	// free duplicated string
 								}
 	| expr '+' expr				{
 									$$ = cb_syntree_create('+', $1, $3);
