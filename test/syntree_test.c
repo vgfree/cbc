@@ -86,17 +86,6 @@ void test_syntree_lineno_simple(CuTest *tc)
 	free(((CbFuncDeclarationNode*) s)->sym_id); free(s);
 }
 
-
-//	| foo |
-//	function FooBar()
-//	   WriteLn('Foobar'),
-//	end,
-//	foo := 0,
-//	while foo < 10 do
-//	   foo := foo + 1,
-//	end,
-//	foo,
-
 // -----------------------------------------------------------------------------
 // Test line_no attribute in a real parsed codeblock
 // NOTE: This testcase will currently fail, since the line number detection is
