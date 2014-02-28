@@ -15,6 +15,14 @@ const char* yy_get_token_string(int* token_id);
 
 }
 
+%{
+
+void yylineno_push(int ln);
+int yylineno_pop();
+int yylineno_temp = -1;
+
+%}
+
 %union {
 	CbSyntree* ast;
 	char* id;
@@ -118,27 +126,43 @@ stmtlist:
 	|							{ $$ = NULL; }
 	;
 
+
+/*
+	If an keyword occurs, that initiates a complex syntax node, the line number
+	of this keyword will be temporarily stored, since a the syntax node could
+	span over several lines.
+*/
+function_keyword:
+	FUNCTION					{ yylineno_push(yylineno); }
+	;
+while_keyword:
+	WHILE						{ yylineno_push(yylineno); }
+	;
+if_keyword:
+	IF							{ yylineno_push(yylineno); }
+	;
+
 stmt:
 	expr						{ $$ = $1; }
-	| IF expr THEN stmtlist ENDIF {
+	| if_keyword expr THEN stmtlist ENDIF {
 									$$ = cb_flow_create(SNT_FLOW_IF, $2, $4,
 														NULL);
-									$$->line_no = yylineno;
+									$$->line_no = yylineno_pop();
 								}
-	| IF expr THEN stmtlist ELSE stmtlist ENDIF {
+	| if_keyword expr THEN stmtlist ELSE stmtlist ENDIF {
 									$$ = cb_flow_create(SNT_FLOW_IF, $2, $4, $6);
-									$$->line_no = yylineno;
+									$$->line_no = yylineno_pop();
 								}
-	| WHILE expr DO stmtlist END {
+	| while_keyword expr DO stmtlist END {
 									$$ = cb_flow_create(SNT_FLOW_WHILE, $2, $4,
 														NULL);
-									$$->line_no = yylineno;
+									$$->line_no = yylineno_pop();
 								}
-	|	FUNCTION IDENTIFIER '(' params ')'
+	|	function_keyword IDENTIFIER '(' params ')'
 			stmtlist
 		END						{
 									$$ = cb_funcdecl_create($2, $6, $4);
-									$$->line_no = yylineno;
+									$$->line_no = yylineno_pop();
 									free($2);	// free duplicated string
 								}
 	| PRINT expr				{
@@ -243,4 +267,23 @@ expr:
 const char* yy_get_token_string(int* token_id)
 {
 	return yytname[YYTRANSLATE(*token_id)];
+}
+
+// -----------------------------------------------------------------------------
+// Push current line number
+// -----------------------------------------------------------------------------
+void yylineno_push(int ln)
+{
+	yylineno_temp = ln;
+}
+
+// -----------------------------------------------------------------------------
+// Pop stored line number
+// -----------------------------------------------------------------------------
+int yylineno_pop()
+{
+	int ln		  = yylineno_temp;
+	yylineno_temp = -1;	// reset temporarily stored line number
+	
+	return ln;
 }
