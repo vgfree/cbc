@@ -91,7 +91,7 @@ int codeblock_parse_string(Codeblock* cb, const char* string)
 // -----------------------------------------------------------------------------
 // execute codeblock
 // -----------------------------------------------------------------------------
-CbValue* codeblock_execute(Codeblock* cb)
+int codeblock_execute(Codeblock* cb)
 {
 	assert(cb->symtab);
 	assert(cb->ast);
@@ -110,7 +110,10 @@ CbValue* codeblock_execute(Codeblock* cb)
 	clock_t end  = clock();		// end execution
 	cb->duration = ((double) end - (double) begin) / CLOCKS_PER_SEC;
 	
-	return cb->result;
+	if (cb->result == NULL)
+		return EXIT_FAILURE;
+	else
+		return EXIT_SUCCESS;
 }
 
 

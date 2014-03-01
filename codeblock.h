@@ -28,7 +28,7 @@ Codeblock* codeblock_create();
 void codeblock_free(Codeblock* cb);
 int codeblock_parse_file(Codeblock* cb, FILE* input);
 int codeblock_parse_string(Codeblock* cb, const char* string);
-CbValue* codeblock_execute(Codeblock* cb);
+int codeblock_execute(Codeblock* cb);
 
 
 #endif // CODEBLOCK_H
