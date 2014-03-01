@@ -1,5 +1,5 @@
 /*******************************************************************************
- * symref_t -- 'syntree_t'-node, that references a symbol in the symbol-table.
+ * CbSymref -- CbSyntree-node, that references a symbol in the symbol-table.
  ******************************************************************************/
 
 #include <stdio.h>
@@ -9,6 +9,7 @@
 #include "symref.h"
 #include "symtab.h"
 #include "syntree.h"
+#include "error_handling.h"
 
 
 // #############################################################################
@@ -34,20 +35,22 @@ CbSyntree* cb_symref_create(char* identifier)
 // global symbol-table.
 // if there is no such a symbol, an error will be raised.
 // -----------------------------------------------------------------------------
-void cb_symref_set_symbol_from_table(CbSymref* node, CbSymtab* symtab)
+int cb_symref_set_symbol_from_table(CbSymref* node, CbSymtab* symtab)
 {
 	CbSymbol* table_sym = node->table_sym;
 	
 	// get symbol-reference
 	CbSymbol* dummy = cb_symtab_lookup(symtab, node->sym_id);
 	
-	// if there is no such a symbol -> error
-	if (!dummy)
+	if (!dummy) // if there is no such a symbol -> error
 	{
-		fprintf(stderr, "Error: Undefined symbol: %s\n", node->sym_id);
-		exit(EXIT_FAILURE);
+		cb_print_error(CB_ERR_RUNTIME, node->line_no, "Undefined symbol: %s",
+					   node->sym_id);
+		return EXIT_FAILURE;
 	}
 	
 	// symbol was found -> store reference
 	node->table_sym = dummy;
+	
+	return EXIT_SUCCESS;
 }

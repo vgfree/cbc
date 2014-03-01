@@ -1,7 +1,7 @@
 /*******************************************************************************
- * symref_t -- 'syntree_t'-node, that references a symbol in the symbol-table.
+ * CbSymref -- CbSyntree-node, that references a symbol in the symbol-table.
  * 
- *  	This structure is part of the abstract syntax-tree 'syntree_t'.
+ *  	This structure is part of the abstract syntax-tree CbSyntree.
  *  	It uses the node-type SNT_SYMREF.
  ******************************************************************************/
 
@@ -25,7 +25,7 @@ typedef struct
 
 // interface functions
 CbSyntree* cb_symref_create(char* identifier);
-void cb_symref_set_symbol_from_table(CbSymref* node, CbSymtab* symtab);
+int cb_symref_set_symbol_from_table(CbSymref* node, CbSymtab* symtab);
 
 
 #endif // SYMREF_H
