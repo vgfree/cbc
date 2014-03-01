@@ -11,6 +11,7 @@
 #include "symref.h"
 #include "funccall.h"
 #include "funcdecl.h"
+#include "error_handling.h"
 
 
 // #############################################################################
@@ -210,7 +211,9 @@ void cb_syntree_free(CbSyntree* node)
 }
 
 // -----------------------------------------------------------------------------
-// evaluate a complete syntax tree and return its result
+// Evaluate a complete syntax tree and return its result
+// 
+//    In case of an error the return value is NULL
 // -----------------------------------------------------------------------------
 CbValue* cb_syntree_eval(CbSyntree* node, CbSymtab* symtab)
 {
@@ -227,8 +230,9 @@ CbValue* cb_syntree_eval(CbSyntree* node, CbSymtab* symtab)
 		case SNT_SYMREF:
 		{
 			CbSymref* sr = (CbSymref*) node;
-			cb_symref_set_symbol_from_table(sr, symtab);
-			result = cb_value_copy(cb_symbol_variable_get_value(sr->table_sym));
+			if (cb_symref_set_symbol_from_table(sr, symtab) == EXIT_SUCCESS)
+				result = cb_value_copy(cb_symbol_variable_get_value(sr->table_sym));
+			
 			break;
 		}
 		
@@ -237,10 +241,13 @@ CbValue* cb_syntree_eval(CbSyntree* node, CbSymtab* symtab)
 			// evaluate right-hand-side first, since it could contain a
 			// function-call, which could change the order in the symbol-table!
 			CbValue* rhs = cb_syntree_eval(node->r, symtab);
+			if (rhs == NULL)
+				break;
 			
 			// after that, set symbol from the symbol-table
 			CbSymref* sr = (CbSymref*) node->l;
-			cb_symref_set_symbol_from_table(sr, symtab);
+			if (cb_symref_set_symbol_from_table(sr, symtab) == EXIT_FAILURE)
+				break;	// an error occurred -> break
 			
 			// assign right-hand-side expression
 			cb_symbol_variable_assign_value(sr->table_sym, rhs);
@@ -284,6 +291,9 @@ CbValue* cb_syntree_eval(CbSyntree* node, CbSymtab* symtab)
 		case SNT_PRINT:
 		{
 			CbValue* temp = cb_syntree_eval(node->l, symtab);
+			if (temp == NULL)
+				break;
+			
 			cb_value_print(temp);
 			cb_value_free(temp);
 			// print newline
@@ -296,9 +306,10 @@ CbValue* cb_syntree_eval(CbSyntree* node, CbSymtab* symtab)
 		case SNT_FUNC_CALL:
 		{
 			CbFuncCallNode* fncall = (CbFuncCallNode*) node;
-			cb_symref_set_symbol_from_table((CbSymref*) fncall, symtab);
-			CbFunction* f = cb_symbol_function_get_function(fncall->table_sym);
+			if (cb_symref_set_symbol_from_table((CbSymref*) fncall, symtab) == EXIT_FAILURE)
+				break;	// an error occurred -> break
 			
+			CbFunction* f = cb_symbol_function_get_function(fncall->table_sym);
 			cb_function_call(f, fncall->args, symtab);
 			result = cb_value_copy(f->result);
 			cb_function_reset(f);
@@ -309,18 +320,29 @@ CbValue* cb_syntree_eval(CbSyntree* node, CbSymtab* symtab)
 		case SNT_FLOW_IF:
 		{
 			CbValue* condition = cb_syntree_eval(((CbFlowNode*) node)->cond, symtab);
+			if (condition == NULL)
+				break;
+			
 			assert(cb_value_is_type(condition, VT_BOOLEAN));
 			
 			// evaluate condition and check its result
 			if (condition->boolean)
+			{
 				// condition is ture -> evaluate the true-branch
 				result = cb_syntree_eval(((CbFlowNode*) node)->tb, symtab);
+				if (result == NULL)
+					break;
+			}
 			else
 			{
 				// condition is false -> evaluate the false-branch,
 				// if there is one
 				if (((CbFlowNode*) node)->fb)
+				{
 					result = cb_syntree_eval(((CbFlowNode*) node)->fb, symtab);
+					if (result == NULL)
+						break;
+				}
 				else
 					// otherwise, return an empty value
 					result = cb_value_create();
@@ -333,6 +355,9 @@ CbValue* cb_syntree_eval(CbSyntree* node, CbSymtab* symtab)
 		case SNT_FLOW_WHILE:
 		{
 			CbValue* temp = cb_syntree_eval(((CbFlowNode*) node)->cond, symtab);
+			if (temp == NULL)
+				break;
+			
 			assert(cb_value_is_type(temp, VT_BOOLEAN));
 			
 			// default result (in case the while-loop won't be entered)
@@ -348,53 +373,86 @@ CbValue* cb_syntree_eval(CbSyntree* node, CbSymtab* symtab)
 				
 				result = cb_syntree_eval(((CbFlowNode*) node)->tb, symtab);
 				temp   = cb_syntree_eval(((CbFlowNode*) node)->cond, symtab);
+				
+				if (result == NULL || temp == NULL)
+					break;
 			}
 			
-			// free last dummy-value
-			cb_value_free(temp);
+			if (temp)
+				// free last dummy-value
+				cb_value_free(temp);
 			break;
 		}
 		
 		case SNT_COMPARISON:
 		{
 			CbComparisonNode* cmp = ((CbComparisonNode*) node);
-			result = cb_value_compare(cmp->cmp_type,
-									  cb_syntree_eval(cmp->l, symtab),
-									  cb_syntree_eval(cmp->r, symtab));
+			
+			CbValue* l = cb_syntree_eval(cmp->l, symtab);
+			CbValue* r = cb_syntree_eval(cmp->r, symtab);
+			
+			if (l && r) // both values of left and right syntax node must be valid
+				result = cb_value_compare(cmp->cmp_type, l, r);
 			break;
 		}
 		
 		case SNT_STATEMENTLIST:
-			cb_value_free(cb_syntree_eval(node->l, symtab));
-			result = cb_syntree_eval(node->r, symtab);
+		{
+			CbValue* temp = cb_syntree_eval(node->l, symtab);
+			if (temp)	// Check if returned value is valid
+			{
+				cb_value_free(temp);
+				result = cb_syntree_eval(node->r, symtab);
+			}
 			break;
+		}
 		
 		case '+':
-			result = cb_value_add(cb_syntree_eval(node->l, symtab),
-								  cb_syntree_eval(node->r, symtab));
+		{
+			CbValue* l = cb_syntree_eval(node->l, symtab);
+			CbValue* r = cb_syntree_eval(node->r, symtab);
+			
+			if (l && r)
+				result = cb_value_add(l, r);
 			break;
+		}
 		case '-':
-			result = cb_numeric_sub(cb_syntree_eval(node->l, symtab),
-									cb_syntree_eval(node->r, symtab));
+		{
+			CbValue* l = cb_syntree_eval(node->l, symtab);
+			CbValue* r = cb_syntree_eval(node->r, symtab);
+			
+			if (l && r)
+				result = cb_numeric_sub(l, r);
 			break;
+		}
 		case '*':
-			result = cb_numeric_mul(cb_syntree_eval(node->l, symtab),
-									cb_syntree_eval(node->r, symtab));
+		{
+			CbValue* l = cb_syntree_eval(node->l, symtab);
+			CbValue* r = cb_syntree_eval(node->r, symtab);
+			
+			if (l && r)
+				result = cb_numeric_mul(l, r);
 			break;
+		}
 		case '/':
-			result = cb_numeric_div(cb_syntree_eval(node->l, symtab),
-									cb_syntree_eval(node->r, symtab));
+		{
+			CbValue* l = cb_syntree_eval(node->l, symtab);
+			CbValue* r = cb_syntree_eval(node->r, symtab);
+			
+			if (l && r)
+				result = cb_numeric_div(l, r);
 			break;
+		}
 		
 		case SNT_UNARYMINUS:
-			result			= cb_syntree_eval(node->l, symtab);
-			result->value	= - result->value;
+			result = cb_syntree_eval(node->l, symtab);
+			if (result)
+				result->value = - result->value;
 			break;
 		
 		default:
-			fprintf(stderr, "syntax-tree node-type not recognized: %d",
-					node->type);
-			exit(EXIT_FAILURE);
+			cb_print_error(CB_ERR_RUNTIME, node->line_no,
+						   "Syntax-tree node-type not recognized");
 	}
 	
 	return result;
