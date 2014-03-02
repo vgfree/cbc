@@ -246,8 +246,12 @@ CbValue* cb_syntree_eval(CbSyntree* node, CbSymtab* symtab)
 			
 			// after that, set symbol from the symbol-table
 			CbSymref* sr = (CbSymref*) node->l;
+			// check if an error occurred
 			if (cb_symref_set_symbol_from_table(sr, symtab) == EXIT_FAILURE)
-				break;	// an error occurred -> break
+			{
+				cb_value_free(rhs);	// free allocated memory
+				break;
+			}
 			
 			// assign right-hand-side expression
 			cb_symbol_variable_assign_value(sr->table_sym, rhs);
@@ -330,19 +334,13 @@ CbValue* cb_syntree_eval(CbSyntree* node, CbSymtab* symtab)
 			{
 				// condition is ture -> evaluate the true-branch
 				result = cb_syntree_eval(((CbFlowNode*) node)->tb, symtab);
-				if (result == NULL)
-					break;
 			}
 			else
 			{
 				// condition is false -> evaluate the false-branch,
 				// if there is one
 				if (((CbFlowNode*) node)->fb)
-				{
 					result = cb_syntree_eval(((CbFlowNode*) node)->fb, symtab);
-					if (result == NULL)
-						break;
-				}
 				else
 					// otherwise, return an empty value
 					result = cb_value_create();
@@ -393,6 +391,11 @@ CbValue* cb_syntree_eval(CbSyntree* node, CbSymtab* symtab)
 			
 			if (l && r) // both values of left and right syntax node must be valid
 				result = cb_value_compare(cmp->cmp_type, l, r);
+			else if (l)
+				cb_value_free(l);
+			else
+				cb_value_free(r);
+			
 			break;
 		}
 		
@@ -410,37 +413,65 @@ CbValue* cb_syntree_eval(CbSyntree* node, CbSymtab* symtab)
 		case '+':
 		{
 			CbValue* l = cb_syntree_eval(node->l, symtab);
-			CbValue* r = cb_syntree_eval(node->r, symtab);
+			if (l == NULL)
+				break;
 			
-			if (l && r)
-				result = cb_value_add(l, r);
+			CbValue* r = cb_syntree_eval(node->r, symtab);
+			if (r == NULL)
+			{
+				cb_value_free(l);
+				break;
+			}
+			
+			result = cb_value_add(l, r);
 			break;
 		}
 		case '-':
 		{
 			CbValue* l = cb_syntree_eval(node->l, symtab);
-			CbValue* r = cb_syntree_eval(node->r, symtab);
+			if (l == NULL)
+				break;
 			
-			if (l && r)
-				result = cb_numeric_sub(l, r);
+			CbValue* r = cb_syntree_eval(node->r, symtab);
+			if (r == NULL)
+			{
+				cb_value_free(l);
+				break;
+			}
+			
+			result = cb_numeric_sub(l, r);
 			break;
 		}
 		case '*':
 		{
 			CbValue* l = cb_syntree_eval(node->l, symtab);
-			CbValue* r = cb_syntree_eval(node->r, symtab);
+			if (l == NULL)
+				break;
 			
-			if (l && r)
-				result = cb_numeric_mul(l, r);
+			CbValue* r = cb_syntree_eval(node->r, symtab);
+			if (r == NULL)
+			{
+				cb_value_free(l);
+				break;
+			}
+			
+			result = cb_numeric_mul(l, r);
 			break;
 		}
 		case '/':
 		{
 			CbValue* l = cb_syntree_eval(node->l, symtab);
-			CbValue* r = cb_syntree_eval(node->r, symtab);
+			if (l == NULL)
+				break;
 			
-			if (l && r)
-				result = cb_numeric_div(l, r);
+			CbValue* r = cb_syntree_eval(node->r, symtab);
+			if (r == NULL)
+			{
+				cb_value_free(l);
+				break;
+			}
+			
+			result = cb_numeric_div(l, r);
 			break;
 		}
 		
