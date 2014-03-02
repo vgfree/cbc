@@ -168,12 +168,12 @@ static int codeblock_parse_internal(Codeblock* cb)
 	switch (yyparse(&cb->ast))
 	{
 		case 1:
-			fprintf(stderr, "Error: Parsing failed due to invalid input.\n");
+			cb_print_error_msg("Parsing failed due to invalid input");
 			result = EXIT_FAILURE;
 			break;
 		
 		case 2:
-			fprintf(stderr, "Error: Parsing failed due to memory exhaustion.\n");
+			cb_print_error_msg("Parsing failed due to memory exhaustion");
 			result = EXIT_FAILURE;
 			break;
 	}
