@@ -56,6 +56,31 @@ int yylineno_temp = -1;
 %parse-param {CbSyntree** result_tree}
 %error-verbose
 
+/* Destructors: Free discarded symbols in case of errors */
+%destructor {
+	cb_syntree_free($$);
+} decllist decl stmtlist stmt expr symref
+
+%destructor {
+	cb_strlist_free($$);
+} params paramlist
+
+%destructor {
+	CbStrlist* item = $$;
+	while (item)
+	{
+		cb_syntree_free(item->data);	// free syntax node
+		item = item->next;				// process next item
+	}
+	
+	cb_strlist_free($$);	// finally, free the list
+} exprlist args
+
+%destructor {
+	free($$);
+} IDENTIFIER STRING
+
+
 %%	/* RULES ---------------------------------------------------------------- */
 
 
