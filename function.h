@@ -49,7 +49,7 @@ CbFunction* cb_function_create_builtin(char* identifier, int param_count,
 CbFunction* cb_function_create_user_defined(char* identifier, CbSyntree* body);
 void cb_function_free(CbFunction* f);
 void cb_function_add_param(CbFunction* f, char* param_id);
-CbValue* cb_function_call(CbFunction* f, CbStrlist* args, CbSymtab* symtab);
+int cb_function_call(CbFunction* f, CbStrlist* args, CbSymtab* symtab);
 void cb_function_reset(CbFunction* f);
 
 

@@ -11,6 +11,7 @@
 #include "symtab.h"
 #include "syntree.h"
 #include "stack.h"
+#include "error_handling.h"
 
 
 // #############################################################################
@@ -89,8 +90,9 @@ void cb_function_add_param(CbFunction* f, char* param_id)
 // call function
 // if the function has no parameters, pass a NULL-value as arguments.
 // -----------------------------------------------------------------------------
-CbValue* cb_function_call(CbFunction* f, CbStrlist* args, CbSymtab* symtab)
+int cb_function_call(CbFunction* f, CbStrlist* args, CbSymtab* symtab)
 {
+	int result = EXIT_SUCCESS;
 	// reset function-result
 	// this is necessary in case the function was already called.
 	cb_function_reset(f);
@@ -163,17 +165,31 @@ CbValue* cb_function_call(CbFunction* f, CbStrlist* args, CbSymtab* symtab)
 		cb_stack_free(param_stack);
 		
 #ifdef _CBC_DEFAULT_FUNC_RESULT_SYMBOL
-		cb_value_free(cb_syntree_eval(f->body, symtab));
-		// result is value of the "Result"-symbol
-		f->result = cb_value_copy(cb_symbol_variable_get_value(default_result));
+		CbValue* eval_result = cb_syntree_eval(f->body, symtab);
+		if (eval_result == NULL)
+		{
+			f->result = NULL;
+			result    = EXIT_FAILURE;
+		}
+		else
+		{
+			cb_value_free(eval_result);
+			// result is value of the "Result"-symbol
+			f->result = cb_value_copy(cb_symbol_variable_get_value(default_result));
+		}
 #else
 		f->result = cb_syntree_eval(f->body, symtab);	// result is the last
 														// expression in the function
+		if (f->result == NULL)
+			result = EXIT_FAILURE;
 #endif // _CBC_DEFAULT_FUNC_RESULT_SYMBOL
 	}
 	else
 	{
 		f->result = f->func_ref(arg_stack);
+		if (f->result == NULL)
+			result = EXIT_FAILURE;
+		
 		cb_stack_free(arg_stack);
 		cb_stack_free(param_stack);
 	}
@@ -183,7 +199,7 @@ CbValue* cb_function_call(CbFunction* f, CbStrlist* args, CbSymtab* symtab)
 	// will be freed!
 	cb_symtab_leave_scope(symtab);
 	
-	return f->result;
+	return result;
 }
 
 // -----------------------------------------------------------------------------

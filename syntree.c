@@ -314,10 +314,11 @@ CbValue* cb_syntree_eval(CbSyntree* node, CbSymtab* symtab)
 				break;	// an error occurred -> break
 			
 			CbFunction* f = cb_symbol_function_get_function(fncall->table_sym);
-			cb_function_call(f, fncall->args, symtab);
-			result = cb_value_copy(f->result);
-			cb_function_reset(f);
-			
+			if (cb_function_call(f, fncall->args, symtab) == EXIT_SUCCESS)
+			{
+				result = cb_value_copy(f->result);
+				cb_function_reset(f);
+			}
 			break;
 		}
 		
