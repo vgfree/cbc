@@ -104,9 +104,13 @@ int cb_function_call(CbFunction* f, CbStrlist* args, CbSymtab* symtab)
 	// validate params and arguments
 	if (count_params != count_args)
 	{
-		fprintf(stderr,	"Error: Expecting %d argument(s), but %d was/were "\
-						"actually passed!\n", count_params, count_args);
-		exit(EXIT_FAILURE);
+		char* exp_str = (count_params == 1) ? "argument" : "arguments";
+		char* act_str = (count_args == 1)   ? "was"      : "were";
+		
+		cb_print_error(CB_ERR_RUNTIME, -1, "In function `%s': Expecting %d %s,"\
+										   " but %d %s actually passed",
+					   f->id, count_params, exp_str, count_args, act_str);
+		return EXIT_FAILURE;
 	}
 	
 	CbStack* arg_stack   = cb_stack_create();
