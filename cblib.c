@@ -116,16 +116,19 @@ CbValue* bif_eval(CbStack* arg_stack)
 	
 	assert(cb_value_is_type(arg, VT_STRING));
 	
-	Codeblock* cb = codeblock_create();
+	Codeblock* cb   = codeblock_create();
+	CbValue* result = NULL;
 	
 	// Parse codeblock string
-	codeblock_parse_string(cb, arg->string);
+	int parser_result = codeblock_parse_string(cb, arg->string);
 	cb_value_free(arg);
 	
-	// Execute codeblock
-	codeblock_execute(cb);
-	
-	CbValue* result = cb_value_copy(cb->result);
+	if (parser_result == EXIT_SUCCESS)
+	{
+		// Execute codeblock
+		if (codeblock_execute(cb) == EXIT_SUCCESS)
+			result = cb_value_copy(cb->result);
+	}
 	
 	codeblock_free(cb);
 	
