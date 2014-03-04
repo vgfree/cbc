@@ -128,6 +128,12 @@ int cb_function_call(CbFunction* f, CbStrlist* args, CbSymtab* symtab)
 			// obtain argument value
 			CbValue* arg_value = cb_syntree_eval(((CbSyntree*) curr_arg->data),
 												 symtab);
+			if (arg_value == NULL)
+			{
+				result = EXIT_FAILURE;
+				break;
+			}
+			
 			// push argument value on the stack
 			cb_stack_push(arg_stack, arg_value);
 			// process next item
@@ -137,20 +143,20 @@ int cb_function_call(CbFunction* f, CbStrlist* args, CbSymtab* symtab)
 		}
 	}
 	
-	cb_symtab_enter_scope(symtab, f->id);	// enter function-scope
-	
-	if (f->type == FUNC_TYPE_USER_DEFINED)
+	if (result == EXIT_SUCCESS)
 	{
-	
-#ifdef _CBC_DEFAULT_FUNC_RESULT_SYMBOL
-		// declare default function-result symbol
-		CbSymbol* default_result = cb_symbol_create_variable("Result");
-		cb_symtab_append(symtab, default_result);
-#endif // _CBC_DEFAULT_FUNC_RESULT_SYMBOL
+		cb_symtab_enter_scope(symtab, f->id);	// enter function-scope
 		
-		// declare all arguments
-		if (count_params > 0)	// TODO: If-statement is not necessary here.
+		if (f->type == FUNC_TYPE_USER_DEFINED)
 		{
+		
+#ifdef _CBC_DEFAULT_FUNC_RESULT_SYMBOL
+			// declare default function-result symbol
+			CbSymbol* default_result = cb_symbol_create_variable("Result");
+			cb_symtab_append(symtab, default_result);
+#endif // _CBC_DEFAULT_FUNC_RESULT_SYMBOL
+			
+			// declare all arguments
 			while (!cb_stack_is_empty(param_stack))
 			{
 				CbValue* arg_value;
@@ -160,48 +166,54 @@ int cb_function_call(CbFunction* f, CbStrlist* args, CbSymtab* symtab)
 				CbSymbol* arg = cb_symbol_create_variable(param_id);
 				cb_symbol_variable_assign_value(arg, arg_value);
 				cb_value_free(arg_value);
-				cb_symtab_append(symtab, arg);	// declare argument within function-
-											// scope
+				
+				// declare argument within function-scope
+				if (!cb_symtab_append(symtab, arg))
+				{
+					cb_symbol_free(arg);
+					result = EXIT_FAILURE;
+					break;
+				}
 			}
-		}
-	
-		cb_stack_free(arg_stack);
-		cb_stack_free(param_stack);
-		
+			
+			if (result == EXIT_SUCCESS)
+			{
 #ifdef _CBC_DEFAULT_FUNC_RESULT_SYMBOL
-		CbValue* eval_result = cb_syntree_eval(f->body, symtab);
-		if (eval_result == NULL)
-		{
-			f->result = NULL;
-			result    = EXIT_FAILURE;
+				CbValue* eval_result = cb_syntree_eval(f->body, symtab);
+				if (eval_result == NULL)
+				{
+					f->result = NULL;
+					result    = EXIT_FAILURE;
+				}
+				else
+				{
+					cb_value_free(eval_result);
+					// result is value of the "Result"-symbol
+					f->result = cb_value_copy(cb_symbol_variable_get_value(default_result));
+				}
+#else
+				f->result = cb_syntree_eval(f->body, symtab);	// result is the last
+																// expression in the function
+				if (f->result == NULL)
+					result = EXIT_FAILURE;
+#endif // _CBC_DEFAULT_FUNC_RESULT_SYMBOL
+			}
 		}
 		else
 		{
-			cb_value_free(eval_result);
-			// result is value of the "Result"-symbol
-			f->result = cb_value_copy(cb_symbol_variable_get_value(default_result));
+			f->result = f->func_ref(arg_stack);
+			if (f->result == NULL)
+				result = EXIT_FAILURE;
 		}
-#else
-		f->result = cb_syntree_eval(f->body, symtab);	// result is the last
-														// expression in the function
-		if (f->result == NULL)
-			result = EXIT_FAILURE;
-#endif // _CBC_DEFAULT_FUNC_RESULT_SYMBOL
-	}
-	else
-	{
-		f->result = f->func_ref(arg_stack);
-		if (f->result == NULL)
-			result = EXIT_FAILURE;
 		
-		cb_stack_free(arg_stack);
-		cb_stack_free(param_stack);
+		// leave function-scope:
+		// all symbols, that were declared within this scope (like parameters),
+		// will be freed!
+		cb_symtab_leave_scope(symtab);
 	}
 	
-	// leave function-scope:
-	// all symbols, that were declared within this scope (like parameters),
-	// will be freed!
-	cb_symtab_leave_scope(symtab);
+	cb_stack_free(arg_stack);
+	cb_stack_free(param_stack);
 	
 	return result;
 }

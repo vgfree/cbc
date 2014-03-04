@@ -266,9 +266,12 @@ CbValue* cb_syntree_eval(CbSyntree* node, CbSymtab* symtab)
 			CbSymref* sr = (CbSymref*) node->l;
 			
 			CbSymbol* dummy = cb_symbol_create_variable(sr->sym_id);
-			cb_symtab_append(symtab, dummy);	// declare symbol
+			if (cb_symtab_append(symtab, dummy))	// declare symbol
+				result = cb_value_create();	// return empty value,
+											// if there were no errors
+			else
+				cb_symbol_free(dummy);
 			
-			result = cb_value_create();		// return empty value
 			break;
 		}
 		
@@ -286,9 +289,12 @@ CbValue* cb_syntree_eval(CbSyntree* node, CbSymtab* symtab)
 				func->param_count = func->params->count;
 			
 			CbSymbol* s = cb_symbol_create_function(fndecl->sym_id, func);
-			cb_symtab_append(symtab, s);	// declare function
+			if (cb_symtab_append(symtab, s))	// declare function
+				result = cb_value_create();	// return empty value,
+											// if there were no errors
+			else
+				cb_symbol_free(s);
 			
-			result = cb_value_create();	// return empty value
 			break;
 		}
 		

@@ -31,7 +31,7 @@ void cb_symtab_free(CbSymtab* st);
 CbSymbol* cb_symtab_append(CbSymtab* st, CbSymbol* s);
 CbSymbol* cb_symtab_dispatch(CbSymtab* st, const char* id);
 void cb_symtab_remove(CbSymtab* st, const char* id);
-CbSymbol* cb_symtab_lookup(CbSymtab* st, const char* id);
+CbSymbol* cb_symtab_lookup(CbSymtab* st, const char* id, bool exact_scope);
 CbSymbol* cb_symtab_next(CbSymtab* st);
 CbSymbol* cb_symtab_current(CbSymtab* st);
 CbSymbol* cb_symtab_previous(CbSymtab* st);

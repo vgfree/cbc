@@ -7,6 +7,7 @@
 #include <string.h>
 #include "symtab.h"
 #include "scope.h"
+#include "error_handling.h"
 
 // -----------------------------------------------------------------------------
 // Constructor
@@ -49,8 +50,8 @@ CbSymbol* cb_symtab_append(CbSymtab* st, CbSymbol* s)
 {
 	assert(st);
 	assert(s);
-	assert(cb_symbol_get_next(s)	  == NULL); // allow appending single symbols only
-	assert(cb_symbol_get_previous(s) == NULL);
+	assert(cb_symbol_get_next(s)     == NULL); // allow appending single symbols
+	assert(cb_symbol_get_previous(s) == NULL); // only
 	
 	if (cb_symtab_is_empty(st))
 	{
@@ -58,7 +59,17 @@ CbSymbol* cb_symtab_append(CbSymtab* st, CbSymbol* s)
 		st->current	= s;
 	}
 	else
+	{
+		const char* symbol_id = cb_symbol_get_id(s);
+		if (cb_symtab_lookup(st, symbol_id, true) != NULL)
+		{
+			cb_print_error(CB_ERR_RUNTIME, -1, "Cannot redeclare symbol: %s",
+						   symbol_id);
+			return NULL;
+		}
+		
 		cb_symbol_connect(st->last, s);
+	}
 	
 	cb_symbol_set_scope(s, cb_stack_get_top_item(st->scope_stack));
 	st->last = s;
@@ -73,7 +84,7 @@ CbSymbol* cb_symtab_append(CbSymtab* st, CbSymbol* s)
 // -----------------------------------------------------------------------------
 CbSymbol* cb_symtab_dispatch(CbSymtab* st, const char* id)
 {
-	CbSymbol* found = cb_symtab_lookup(st, id);
+	CbSymbol* found = cb_symtab_lookup(st, id, true);
 	
 	if (found)
 	{
@@ -127,8 +138,10 @@ void cb_symtab_remove(CbSymtab* st, const char* id)
 
 // -----------------------------------------------------------------------------
 // Lookup a symbol by id
+// If 'exact_scope' is true, then no symbols from the global scope will be found
+// unless the current scope is the global scope
 // -----------------------------------------------------------------------------
-CbSymbol* cb_symtab_lookup(CbSymtab* st, const char* id)
+CbSymbol* cb_symtab_lookup(CbSymtab* st, const char* id, bool exact_scope)
 {
 	CbSymbol* current	= st->first;
 	CbSymbol* result	= NULL;
@@ -145,7 +158,7 @@ CbSymbol* cb_symtab_lookup(CbSymtab* st, const char* id)
 			}
 			// NULL-scope means, that the current symbol is in global scope.
 			// -> Can potentially be used, if there is no local declaration.
-			else if (cb_symbol_get_scope(current) == NULL)
+			else if (!exact_scope && (cb_symbol_get_scope(current) == NULL))
 				// Do not break in this case,
 				// since there could still be a local declaration of the symbol!
 				result = current;

@@ -40,7 +40,7 @@ int cb_symref_set_symbol_from_table(CbSymref* node, CbSymtab* symtab)
 	CbSymbol* table_sym = node->table_sym;
 	
 	// get symbol-reference
-	CbSymbol* dummy = cb_symtab_lookup(symtab, node->sym_id);
+	CbSymbol* dummy = cb_symtab_lookup(symtab, node->sym_id, false);
 	
 	if (!dummy) // if there is no such a symbol -> error
 	{
