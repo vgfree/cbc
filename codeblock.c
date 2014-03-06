@@ -93,22 +93,23 @@ int codeblock_parse_string(Codeblock* cb, const char* string)
 // -----------------------------------------------------------------------------
 int codeblock_execute(Codeblock* cb)
 {
-	assert(cb->symtab);
 	assert(cb->ast);
 	
 	cb->duration = 0;
 	codeblock_reset_result(cb);
 	
-	// register builtin symbols
-	register_builtin_all(cb->symtab);
+	cb->symtab = cb_symtab_create();	// create symbol table
+	register_builtin_all(cb->symtab);	// register builtin symbols
 	
-	clock_t begin = clock();	// begin execution
+	clock_t begin = clock();	// begin tracking of execution duration
 	
 	// execute codeblock
 	cb->result = cb_syntree_eval(cb->ast, cb->symtab);
 	
-	clock_t end  = clock();		// end execution
+	clock_t end  = clock();		// end tracking of execution duration
 	cb->duration = ((double) end - (double) begin) / CLOCKS_PER_SEC;
+	
+	cb_symtab_free(cb->symtab);	// cleanup symbol table
 	
 	if (cb->result == NULL)
 		return EXIT_FAILURE;
@@ -122,7 +123,7 @@ int codeblock_execute(Codeblock* cb)
 // #############################################################################
 
 // -----------------------------------------------------------------------------
-// reset codeblock (internal)
+// reset codeblock syntax tree (internal)
 // -----------------------------------------------------------------------------
 static void codeblock_reset(Codeblock* cb)
 {
@@ -130,12 +131,6 @@ static void codeblock_reset(Codeblock* cb)
 	{
 		cb_syntree_free(cb->ast);
 		cb->ast = NULL;
-	}
-	
-	if (cb->symtab)
-	{
-		cb_symtab_free(cb->symtab);
-		cb->symtab = NULL;
 	}
 }
 
@@ -161,9 +156,6 @@ static int codeblock_parse_internal(Codeblock* cb)
 	// reset codeblock, this is necessary in case the codeblock was already
 	// parsed or executed before.
 	codeblock_reset(cb);
-	
-	// recreate symbol table
-	cb->symtab = cb_symtab_create();
 	
 	switch (yyparse(&cb->ast))
 	{
