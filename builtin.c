@@ -10,6 +10,7 @@
 #include "symbol.h"
 #include "symtab.h"
 #include "function.h"
+#include "error_handling.h"
 
 
 // #############################################################################
@@ -75,9 +76,9 @@ int register_builtin_all(CbSymtab* symtab)
 									   builtin_func_decl_list[i].param_count);
 		if (result != EXIT_SUCCESS)
 		{
-			fprintf(stderr, "Error: Unable to register builtin symbol `%s'!\n",
-					builtin_func_decl_list[i].identifier);
-			exit(EXIT_FAILURE);
+			cb_print_error_msg("Unable to register builtin symbol `%s'",
+							   builtin_func_decl_list[i].identifier);
+			break;
 		}
 	}
 	

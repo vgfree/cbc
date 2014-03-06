@@ -98,16 +98,17 @@ int codeblock_execute(Codeblock* cb)
 	cb->duration = 0;
 	codeblock_reset_result(cb);
 	
-	cb->symtab = cb_symtab_create();	// create symbol table
-	register_builtin_all(cb->symtab);	// register builtin symbols
-	
-	clock_t begin = clock();	// begin tracking of execution duration
-	
-	// execute codeblock
-	cb->result = cb_syntree_eval(cb->ast, cb->symtab);
-	
-	clock_t end  = clock();		// end tracking of execution duration
-	cb->duration = ((double) end - (double) begin) / CLOCKS_PER_SEC;
+	cb->symtab = cb_symtab_create();						// create symbol table
+	if (register_builtin_all(cb->symtab) == EXIT_SUCCESS)	// register builtin symbols
+	{
+		clock_t begin = clock();	// begin tracking of execution duration
+		
+		// execute codeblock
+		cb->result = cb_syntree_eval(cb->ast, cb->symtab);
+		
+		clock_t end  = clock();		// end tracking of execution duration
+		cb->duration = ((double) end - (double) begin) / CLOCKS_PER_SEC;
+	}
 	
 	cb_symtab_free(cb->symtab);	// cleanup symbol table
 	
