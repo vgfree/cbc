@@ -22,7 +22,6 @@ void test_codeblock_execute(CuTest *tc)
 {
 	Codeblock* cb = codeblock_create();
 	cb->ast		  = cb_conststr_create("test");
-	cb->symtab	  = cb_symtab_create();
 	
 	codeblock_execute(cb);	// execute codeblock once
 	
@@ -86,8 +85,6 @@ void test_codeblock_execute_complex(CuTest *tc)
 									)
 								)
 							);
-	
-	cb->symtab = cb_symtab_create();
 	
 	codeblock_execute(cb);	// execute codeblock once
 	
