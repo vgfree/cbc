@@ -29,7 +29,7 @@ void test_scope(CuTest *tc)
 	CuAssertTrue(tc, !cb_scope_equals(scope1, scope2));
 	CuAssertTrue(tc, !cb_scope_equals(NULL, scope2));
 	CuAssertTrue(tc, !cb_scope_equals(scope1, NULL));
-	CuAssertTrue(tc, !cb_scope_equals(NULL, NULL));
+	CuAssertTrue(tc, cb_scope_equals(NULL, NULL));
 	CuAssertTrue(tc, cb_scope_equals(scope1, scope1_clone));
 	
 	cb_scope_free(scope1);

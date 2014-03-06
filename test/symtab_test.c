@@ -102,7 +102,7 @@ void test_symtab_scope_stack(CuTest* tc)
 	cb_symtab_append(symtab, sym);
 	
 	// find global symbol
-	CuAssertPtrEquals(tc, sym, cb_symtab_lookup(symtab, "symbol_global"));
+	CuAssertPtrEquals(tc, sym, cb_symtab_lookup(symtab, "symbol_global", false));
 	
 	int i = 0;
 	for (; i < 10; i++)
@@ -122,16 +122,16 @@ void test_symtab_scope_stack(CuTest* tc)
 		CuAssertPtrNotNull(tc, symtab->scope_stack->top);
 		
 		// global symbol always has to be found in any scope
-		CuAssertPtrEquals(tc, sym, cb_symtab_lookup(symtab, "symbol_global"));
+		CuAssertPtrEquals(tc, sym, cb_symtab_lookup(symtab, "symbol_global", false));
 		
 		CbSymbol* s = cb_symbol_create_variable(sym_id->buffer);
 		cb_symtab_append(symtab, s);	// declare symbol within new scope
 		
 		// find new symbol
-		CuAssertPtrEquals(tc, s, cb_symtab_lookup(symtab, sym_id->buffer));
+		CuAssertPtrEquals(tc, s, cb_symtab_lookup(symtab, sym_id->buffer, false));
 		if (i > 1)
 			// try to find symbol different scope -> must return NULL!
-			CuAssertPtrEquals(tc, NULL, cb_symtab_lookup(symtab, old_sym_id->buffer));
+			CuAssertPtrEquals(tc, NULL, cb_symtab_lookup(symtab, old_sym_id->buffer, false));
 		
 		CuStringDelete(old_sym_id);
 		CuStringDelete(sym_id);
