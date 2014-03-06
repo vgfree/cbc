@@ -16,6 +16,11 @@ static const char codeblock_string_undeffunc[] = "UndefinedFunction(),";
 static const char codeblock_string_undefvar[] = "cUndefinedVar := 'foobar',";
 static const char codeblock_string_unexptokennum[] = "WriteLn('foo' 123, True),";
 static const char codeblock_string_missingcomma[] = "WriteLn('foo')";
+static const char codeblock_string_redeclvar[] = "| foo, foo | foo := 123,";
+static const char codeblock_string_redeclfunc[] = "function Foo() 1, end, function Foo() 1, end,";
+static const char codeblock_string_paramcount1[] = "function Foo(p) 1, end, Foo('a', 1, True),";
+static const char codeblock_string_paramcount2[] = "function Foo() 1, end, Foo(1),";
+static const char codeblock_string_paramcount3[] = "function Foo(p1,p2,p3) 1, end, Foo(1, '2'),";
 
 static void test_error(CuTest* tc, const char* codeblock_string,
 					   const char* expected_error_message, cb_error_type type);
@@ -84,6 +89,38 @@ void test_error_handling_undefinedsymbol(CuTest *tc)
 			   CB_ERR_RUNTIME);
 }
 
+// -----------------------------------------------------------------------------
+// Test the "Cannot redeclare symbol ..." runtime error
+// -----------------------------------------------------------------------------
+void test_error_handling_symbolredecl(CuTest *tc)
+{
+	test_error(tc, codeblock_string_redeclvar,
+			   "Runtime error: Cannot redeclare symbol: foo",
+			   CB_ERR_RUNTIME);
+	test_error(tc, codeblock_string_redeclfunc,
+			   "Runtime error: Cannot redeclare symbol: Foo",
+			   CB_ERR_RUNTIME);
+}
+
+// -----------------------------------------------------------------------------
+// Test the param count mismatch runtime error
+// -----------------------------------------------------------------------------
+void test_error_handling_paramcount(CuTest *tc)
+{
+	test_error(tc, codeblock_string_paramcount1,
+			   "Runtime error: In function `Foo': Expecting 1 argument, "\
+			   "but 3 were actually passed",
+			   CB_ERR_RUNTIME);
+	test_error(tc, codeblock_string_paramcount2,
+			   "Runtime error: In function `Foo': Expecting 0 arguments, "\
+			   "but 1 was actually passed",
+			   CB_ERR_RUNTIME);
+	test_error(tc, codeblock_string_paramcount3,
+			   "Runtime error: In function `Foo': Expecting 3 arguments, "\
+			   "but 2 were actually passed",
+			   CB_ERR_RUNTIME);
+}
+
 
 // #############################################################################
 // make suite
@@ -94,6 +131,8 @@ CuSuite* make_suite_error_handling()
 	CuSuite* suite = CuSuiteNew();
 	SUITE_ADD_TEST(suite, test_error_handling_syntax_errors);
 	SUITE_ADD_TEST(suite, test_error_handling_undefinedsymbol);
+	SUITE_ADD_TEST(suite, test_error_handling_symbolredecl);
+	SUITE_ADD_TEST(suite, test_error_handling_paramcount);
 	return suite;
 }
 
