@@ -37,9 +37,10 @@ void cb_scope_free(CbScope* scope)
 // -----------------------------------------------------------------------------
 bool cb_scope_equals(const CbScope* scope1, const CbScope* scope2)
 {
-	if (scope1 == NULL || scope2 == NULL)
-		return false;	// if either of the arguments is NULL
-						// -> scopes are not equal!
+	if (scope1 == NULL && scope2 == NULL)
+		return true;	// if both arguments are NULL -> scopes are not equal!
+	else if (scope1 == NULL || scope2 == NULL)
+		return false;
 	else
 		return (scope1->level == scope2->level &&
 				strcmp(scope1->context, scope2->context) == 0);
