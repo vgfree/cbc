@@ -78,15 +78,7 @@ CbSyntree* cb_constbool_create(CbBoolean boolean)
 CbSyntree* cb_flow_create(enum cb_syntree_node_type type, CbSyntree* condition,
 						  CbSyntree* then_branch, CbSyntree* else_branch)
 {
-	// TODO: REPLACE THE FOLLOWING CHECK WIHT AN ASSERT
-	
-	// check if passed type is valid for this node
-	if (type != SNT_FLOW_IF && type != SNT_FLOW_WHILE)
-	{
-		fprintf(stderr, "Error: Invalid node-type for control-flow-node: %d",
-				type);
-		exit(EXIT_FAILURE);
-	}
+	assert(type == SNT_FLOW_IF || type == SNT_FLOW_WHILE);
 	
 	CbFlowNode* node = malloc(sizeof(CbFlowNode));
 	node->type		 = type;
@@ -202,9 +194,9 @@ void cb_syntree_free(CbSyntree* node)
 			break;
 			
 		default:
-			fprintf(stderr, "syntax-tree node-type not recognized: %d",
-					node->type);
-			exit(EXIT_FAILURE);
+			// do not report errors if the node type is not reckognized, since
+			// the syntax tree is being freed anyway
+			break;
 	}
 	// always free node itself at the end
 	free(node);
