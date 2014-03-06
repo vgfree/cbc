@@ -5,7 +5,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 #include "value.h"
+#include "error_handling.h"
 
 #define NO_VALUE_AS_STRING "<no value returned>"
 
@@ -139,6 +141,8 @@ CbValue* cb_value_copy(const CbValue* val)
 // -----------------------------------------------------------------------------
 char* cb_value_to_string(const CbValue* val)
 {
+	assert(val);
+	
 	char* result_buf;
 	
 	switch (val->type)
@@ -166,8 +170,7 @@ char* cb_value_to_string(const CbValue* val)
 			break;
 		
 		default:
-			fprintf(stderr, "Error: Value does not have a valid value-type\n");
-			exit(EXIT_FAILURE);
+			assert(("Invalid value-type", false));
 			break;
 	}
 	
@@ -192,12 +195,7 @@ void cb_value_print(const CbValue* val)
 // -----------------------------------------------------------------------------
 CbValue* cb_value_compare(enum cb_comparison_type type, CbValue* l, CbValue* r)
 {
-	if (!cb_value_is_type(l, r->type))
-	{
-		fprintf(stderr, "Type mismatch: lhs-type %d differs from rhs-type %d\n",
-				l->type, r->type);
-		exit(EXIT_FAILURE);
-	}
+	assert(cb_value_is_type(l, r->type));
 	
 	CbValue* result = NULL;
 	
@@ -229,12 +227,7 @@ CbValue* cb_value_compare(enum cb_comparison_type type, CbValue* l, CbValue* r)
 CbValue* cb_numeric_compare(	enum cb_comparison_type type, const CbValue* l,
 							const CbValue* r)
 {
-	if (!cb_value_is_type(l, VT_NUMERIC) || !cb_value_is_type(r, VT_NUMERIC))
-	{
-		fprintf(stderr, "Error: Value has invalid type for this operation, "\
-						"expecting VT_NUMERIC!");
-		exit(EXIT_FAILURE);
-	}
+	assert(cb_value_is_type(l, VT_NUMERIC) && cb_value_is_type(r, VT_NUMERIC));
 	
 	CbValue* result = cb_boolean_create(false);
 	
@@ -265,9 +258,7 @@ CbValue* cb_value_add(CbValue* l, CbValue* r)
 			return cb_string_concat(l, r);
 			break;
 		default:
-			fprintf(stderr, "Error: Unable to perform OPR_ADD on value-type: " \
-							"%d!\n", l->type);
-			exit(EXIT_FAILURE);
+			assert(("Unable to perform OPR_ADD on this value-type", false));
 			break;
 	}
 }
@@ -310,12 +301,7 @@ CbValue* cb_numeric_div(CbValue* l, CbValue* r)
 CbValue* cb_string_compare(enum cb_comparison_type type, const CbValue* l,
 						   const CbValue* r)
 {
-	if (!cb_value_is_type(l, VT_STRING) || !cb_value_is_type(r, VT_STRING))
-	{
-		fprintf(stderr, "Error: Value has invalid type for this operation, "\
-						"expecting VT_STRING!");
-		exit(EXIT_FAILURE);
-	}
+	assert(cb_value_is_type(l, VT_STRING) && cb_value_is_type(r, VT_STRING));
 	
 	bool not_flag	= false;
 	bool result		= false;
@@ -334,9 +320,7 @@ CbValue* cb_string_compare(enum cb_comparison_type type, const CbValue* l,
 		}
 		
 		default:
-			fprintf(stderr, "Error: Comparison-type %d not allowed for string "\
-							"comparison!", type);
-			exit(EXIT_FAILURE);
+			assert(("comparison-type %d not allowed for string comparison", false));
 			break;
 	}
 	
@@ -350,12 +334,7 @@ CbValue* cb_string_compare(enum cb_comparison_type type, const CbValue* l,
 CbValue* cb_boolean_compare(enum cb_comparison_type type, const CbValue* l,
 							const CbValue* r)
 {
-	if (!cb_value_is_type(l, VT_BOOLEAN))
-	{
-		fprintf(stderr, "Error: Value has invalid type for this operation, "\
-						"expecting VT_BOOLEAN!");
-		exit(EXIT_FAILURE);
-	}
+	assert(cb_value_is_type(l, VT_BOOLEAN));
 	
 	bool not_flag	= false;
 	CbBoolean result= false;
@@ -374,9 +353,7 @@ CbValue* cb_boolean_compare(enum cb_comparison_type type, const CbValue* l,
 		}
 		
 		default:
-			fprintf(stderr, "Error: Comparison-type %d not allowed for "\
-							"boolean comparison!", type);
-			exit(EXIT_FAILURE);
+			assert(("comparison-type %d not allowed for boolean comparison", false));
 			break;
 	}
 	
@@ -395,12 +372,7 @@ CbValue* cb_boolean_compare(enum cb_comparison_type type, const CbValue* l,
 static CbValue* cb_numeric_operation(enum cb_operation_type type, CbValue* l,
 									 CbValue* r)
 {
-	if (!cb_value_is_type(l, VT_NUMERIC))
-	{
-		fprintf(stderr, "Error: Value has invalid type for this operation, "\
-						"expecting VT_NUMERIC!");
-		exit(EXIT_FAILURE);
-	}
+	assert(cb_value_is_type(r, VT_NUMERIC));
 	
 	CbValue* result	= cb_numeric_create(0);
 	
@@ -410,11 +382,12 @@ static CbValue* cb_numeric_operation(enum cb_operation_type type, CbValue* l,
 		case OPR_SUB: result->value = l->value - r->value; break;
 		case OPR_MUL: result->value = l->value * r->value; break;
 		case OPR_DIV:
-			// check for division by zero first!
-			if (r->value == 0)
+			if (r->value == 0) // check for division by zero first!
 			{
-				fprintf(stderr, "Error: Division by zero is not allowed!\n");
-				exit(EXIT_FAILURE);
+				cb_print_error_msg("Division by zero is not allowed");
+				cb_value_free(result);	// free previously allocated value
+				result = NULL;			// assign NULL to indicate failure
+				break;
 			}
 			
 			result->value = l->value / r->value;
@@ -433,12 +406,7 @@ static CbValue* cb_numeric_operation(enum cb_operation_type type, CbValue* l,
 // -----------------------------------------------------------------------------
 static CbValue* cb_string_concat(CbValue* l, CbValue* r)
 {
-	if (!cb_value_is_type(l, VT_STRING) || !cb_value_is_type(r, VT_STRING))
-	{
-		fprintf(stderr, "Error: Value has invalid type for this operation, "\
-						"expecting VT_STRING!");
-		exit(EXIT_FAILURE);
-	}
+	assert(cb_value_is_type(r, VT_STRING));
 	
 	char* buffer = (char*) malloc(strlen(l->string) +
 								  strlen(r->string) + 1);
