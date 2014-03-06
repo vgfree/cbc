@@ -12,15 +12,15 @@
 // declarations
 // #############################################################################
 
-static const char codeblock_string_undeffunc[] = "UndefinedFunction(),";
-static const char codeblock_string_undefvar[] = "cUndefinedVar := 'foobar',";
-static const char codeblock_string_unexptokennum[] = "WriteLn('foo' 123, True),";
-static const char codeblock_string_missingcomma[] = "WriteLn('foo')";
-static const char codeblock_string_redeclvar[] = "| foo, foo | foo := 123,";
-static const char codeblock_string_redeclfunc[] = "function Foo() 1, end, function Foo() 1, end,";
-static const char codeblock_string_paramcount1[] = "function Foo(p) 1, end, Foo('a', 1, True),";
-static const char codeblock_string_paramcount2[] = "function Foo() 1, end, Foo(1),";
-static const char codeblock_string_paramcount3[] = "function Foo(p1,p2,p3) 1, end, Foo(1, '2'),";
+static const char cbstr_undeffunc[]     = "UndefinedFunction(),";
+static const char cbstr_undefvar[]      = "cUndefinedVar := 'foobar',";
+static const char cbstr_unexptokennum[] = "WriteLn('foo' 123, True),";
+static const char cbstr_missingcomma[]  = "WriteLn('foo')";
+static const char cbstr_redeclvar[]     = "| foo, foo | foo := 123,";
+static const char cbstr_redeclfunc[]    = "function Foo() 1, end, function Foo() 1, end,";
+static const char cbstr_paramcount1[]   = "function Foo(p) 1, end, Foo('a', 1, True),";
+static const char cbstr_paramcount2[]   = "function Foo() 1, end, Foo(1),";
+static const char cbstr_paramcount3[]   = "function Foo(p1,p2,p3) 1, end, Foo(1, '2'),";
 
 static void test_error(CuTest* tc, const char* codeblock_string,
 					   const char* expected_error_message, cb_error_type type);
@@ -68,10 +68,10 @@ static void test_error(CuTest* tc, const char* codeblock_string,
 // -----------------------------------------------------------------------------
 void test_error_handling_syntax_errors(CuTest *tc)
 {
-	test_error(tc, codeblock_string_unexptokennum,
+	test_error(tc, cbstr_unexptokennum,
 			   "Syntax error: Line 1: Unexpected token NUMBER",
 			   CB_ERR_SYNTAX);
-	test_error(tc, codeblock_string_missingcomma,
+	test_error(tc, cbstr_missingcomma,
 			   "Syntax error: Line 1: Unexpected token ENDOFFILE",
 			   CB_ERR_SYNTAX);
 }
@@ -81,10 +81,10 @@ void test_error_handling_syntax_errors(CuTest *tc)
 // -----------------------------------------------------------------------------
 void test_error_handling_undefinedsymbol(CuTest *tc)
 {
-	test_error(tc, codeblock_string_undeffunc,
+	test_error(tc, cbstr_undeffunc,
 			   "Runtime error: Line 1: Undefined symbol: UndefinedFunction",
 			   CB_ERR_RUNTIME);
-	test_error(tc, codeblock_string_undefvar,
+	test_error(tc, cbstr_undefvar,
 			   "Runtime error: Line 1: Undefined symbol: cUndefinedVar",
 			   CB_ERR_RUNTIME);
 }
@@ -94,10 +94,10 @@ void test_error_handling_undefinedsymbol(CuTest *tc)
 // -----------------------------------------------------------------------------
 void test_error_handling_symbolredecl(CuTest *tc)
 {
-	test_error(tc, codeblock_string_redeclvar,
+	test_error(tc, cbstr_redeclvar,
 			   "Runtime error: Cannot redeclare symbol: foo",
 			   CB_ERR_RUNTIME);
-	test_error(tc, codeblock_string_redeclfunc,
+	test_error(tc, cbstr_redeclfunc,
 			   "Runtime error: Cannot redeclare symbol: Foo",
 			   CB_ERR_RUNTIME);
 }
@@ -107,15 +107,15 @@ void test_error_handling_symbolredecl(CuTest *tc)
 // -----------------------------------------------------------------------------
 void test_error_handling_paramcount(CuTest *tc)
 {
-	test_error(tc, codeblock_string_paramcount1,
+	test_error(tc, cbstr_paramcount1,
 			   "Runtime error: In function `Foo': Expecting 1 argument, "\
 			   "but 3 were actually passed",
 			   CB_ERR_RUNTIME);
-	test_error(tc, codeblock_string_paramcount2,
+	test_error(tc, cbstr_paramcount2,
 			   "Runtime error: In function `Foo': Expecting 0 arguments, "\
 			   "but 1 was actually passed",
 			   CB_ERR_RUNTIME);
-	test_error(tc, codeblock_string_paramcount3,
+	test_error(tc, cbstr_paramcount3,
 			   "Runtime error: In function `Foo': Expecting 3 arguments, "\
 			   "but 2 were actually passed",
 			   CB_ERR_RUNTIME);
