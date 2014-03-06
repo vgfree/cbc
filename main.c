@@ -42,18 +42,14 @@ int main(int argc, char* argv[])
 	if (parse_file)		// if a file was parsed
 		fclose(input);	// -> close file stream
 	
-	if (parser_result == EXIT_SUCCESS)
+	if (parser_result         == EXIT_SUCCESS &&
+		codeblock_execute(cb) == EXIT_SUCCESS)	// execute ...
 	{
-		if (codeblock_execute(cb) == EXIT_SUCCESS)	// execute ...
-		{
-			cb_value_print(cb->result);				// and print result
-			
+		cb_value_print(cb->result);				// and print result
+		
 #ifdef _CBC_TRACK_EXECUTION_TIME
-			printf("\nExecution duration: %f seconds", cb->duration);
+		printf("\nExecution duration: %f seconds", cb->duration);
 #endif // _CBC_TRACK_EXECUTION_TIME
-		}
-		else	// print concluding error message
-			cb_print_error_msg("Execution failed due to previous error(s)");
 	}
 	
 	codeblock_free(cb);	// cleanup
