@@ -131,12 +131,6 @@ void cb_syntree_free(CbSyntree* node)
 			break;
 		
 		// special nodes
-		case SNT_LIST:
-			cb_syntree_free(node->r);
-			if (node->l)
-				cb_syntree_free(node->l);
-			break;
-		
 		case SNT_FUNC_DECL:
 		{
 			CbFuncDeclarationNode* fndecl = ((CbFuncDeclarationNode*) node);
