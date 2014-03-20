@@ -44,10 +44,13 @@ int yylineno_temp = -1;
 %token	<boolval>	BOOLEAN
 
 %right	ASSIGN
+%right	NOT
 %left	'+' '-'
 %left	'*' '/'
 
 %nonassoc	<cmp>	COMPARE
+%nonassoc	AND
+%nonassoc	OR
 
 %type <ast>		decllist decl stmtlist stmt expr symref
 %type <list>	params paramlist exprlist args
@@ -271,6 +274,15 @@ expr:
 	| expr COMPARE expr			{
 									$$ = cb_comparison_create($2, $1, $3);
 									$$->line_no = yylineno;
+								}
+	| expr AND expr				{
+									$$ = cb_syntree_create(SNT_LOGICAL_AND, $1, $3);
+								}
+	| expr OR expr				{
+									$$ = cb_syntree_create(SNT_LOGICAL_OR, $1, $3);
+								}
+	| NOT expr					{
+									$$ = cb_syntree_create(SNT_LOGICAL_NOT, $2, NULL);
 								}
 	| '(' expr ')'				{ $$ = $2; }
 	| '-' expr					{

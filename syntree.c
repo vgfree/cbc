@@ -120,6 +120,8 @@ void cb_syntree_free(CbSyntree* node)
 		case '/':
 		case SNT_ASSIGNMENT:
 		case SNT_STATEMENTLIST:
+		case SNT_LOGICAL_AND:
+		case SNT_LOGICAL_OR:
 			cb_syntree_free(node->r);
 			// no break here to free left child-node as well
 		
@@ -127,6 +129,7 @@ void cb_syntree_free(CbSyntree* node)
 		case SNT_UNARYMINUS:
 		case SNT_DECLARATION:
 		case SNT_PRINT:
+		case SNT_LOGICAL_NOT:
 			cb_syntree_free(node->l);
 			break;
 		
@@ -465,6 +468,92 @@ CbValue* cb_syntree_eval(CbSyntree* node, CbSymtab* symtab)
 			}
 			
 			result = cb_numeric_div(l, r);
+			break;
+		}
+		case SNT_LOGICAL_AND:
+		case SNT_LOGICAL_OR:
+		{
+			CbValue* l = cb_syntree_eval(node->l, symtab);
+			if (l == NULL)
+				break;
+			
+			CbValue* r = cb_syntree_eval(node->r, symtab);
+			if (r == NULL)
+			{
+				cb_value_free(l);
+				break;
+			}
+			
+			if (!cb_value_is_type(r, l->type))
+			{
+				cb_print_error(CB_ERR_RUNTIME, node->line_no,
+							   "Node type of lhs differs from rhs");
+			}
+			else
+				switch (l->type)
+				{
+					case VT_BOOLEAN:
+						switch (node->type)
+						{
+							case SNT_LOGICAL_AND:
+								result = cb_boolean_create(l->boolean && r->boolean);
+								break;
+							
+							case SNT_LOGICAL_OR:
+								result = cb_boolean_create(l->boolean || r->boolean);
+								break;
+						}
+						break;
+					
+					case VT_NUMERIC:
+						switch (node->type)
+						{
+							case SNT_LOGICAL_AND:
+								result = cb_numeric_create(l->value & r->value);
+								break;
+							
+							case SNT_LOGICAL_OR:
+								result = cb_numeric_create(l->value | r->value);
+								break;
+						}
+						break;
+					
+					default:
+						cb_print_error(CB_ERR_RUNTIME, node->line_no,
+									   "Wrong value-type");
+						break;
+				}
+			
+			cb_value_free(l);
+			cb_value_free(r);
+			
+			break;
+		}
+		
+		case SNT_LOGICAL_NOT:
+		{
+			CbValue* operand = cb_syntree_eval(node->l, symtab);
+			if (operand == NULL)
+				break;
+			
+			switch (operand->type)
+			{
+				case VT_BOOLEAN:
+					result = cb_boolean_create(!operand->boolean);
+					break;
+				
+				case VT_NUMERIC:
+					result = cb_numeric_create(!operand->value);
+					break;
+				
+				default:
+					cb_print_error(CB_ERR_RUNTIME, node->line_no,
+								   "Wrong value-type");
+					break;
+			}
+			
+			cb_value_free(operand);
+			
 			break;
 		}
 		

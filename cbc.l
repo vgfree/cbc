@@ -32,6 +32,11 @@
 "end"		{ return END; }
 "function"	{ return FUNCTION; }
 "print"		{ return PRINT; }
+
+			/* logical gates */
+"and"		{ return AND; }
+"or"		{ return OR; }
+"not"		{ return NOT; }
 			
 			/* boolean values */
 "True"		{

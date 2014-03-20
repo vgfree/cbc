@@ -13,12 +13,15 @@ enum cb_syntree_node_type
 	SNT_ASSIGNMENT = 256,
 	SNT_COMPARISON,
 	SNT_STATEMENTLIST,
+	SNT_LOGICAL_AND,
+	SNT_LOGICAL_OR,
 	SNT_FUNC_DECL,
 	SNT_FUNC_CALL,
 	// the following node-types have one child-node
 	SNT_UNARYMINUS,
 	SNT_DECLARATION,
 	SNT_PRINT,
+	SNT_LOGICAL_NOT,
 	// the following node-types have no child-nodes
 	SNT_CONSTVAL,
 	SNT_CONSTBOOL,
