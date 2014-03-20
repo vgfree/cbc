@@ -68,9 +68,32 @@ const CbValue expected_results[] = {
 	{VT_STRING, (CbNumeric) "LNCU"}		// Testcase 45
 };
 
+// CbTestString -- Combination of a test codeblock string and the expected result
+typedef struct
+{
+	char* cb_string;
+	CbValue expected_result;
+} CbTestString;
+
+// logical gates (e.g. AND, OR, NOT) test codeblock strings
+static const CbTestString cbstrings_logical_gates[] = {
+	{"True and False,", {VT_BOOLEAN, false}},
+	{"True and True,", {VT_BOOLEAN, true}},
+	{"False and False,", {VT_BOOLEAN, false}},
+	{"True or False,", {VT_BOOLEAN, true}},
+	{"True or True,", {VT_BOOLEAN, true}},
+	{"False or False,", {VT_BOOLEAN, false}},
+	{"not False,", {VT_BOOLEAN, true}},
+	{"not True,", {VT_BOOLEAN, false}},
+	{
+		"| foo, bar | foo := True, bar := False, not (foo and bar),",
+		{VT_BOOLEAN, true}
+	}
+};
+
 
 // #############################################################################
-// test procedures
+// utilities
 // #############################################################################
 
 // -----------------------------------------------------------------------------
@@ -120,6 +143,43 @@ static void test_codeblock_file(CuTest *tc, const char* test_file_name,
 }
 
 // -----------------------------------------------------------------------------
+// Test a codeblock string
+// -----------------------------------------------------------------------------
+void test_codeblock_string(CuTest *tc, const CbTestString* test_data)
+{
+	Codeblock* cb = codeblock_create();
+	
+	CuAssertIntEquals(tc, EXIT_SUCCESS,
+					  codeblock_parse_string(cb, test_data->cb_string));
+	CuAssertIntEquals(tc, EXIT_SUCCESS, codeblock_execute(cb));
+	
+	const CbValue* expected = &(test_data->expected_result);
+	
+	CuAssertIntEquals(tc, expected->type, cb->result->type);
+	switch (expected->type)
+	{
+		case VT_BOOLEAN:
+			CuAssertIntEquals(tc, expected->boolean, cb->result->boolean);
+			break;
+		
+		case VT_NUMERIC:
+			CuAssertIntEquals(tc, expected->value, cb->result->value);
+			break;
+		
+		case VT_STRING:
+			CuAssertStrEquals(tc, expected->string, cb->result->string);
+			break;
+	}
+	
+	codeblock_free(cb);
+}
+
+
+// #############################################################################
+// test procedures
+// #############################################################################
+
+// -----------------------------------------------------------------------------
 // Test: test_codeblock_all_files() -- Test all codeblock script files
 // -----------------------------------------------------------------------------
 void test_codeblock_all_files(CuTest *tc)
@@ -137,6 +197,18 @@ void test_codeblock_all_files(CuTest *tc)
 	}
 }
 
+// -----------------------------------------------------------------------------
+// Test logical gates (such as: AND, OR, NOT)
+// -----------------------------------------------------------------------------
+void test_codeblock_logical_gates(CuTest *tc)
+{
+	int testcase	   = 0;
+	int testcase_count = sizeof(cbstrings_logical_gates) / sizeof(CbTestString);
+	
+	for (; testcase < testcase_count; testcase++)
+		test_codeblock_string(tc, &cbstrings_logical_gates[testcase]);
+}
+
 
 // #############################################################################
 // make suite
@@ -146,5 +218,6 @@ CuSuite* make_suite_codeblock_generic()
 {
 	CuSuite* suite = CuSuiteNew();
 	SUITE_ADD_TEST(suite, test_codeblock_all_files);
+	SUITE_ADD_TEST(suite, test_codeblock_logical_gates);
 	return suite;
 }
