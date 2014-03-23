@@ -72,7 +72,6 @@ CbValue* cb_value_copy(const CbValue* val);
 char* cb_value_to_string(const CbValue* val);
 void cb_value_print(const CbValue* val);
 CbValue* cb_value_compare(enum cb_comparison_type type, CbValue* l, CbValue* r);
-CbValue* cb_value_add(CbValue* l, CbValue* r);
 // CbNumeric interface functions
 CbValue* cb_numeric_compare(enum cb_comparison_type type, const CbValue* l,
 							const CbValue* r);
@@ -83,6 +82,7 @@ CbValue* cb_numeric_div(CbValue* l, CbValue* r);
 // CbString interface functions
 CbValue* cb_string_compare(enum cb_comparison_type type, const CbValue* l,
 						   const CbValue* r);
+CbValue* cb_string_concat(CbValue* l, CbValue* r);
 // CbBoolean interface functions
 CbValue* cb_boolean_compare(enum cb_comparison_type type, const CbValue* l,
 							const CbValue* r);

@@ -18,7 +18,6 @@
 
 static CbValue* cb_numeric_operation(enum cb_operation_type type, CbValue* l,
 									 CbValue* r);
-static CbValue* cb_string_concat(CbValue* l, CbValue* r);
 
 
 // #############################################################################
@@ -224,10 +223,11 @@ CbValue* cb_value_compare(enum cb_comparison_type type, CbValue* l, CbValue* r)
 // -----------------------------------------------------------------------------
 // numerical comparison
 // -----------------------------------------------------------------------------
-CbValue* cb_numeric_compare(	enum cb_comparison_type type, const CbValue* l,
+CbValue* cb_numeric_compare(enum cb_comparison_type type, const CbValue* l,
 							const CbValue* r)
 {
-	assert(cb_value_is_type(l, VT_NUMERIC) && cb_value_is_type(r, VT_NUMERIC));
+	assert(cb_value_is_type(l, VT_NUMERIC));
+	assert(cb_value_is_type(r, VT_NUMERIC));
 	
 	CbValue* result = cb_boolean_create(false);
 	
@@ -242,25 +242,6 @@ CbValue* cb_numeric_compare(	enum cb_comparison_type type, const CbValue* l,
 	}
 	
 	return result;
-}
-
-// -----------------------------------------------------------------------------
-// perform add-operation
-// -----------------------------------------------------------------------------
-CbValue* cb_value_add(CbValue* l, CbValue* r)
-{
-	switch (l->type)
-	{
-		case VT_NUMERIC:
-			return cb_numeric_operation(OPR_ADD, l, r);
-			break;
-		case VT_STRING:
-			return cb_string_concat(l, r);
-			break;
-		default:
-			assert(("Unable to perform OPR_ADD on this value-type", false));
-			break;
-	}
 }
 
 // -----------------------------------------------------------------------------
@@ -301,7 +282,8 @@ CbValue* cb_numeric_div(CbValue* l, CbValue* r)
 CbValue* cb_string_compare(enum cb_comparison_type type, const CbValue* l,
 						   const CbValue* r)
 {
-	assert(cb_value_is_type(l, VT_STRING) && cb_value_is_type(r, VT_STRING));
+	assert(cb_value_is_type(l, VT_STRING));
+	assert(cb_value_is_type(r, VT_STRING));
 	
 	bool not_flag	= false;
 	bool result		= false;
@@ -329,12 +311,35 @@ CbValue* cb_string_compare(enum cb_comparison_type type, const CbValue* l,
 }
 
 // -----------------------------------------------------------------------------
+// concatenate strings
+// -----------------------------------------------------------------------------
+CbValue* cb_string_concat(CbValue* l, CbValue* r)
+{
+	assert(cb_value_is_type(l, VT_STRING));
+	assert(cb_value_is_type(r, VT_STRING));
+	
+	char* buffer = (char*) malloc(strlen(l->string) +
+								  strlen(r->string) + 1);
+	*buffer = '\0';	// terminate string
+	strcat(buffer, l->string);
+	strcat(buffer, r->string);
+	CbValue* result = cb_string_create(buffer);
+	
+	// free lhs and rhs
+	cb_value_free(l);
+	cb_value_free(r);
+	
+	return result;
+}
+
+// -----------------------------------------------------------------------------
 // boolean comparison
 // -----------------------------------------------------------------------------
 CbValue* cb_boolean_compare(enum cb_comparison_type type, const CbValue* l,
 							const CbValue* r)
 {
 	assert(cb_value_is_type(l, VT_BOOLEAN));
+	assert(cb_value_is_type(r, VT_BOOLEAN));
 	
 	bool not_flag	= false;
 	CbBoolean result= false;
@@ -372,6 +377,7 @@ CbValue* cb_boolean_compare(enum cb_comparison_type type, const CbValue* l,
 static CbValue* cb_numeric_operation(enum cb_operation_type type, CbValue* l,
 									 CbValue* r)
 {
+	assert(cb_value_is_type(l, VT_NUMERIC));
 	assert(cb_value_is_type(r, VT_NUMERIC));
 	
 	CbValue* result	= cb_numeric_create(0);
@@ -393,27 +399,6 @@ static CbValue* cb_numeric_operation(enum cb_operation_type type, CbValue* l,
 			result->value = l->value / r->value;
 			break;
 	}
-	
-	// free lhs and rhs
-	cb_value_free(l);
-	cb_value_free(r);
-	
-	return result;
-}
-
-// -----------------------------------------------------------------------------
-// concatenate string (internal)
-// -----------------------------------------------------------------------------
-static CbValue* cb_string_concat(CbValue* l, CbValue* r)
-{
-	assert(cb_value_is_type(r, VT_STRING));
-	
-	char* buffer = (char*) malloc(strlen(l->string) +
-								  strlen(r->string) + 1);
-	*buffer = '\0';	// terminate string
-	strcat(buffer, l->string);
-	strcat(buffer, r->string);
-	CbValue* result = cb_string_create(buffer);
 	
 	// free lhs and rhs
 	cb_value_free(l);
