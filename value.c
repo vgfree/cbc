@@ -325,10 +325,6 @@ CbValue* cb_string_concat(CbValue* l, CbValue* r)
 	strcat(buffer, r->string);
 	CbValue* result = cb_string_create(buffer);
 	
-	// free lhs and rhs
-	cb_value_free(l);
-	cb_value_free(r);
-	
 	return result;
 }
 
@@ -399,10 +395,6 @@ static CbValue* cb_numeric_operation(enum cb_operation_type type, CbValue* l,
 			result->value = l->value / r->value;
 			break;
 	}
-	
-	// free lhs and rhs
-	cb_value_free(l);
-	cb_value_free(r);
 	
 	return result;
 }

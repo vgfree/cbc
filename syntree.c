@@ -407,67 +407,8 @@ CbValue* cb_syntree_eval(CbSyntree* node, CbSymtab* symtab)
 		}
 		
 		case '+':
-		{
-			CbValue* l = cb_syntree_eval(node->l, symtab);
-			if (l == NULL)
-				break;
-			
-			CbValue* r = cb_syntree_eval(node->r, symtab);
-			if (r == NULL)
-			{
-				cb_value_free(l);
-				break;
-			}
-			
-			switch (l->type)
-			{
-				case VT_NUMERIC:
-					result = cb_numeric_add(l, r);
-					break;
-				
-				case VT_STRING:
-					result = cb_string_concat(l, r);
-					break;
-				
-				default:
-					cb_print_error(CB_ERR_RUNTIME, node->line_no,
-								   "Binary addition is only allowed for string and numeric values");
-			}
-			
-			break;
-		}
 		case '-':
-		{
-			CbValue* l = cb_syntree_eval(node->l, symtab);
-			if (l == NULL)
-				break;
-			
-			CbValue* r = cb_syntree_eval(node->r, symtab);
-			if (r == NULL)
-			{
-				cb_value_free(l);
-				break;
-			}
-			
-			result = cb_numeric_sub(l, r);
-			break;
-		}
 		case '*':
-		{
-			CbValue* l = cb_syntree_eval(node->l, symtab);
-			if (l == NULL)
-				break;
-			
-			CbValue* r = cb_syntree_eval(node->r, symtab);
-			if (r == NULL)
-			{
-				cb_value_free(l);
-				break;
-			}
-			
-			result = cb_numeric_mul(l, r);
-			break;
-		}
 		case '/':
 		{
 			CbValue* l = cb_syntree_eval(node->l, symtab);
@@ -481,7 +422,42 @@ CbValue* cb_syntree_eval(CbSyntree* node, CbSymtab* symtab)
 				break;
 			}
 			
-			result = cb_numeric_div(l, r);
+			switch (node->type)
+			{
+				case '+':
+					switch (l->type)
+					{
+						case VT_NUMERIC:
+							result = cb_numeric_add(l, r);
+							break;
+						
+						case VT_STRING:
+							result = cb_string_concat(l, r);
+							break;
+						
+						default:
+							cb_print_error(CB_ERR_RUNTIME, node->line_no,
+										   "Binary addition is only allowed for string and numeric values");
+					}
+					break;
+				
+				case '-':
+					result = cb_numeric_sub(l, r);
+					break;
+				
+				case '*':
+					result = cb_numeric_mul(l, r);
+					break;
+				
+				case '/':
+					result = cb_numeric_div(l, r);
+					break;
+			}
+			
+			// free lhs and rhs
+			cb_value_free(l);
+			cb_value_free(r);
+			
 			break;
 		}
 		
