@@ -77,6 +77,7 @@ typedef struct
 
 // logical gates (e.g. AND, OR, NOT) test codeblock strings
 static const CbTestString cbstrings_logical_gates[] = {
+	// boolean
 	{"True and False,", {VT_BOOLEAN, false}},
 	{"True and True,", {VT_BOOLEAN, true}},
 	{"False and False,", {VT_BOOLEAN, false}},
@@ -88,6 +89,19 @@ static const CbTestString cbstrings_logical_gates[] = {
 	{
 		"| foo, bar | foo := True, bar := False, not (foo and bar),",
 		{VT_BOOLEAN, true}
+	},
+	// numeric
+	{"15 and 31,", {VT_NUMERIC, 15}},
+	{"31 and 15,", {VT_NUMERIC, 15}},
+	{"15 and 15,", {VT_NUMERIC, 15}},
+	{"15 or 31,", {VT_NUMERIC, 31}},
+	{"31 or 15,", {VT_NUMERIC, 31}},
+	{"123 or 456,", {VT_NUMERIC, 507}},
+	{"not 5,", {VT_NUMERIC, -6}},
+	{"not 123456,", {VT_NUMERIC, -123457}},
+	{
+		"| foo, bar | foo := 31, bar := 15, not (foo and bar),",
+		{VT_NUMERIC, -16}
 	}
 };
 
