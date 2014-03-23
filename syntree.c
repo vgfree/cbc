@@ -386,7 +386,26 @@ CbValue* cb_syntree_eval(CbSyntree* node, CbSymtab* symtab)
 			CbValue* r = cb_syntree_eval(cmp->r, symtab);
 			
 			if (l && r) // both values of left and right syntax node must be valid
-				result = cb_value_compare(cmp->cmp_type, l, r);
+			{
+				switch (l->type)
+				{
+					case VT_NUMERIC:
+						result = cb_numeric_compare(cmp->cmp_type, l, r);
+						break;
+					
+					case VT_STRING:
+						result = cb_string_compare(cmp->cmp_type, l, r);
+						break;
+					
+					case VT_BOOLEAN:
+						result = cb_boolean_compare(cmp->cmp_type, l, r);
+						break;
+				}
+				
+				// free lhs and rhs
+				cb_value_free(l);
+				cb_value_free(r);
+			}
 			else if (l)
 				cb_value_free(l);
 			else

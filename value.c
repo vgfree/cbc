@@ -187,40 +187,6 @@ void cb_value_print(const CbValue* val)
 }
 
 // -----------------------------------------------------------------------------
-// compare two codeblock-values.
-// 
-// NOTE:	regardless of the value-type beeing compared, every compare-function
-//			returns a cbboolean-value.
-// -----------------------------------------------------------------------------
-CbValue* cb_value_compare(enum cb_comparison_type type, CbValue* l, CbValue* r)
-{
-	assert(cb_value_is_type(l, r->type));
-	
-	CbValue* result = NULL;
-	
-	switch (l->type)
-	{
-		case VT_NUMERIC:
-			result = cb_numeric_compare(type, l, r);
-			break;
-		
-		case VT_BOOLEAN:
-			result = cb_boolean_compare(type, l, r);
-			break;
-		
-		case VT_STRING:
-			result = cb_string_compare(type, l, r);
-			break;
-	}
-	
-	// free lhs and rhs
-	cb_value_free(l);
-	cb_value_free(r);
-	
-	return result;
-}
-
-// -----------------------------------------------------------------------------
 // numerical comparison
 // -----------------------------------------------------------------------------
 CbValue* cb_numeric_compare(enum cb_comparison_type type, const CbValue* l,

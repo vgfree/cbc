@@ -71,7 +71,6 @@ void cb_value_assign_and_free_source(CbValue* source, CbValue* destination);
 CbValue* cb_value_copy(const CbValue* val);
 char* cb_value_to_string(const CbValue* val);
 void cb_value_print(const CbValue* val);
-CbValue* cb_value_compare(enum cb_comparison_type type, CbValue* l, CbValue* r);
 // CbNumeric interface functions
 CbValue* cb_numeric_compare(enum cb_comparison_type type, const CbValue* l,
 							const CbValue* r);
