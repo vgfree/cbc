@@ -169,7 +169,7 @@ char* cb_value_to_string(const CbValue* val)
 			break;
 		
 		default:
-			assert(("Invalid value-type", false));
+			assert(("Invalid value type", false));
 			break;
 	}
 	
@@ -302,7 +302,7 @@ CbValue* cb_string_compare(enum cb_comparison_type type, const CbValue* l,
 		}
 		
 		default:
-			assert(("comparison-type %d not allowed for string comparison", false));
+			assert(("comparison type not allowed for string comparison", false));
 			break;
 	}
 	
@@ -358,7 +358,7 @@ CbValue* cb_boolean_compare(enum cb_comparison_type type, const CbValue* l,
 		}
 		
 		default:
-			assert(("comparison-type %d not allowed for boolean comparison", false));
+			assert(("comparison type not allowed for boolean comparison", false));
 			break;
 	}
 	
