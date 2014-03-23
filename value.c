@@ -18,6 +18,8 @@
 
 static CbValue* cb_numeric_operation(enum cb_operation_type type, CbValue* l,
 									 CbValue* r);
+static CbValue* cb_boolean_operation(enum cb_operation_type type, CbValue* l,
+									 CbValue* r);
 
 
 // #############################################################################
@@ -243,6 +245,33 @@ CbValue* cb_numeric_div(CbValue* l, CbValue* r)
 }
 
 // -----------------------------------------------------------------------------
+// binary AND for numerical values
+// -----------------------------------------------------------------------------
+CbValue* cb_numeric_and(CbValue* l, CbValue* r)
+{
+	return cb_numeric_operation(OPR_AND, l, r);
+}
+
+// -----------------------------------------------------------------------------
+// binary OR for numerical values
+// -----------------------------------------------------------------------------
+CbValue* cb_numeric_or(CbValue* l, CbValue* r)
+{
+	return cb_numeric_operation(OPR_OR, l, r);
+}
+
+// -----------------------------------------------------------------------------
+// unary NOT for numerical values
+// -----------------------------------------------------------------------------
+CbValue* cb_numeric_not(CbValue* operand)
+{
+	assert(cb_value_is_type(operand, VT_NUMERIC));
+	
+	// IMPORTANT: Use bitwise negation (~) !
+	return cb_numeric_create(~ operand->value);
+}
+
+// -----------------------------------------------------------------------------
 // string comparison
 // -----------------------------------------------------------------------------
 CbValue* cb_string_compare(enum cb_comparison_type type, const CbValue* l,
@@ -328,6 +357,32 @@ CbValue* cb_boolean_compare(enum cb_comparison_type type, const CbValue* l,
 	return result_val;
 }
 
+// -----------------------------------------------------------------------------
+// binary AND for boolean values
+// -----------------------------------------------------------------------------
+CbValue* cb_boolean_and(CbValue* l, CbValue* r)
+{
+	return cb_boolean_operation(OPR_AND, l, r);
+}
+
+// -----------------------------------------------------------------------------
+// binary OR for boolean values
+// -----------------------------------------------------------------------------
+CbValue* cb_boolean_or(CbValue* l, CbValue* r)
+{
+	return cb_boolean_operation(OPR_OR, l, r);
+}
+
+// -----------------------------------------------------------------------------
+// unary NOT for boolean values
+// -----------------------------------------------------------------------------
+CbValue* cb_boolean_not(CbValue* operand)
+{
+	assert(cb_value_is_type(operand, VT_BOOLEAN));
+	
+	return cb_boolean_create(! operand->value);
+}
+
 
 // #############################################################################
 // internal functions
@@ -360,6 +415,28 @@ static CbValue* cb_numeric_operation(enum cb_operation_type type, CbValue* l,
 			
 			result->value = l->value / r->value;
 			break;
+		case OPR_AND: result->value = l->value & r->value; break;
+		case OPR_OR:  result->value = l->value | r->value; break;
+	}
+	
+	return result;
+}
+
+// -----------------------------------------------------------------------------
+// boolean operation (internal)
+// -----------------------------------------------------------------------------
+static CbValue* cb_boolean_operation(enum cb_operation_type type, CbValue* l,
+									 CbValue* r)
+{
+	assert(cb_value_is_type(l, VT_BOOLEAN));
+	assert(cb_value_is_type(r, VT_BOOLEAN));
+	
+	CbValue* result	= cb_boolean_create(false);
+	
+	switch (type)
+	{
+		case OPR_AND: result->boolean = l->boolean && r->boolean; break;
+		case OPR_OR:  result->boolean = l->boolean || r->boolean; break;
 	}
 	
 	return result;

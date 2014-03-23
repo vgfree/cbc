@@ -26,7 +26,10 @@ enum cb_operation_type
 	OPR_ADD,
 	OPR_SUB,
 	OPR_MUL,
-	OPR_DIV
+	OPR_DIV,
+	OPR_AND,
+	OPR_OR,
+	OPR_NOT
 };
 
 // comparison types
@@ -78,6 +81,9 @@ CbValue* cb_numeric_add(CbValue* l, CbValue* r);
 CbValue* cb_numeric_sub(CbValue* l, CbValue* r);
 CbValue* cb_numeric_mul(CbValue* l, CbValue* r);
 CbValue* cb_numeric_div(CbValue* l, CbValue* r);
+CbValue* cb_numeric_and(CbValue* l, CbValue* r);
+CbValue* cb_numeric_or(CbValue* l, CbValue* r);
+CbValue* cb_numeric_not(CbValue* operand);
 // CbString interface functions
 CbValue* cb_string_compare(enum cb_comparison_type type, const CbValue* l,
 						   const CbValue* r);
@@ -85,6 +91,9 @@ CbValue* cb_string_concat(CbValue* l, CbValue* r);
 // CbBoolean interface functions
 CbValue* cb_boolean_compare(enum cb_comparison_type type, const CbValue* l,
 							const CbValue* r);
+CbValue* cb_boolean_and(CbValue* l, CbValue* r);
+CbValue* cb_boolean_or(CbValue* l, CbValue* r);
+CbValue* cb_boolean_not(CbValue* operand);
 
 
 #endif // VALUE_H
