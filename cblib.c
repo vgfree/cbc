@@ -206,7 +206,7 @@ CbValue* bif_setenv(CbStack* arg_stack)
 	error = putenv(envstr);	// set environment variable
 	free(envstr);
 #else
-	error = setenv(name->string, value->string, 1);
+	error = setenv(name->string, value_str, 1);
 #endif // _CBC_PLAT_WNDS
 	if (!error)
 		result = cb_value_create();
