@@ -3,6 +3,7 @@
  ******************************************************************************/
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <assert.h>
 #include "cblib.h"
@@ -105,6 +106,26 @@ CbValue* bif_str(CbStack* arg_stack)
 }
 
 // -----------------------------------------------------------------------------
+// Val() -- Convert a string to a numeric value
+// -----------------------------------------------------------------------------
+CbValue* bif_val(CbStack* arg_stack)
+{
+	assert(arg_stack->count == 1);
+	
+	CbValue* arg;
+	cb_stack_pop(arg_stack, (void*) &arg);
+	
+	assert(cb_value_is_type(arg, VT_STRING));
+	
+	CbValue* result = cb_numeric_create(0);	// default result
+	result->value	= strtol(arg->string, NULL, 10);
+	
+	cb_value_free(arg);
+	
+	return result;
+}
+
+// -----------------------------------------------------------------------------
 // Eval() -- Evaluate a codeblock string
 // -----------------------------------------------------------------------------
 CbValue* bif_eval(CbStack* arg_stack)
@@ -131,6 +152,68 @@ CbValue* bif_eval(CbStack* arg_stack)
 	}
 	
 	codeblock_free(cb);
+	
+	return result;
+}
+
+// -----------------------------------------------------------------------------
+// GetEnv() -- Get value of an environment variable
+// -----------------------------------------------------------------------------
+CbValue* bif_getenv(CbStack* arg_stack)
+{
+	assert(arg_stack->count == 1);
+	
+	CbValue* arg;
+	cb_stack_pop(arg_stack, (void*) &arg);
+	
+	assert(cb_value_is_type(arg, VT_STRING));
+	
+	CbValue* result = NULL;
+	
+	char* value = getenv(arg->string);
+	if (value == NULL)
+		result = cb_string_create("");
+	else
+		result = cb_string_create(strdup(value));
+	
+	cb_value_free(arg);
+	
+	return result;
+}
+
+// -----------------------------------------------------------------------------
+// SetEnv() -- Set the value of an environment variable
+// -----------------------------------------------------------------------------
+CbValue* bif_setenv(CbStack* arg_stack)
+{
+	assert(arg_stack->count == 2);
+	
+	CbValue* name;
+	CbValue* value;
+	cb_stack_pop(arg_stack, (void*) &value);
+	cb_stack_pop(arg_stack, (void*) &name);
+	
+	assert(cb_value_is_type(name, VT_STRING));
+	
+	CbValue* result = NULL;
+	int error		= 0;
+	char* value_str = cb_value_to_string(value);
+	
+#ifdef _CBC_PLAT_WNDS
+	int len		 = strlen(name->string) + 1 + strlen(value_str) + 1;
+	char* envstr = (char*) malloc(len);
+	sprintf(envstr, "%s=%s", name->string, value_str);
+	error = putenv(envstr);	// set environment variable
+	free(envstr);
+#else
+	error = setenv(name->string, value->string, 1);
+#endif // _CBC_PLAT_WNDS
+	if (!error)
+		result = cb_value_create();
+	
+	free(value_str);
+	cb_value_free(name);
+	cb_value_free(value);
 	
 	return result;
 }

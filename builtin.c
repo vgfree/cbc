@@ -32,7 +32,10 @@ CbBuiltinFunctionInfoItem builtin_func_decl_list[] = {
 	{"Mod", bif_mod, 2},
 	{"ValType", bif_valtype, 1},
 	{"Str", bif_str, 1},
-	{"Eval", bif_eval, 1}
+	{"Val", bif_val, 1},
+	{"Eval", bif_eval, 1},
+	{"GetEnv", bif_getenv, 1},
+	{"SetEnv", bif_setenv, 2}
 #ifdef _CBC_PLAT_WNDS
 	, {"Meld", bif_meld, 1}
 #endif // _CBC_PLAT_WNDS
