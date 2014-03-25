@@ -33,6 +33,7 @@ CbBuiltinFunctionInfoItem builtin_func_decl_list[] = {
 	{"ValType", bif_valtype, 1},
 	{"Str", bif_str, 1},
 	{"Val", bif_val, 1},
+	{"Replicate", bif_replicate, 2},
 	{"Eval", bif_eval, 1},
 	{"GetEnv", bif_getenv, 1},
 	{"SetEnv", bif_setenv, 2}

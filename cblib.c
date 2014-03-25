@@ -126,6 +126,43 @@ CbValue* bif_val(CbStack* arg_stack)
 }
 
 // -----------------------------------------------------------------------------
+// Replicate() -- Replicate a string n times
+// -----------------------------------------------------------------------------
+CbValue* bif_replicate(CbStack* arg_stack)
+{
+	assert(arg_stack->count == 2);
+	
+	CbValue* str;
+	CbValue* count;
+	cb_stack_pop(arg_stack, (void*) &count);
+	cb_stack_pop(arg_stack, (void*) &str);
+	
+	assert(cb_value_is_type(str, VT_STRING));
+	assert(cb_value_is_type(count, VT_NUMERIC));
+	
+	CbValue* result;
+	
+	if (count->value > 0)
+	{
+		char* result_str = (char*) malloc((strlen(str->string) * count->value) + 1);
+		*result_str      = '\0';	// terminate string
+		
+		int i = 0;
+		for (; i < count->value; i++)
+			strcat(result_str, str->string);
+		
+		result = cb_string_create(result_str);
+	}
+	else
+		result = cb_string_create(strdup(""));
+	
+	cb_value_free(str);
+	cb_value_free(count);
+	
+	return result;
+}
+
+// -----------------------------------------------------------------------------
 // Eval() -- Evaluate a codeblock string
 // -----------------------------------------------------------------------------
 CbValue* bif_eval(CbStack* arg_stack)
