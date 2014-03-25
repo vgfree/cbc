@@ -20,6 +20,7 @@ CbValue* bif_valtype(CbStack* arg_stack);
 CbValue* bif_str(CbStack* arg_stack);
 CbValue* bif_val(CbStack* arg_stack);
 CbValue* bif_replicate(CbStack* arg_stack);
+CbValue* bif_len(CbStack* arg_stack);
 CbValue* bif_eval(CbStack* arg_stack);
 CbValue* bif_setenv(CbStack* arg_stack);
 CbValue* bif_getenv(CbStack* arg_stack);

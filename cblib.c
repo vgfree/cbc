@@ -163,6 +163,25 @@ CbValue* bif_replicate(CbStack* arg_stack)
 }
 
 // -----------------------------------------------------------------------------
+// Len() -- Determines the length of a string
+// -----------------------------------------------------------------------------
+CbValue* bif_len(CbStack* arg_stack)
+{
+	assert(arg_stack->count == 1);
+	
+	CbValue* arg;
+	cb_stack_pop(arg_stack, (void*) &arg);
+	
+	assert(cb_value_is_type(arg, VT_STRING));
+	
+	CbValue* result = cb_numeric_create(strlen(arg->string));
+	
+	cb_value_free(arg);
+	
+	return result;
+}
+
+// -----------------------------------------------------------------------------
 // Eval() -- Evaluate a codeblock string
 // -----------------------------------------------------------------------------
 CbValue* bif_eval(CbStack* arg_stack)
