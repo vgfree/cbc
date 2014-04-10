@@ -24,6 +24,8 @@ CbValue* bif_len(CbStack* arg_stack);
 CbValue* bif_eval(CbStack* arg_stack);
 CbValue* bif_setenv(CbStack* arg_stack);
 CbValue* bif_getenv(CbStack* arg_stack);
+CbValue* bif_seterror(CbStack* arg_stack);
+CbValue* bif_seterrorif(CbStack* arg_stack);
 
 
 #endif // CBLIB_H

@@ -37,7 +37,9 @@ CbBuiltinFunctionInfoItem builtin_func_decl_list[] = {
 	{"Len", bif_len, 1},
 	{"Eval", bif_eval, 1},
 	{"GetEnv", bif_getenv, 1},
-	{"SetEnv", bif_setenv, 2}
+	{"SetEnv", bif_setenv, 2},
+	{"SetError", bif_seterror, 1},
+	{"SetErrorIf", bif_seterrorif, 2}
 #ifdef _CBC_PLAT_WNDS
 	, {"Meld", bif_meld, 1}
 #endif // _CBC_PLAT_WNDS

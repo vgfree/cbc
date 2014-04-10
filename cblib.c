@@ -8,6 +8,7 @@
 #include <assert.h>
 #include "cblib.h"
 #include "codeblock.h"
+#include "error_handling.h"
 
 
 // #############################################################################
@@ -270,6 +271,53 @@ CbValue* bif_setenv(CbStack* arg_stack)
 	free(value_str);
 	cb_value_free(name);
 	cb_value_free(value);
+	
+	return result;
+}
+
+// -----------------------------------------------------------------------------
+// SetError() -- Raise error
+// -----------------------------------------------------------------------------
+CbValue* bif_seterror(CbStack* arg_stack)
+{
+	assert(arg_stack->count == 1);
+	
+	CbValue* arg;
+	cb_stack_pop(arg_stack, (void*) &arg);
+	
+	assert(cb_value_is_type(arg, VT_STRING));
+	
+	cb_error_set_msg(arg->string);	// set error and print error message
+	
+	CbValue* result = cb_value_create();
+	
+	cb_value_free(arg);
+	
+	return result;
+}
+
+// -----------------------------------------------------------------------------
+// SetErrorIf() -- Conditional error
+// -----------------------------------------------------------------------------
+CbValue* bif_seterrorif(CbStack* arg_stack)
+{
+	assert(arg_stack->count == 2);
+	
+	CbValue* condition;
+	CbValue* message;
+	cb_stack_pop(arg_stack, (void*) &message);	// first pop -> last argument
+	cb_stack_pop(arg_stack, (void*) &condition);
+	
+	assert(cb_value_is_type(condition, VT_BOOLEAN));
+	assert(cb_value_is_type(message, VT_STRING));
+	
+	CbValue* result = cb_value_create();
+	
+	if (condition->boolean)
+		cb_error_set_msg(message->string);
+	
+	cb_value_free(condition);
+	cb_value_free(message);
 	
 	return result;
 }
