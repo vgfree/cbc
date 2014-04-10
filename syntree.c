@@ -208,6 +208,9 @@ CbValue* cb_syntree_eval(CbSyntree* node, CbSymtab* symtab)
 {
 	CbValue* result = NULL;
 	
+	if (cb_error_get() != 0) // Check for errors
+		return NULL;
+	
 	switch (node->type)
 	{
 		case SNT_CONSTVAL:

@@ -121,6 +121,19 @@ void test_error_handling_paramcount(CuTest *tc)
 			   CB_ERR_RUNTIME);
 }
 
+// -----------------------------------------------------------------------------
+// Test global error flag
+// -----------------------------------------------------------------------------
+void test_error_global_flag(CuTest *tc)
+{
+	cb_error_set();
+	CuAssertIntEquals(tc, 1, cb_error_get());
+	cb_error_set_code(5);
+	CuAssertIntEquals(tc, 5, cb_error_get());
+	cb_error_set_code(0);
+	CuAssertIntEquals(tc, 0, cb_error_get());
+}
+
 
 // #############################################################################
 // make suite
@@ -133,6 +146,7 @@ CuSuite* make_suite_error_handling()
 	SUITE_ADD_TEST(suite, test_error_handling_undefinedsymbol);
 	SUITE_ADD_TEST(suite, test_error_handling_symbolredecl);
 	SUITE_ADD_TEST(suite, test_error_handling_paramcount);
+	SUITE_ADD_TEST(suite, test_error_global_flag);
 	return suite;
 }
 

@@ -19,6 +19,9 @@
 // declarations
 // #############################################################################
 
+// Global error flag
+CbErrorType cb_global_error = 0;
+
 // Default error output stream
 FILE* err_out = NULL;
 
@@ -130,6 +133,39 @@ void cb_set_error_output(FILE* error_ouput)
 	assert(error_ouput);
 	
 	err_out = error_ouput;
+}
+
+// -----------------------------------------------------------------------------
+// set global error
+// -----------------------------------------------------------------------------
+void cb_error_set_code(CbErrorType code)
+{
+	cb_global_error = code;
+}
+
+// -----------------------------------------------------------------------------
+// set global error (default)
+// -----------------------------------------------------------------------------
+void cb_error_set()
+{
+	cb_error_set_code(1);
+}
+
+// -----------------------------------------------------------------------------
+// set global error and print error message
+// -----------------------------------------------------------------------------
+void cb_error_set_msg(const char* message)
+{
+	cb_error_set();
+	cb_print_error(CB_ERR_RUNTIME, -1, message);
+}
+
+// -----------------------------------------------------------------------------
+// Get global error flag
+// -----------------------------------------------------------------------------
+CbErrorType cb_error_get()
+{
+	return cb_global_error;
 }
 
 

@@ -27,6 +27,7 @@ typedef enum cb_yyerror_call_context
 	CB_YYERROR_CC_FLEX
 } cb_yyerror_call_context;
 
+typedef int CbErrorType;
 
 // interface functions for flex & bison
 void yyerror(void* call_context, const char* format, ...);
@@ -35,6 +36,10 @@ void yyerror(void* call_context, const char* format, ...);
 void cb_print_error(cb_error_type type, int line, const char* message, ...);
 void cb_print_error_msg(const char* format, ...);
 void cb_set_error_output(FILE* error_ouput);
+void cb_error_set_code(CbErrorType code);
+void cb_error_set();
+void cb_error_set_msg(const char* message);
+CbErrorType cb_error_get();
 
 
 #endif // ERROR_HANDLING_H
