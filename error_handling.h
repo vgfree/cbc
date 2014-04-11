@@ -39,6 +39,7 @@ void cb_set_error_output(FILE* error_ouput);
 void cb_error_set_code(CbErrorType code);
 void cb_error_set();
 void cb_error_set_msg(const char* message);
+void cb_error_clear();
 CbErrorType cb_error_get();
 
 

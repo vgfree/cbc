@@ -6,6 +6,7 @@
 #include "symref.h"
 #include "funccall.h"
 #include "funcdecl.h"
+#include "exception_block_node.h"
 #include "strlist.h"
 #include "error_handling.h"
 
@@ -38,6 +39,7 @@ int yylineno_temp = -1;
 %token				PRINT
 %token				IF THEN ELSE ENDIF
 %token				WHILE DO END
+%token				STARTSEQ STOPSEQ ONERROR ALWAYS
 %token	<val>		NUMBER
 %token	<id>		IDENTIFIER
 %token	<str>		STRING
@@ -166,6 +168,9 @@ while_keyword:
 if_keyword:
 	IF							{ yylineno_push(yylineno); }
 	;
+startseq_keyword:
+	STARTSEQ					{ yylineno_push(yylineno); }
+	;
 
 /* Symbol reference */
 symref:
@@ -204,6 +209,24 @@ stmt:
 									//       -> REMOVE IT FROM SYNTAX
 									$$ = cb_syntree_create(SNT_PRINT, $2, NULL);
 									$$->line_no = yylineno;
+								}
+	|	startseq_keyword
+			stmtlist
+		ONERROR
+			stmtlist
+		STOPSEQ					{
+									$$ = cb_exception_block_create(EXBL_ONERROR,
+																   $2, $4);
+									$$->line_no = yylineno_pop();
+								}
+	|	startseq_keyword
+			stmtlist
+		ALWAYS
+			stmtlist
+		STOPSEQ					{
+									$$ = cb_exception_block_create(EXBL_ALWAYS,
+																   $2, $4);
+									$$->line_no = yylineno_pop();
 								}
 	;
 

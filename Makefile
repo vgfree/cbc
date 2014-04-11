@@ -14,7 +14,8 @@ INC_PARSER		:= $(PARSER:%.c=%.h)
 SRC				:= 	$(LEXER) $(PARSER) \
 					codeblock.c symbol.c symtab.c function.c value.c strlist.c \
 					syntree.c symref.c funccall.c funcdecl.c scope.c stack.c \
-					builtin.c cblib.c cbgui.c error_handling.c
+					builtin.c cblib.c cbgui.c error_handling.c \
+					exception_block_node.c
 OBJ				:= $(SRC:%.c=%.o)
 
 SRC_CBC			:= main.c $(SRC)

@@ -28,7 +28,8 @@ enum cb_syntree_node_type
 	SNT_CONSTSTR,
 	SNT_SYMREF,
 	SNT_FLOW_IF,
-	SNT_FLOW_WHILE
+	SNT_FLOW_WHILE,
+	SNT_EXCEPTION_BLOCK
 };
 
 // forward-declarations

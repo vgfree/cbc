@@ -31,6 +31,11 @@
 "do"		{ return DO; }
 "end"		{ return END; }
 "function"	{ return FUNCTION; }
+"startseq"	{ return STARTSEQ; }
+"stopseq"	{ return STOPSEQ; }
+"onerror"	{ return ONERROR; }
+"always"	{ return ALWAYS; }
+
 "print"		{ return PRINT; }
 
 			/* logical gates */

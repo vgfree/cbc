@@ -11,6 +11,7 @@
 #include "symref.h"
 #include "funccall.h"
 #include "funcdecl.h"
+#include "exception_block_node.h"
 #include "error_handling.h"
 
 
@@ -189,7 +190,12 @@ void cb_syntree_free(CbSyntree* node)
 			cb_syntree_free(((CbComparisonNode*) node)->l);
 			cb_syntree_free(((CbComparisonNode*) node)->r);
 			break;
-			
+		
+		case SNT_EXCEPTION_BLOCK:
+			cb_syntree_free(((CbExceptionBlockNode*) node)->code_block);
+			cb_syntree_free(((CbExceptionBlockNode*) node)->exception_block);
+			break;
+		
 		default:
 			// do not report errors if the node type is not reckognized, since
 			// the syntax tree is being freed anyway
@@ -416,6 +422,11 @@ CbValue* cb_syntree_eval(CbSyntree* node, CbSymtab* symtab)
 			
 			break;
 		}
+		
+		case SNT_EXCEPTION_BLOCK:
+			result = cb_exception_block_execute((CbExceptionBlockNode*) node,
+			                                    symtab);
+			break;
 		
 		case SNT_STATEMENTLIST:
 		{
