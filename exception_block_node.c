@@ -44,7 +44,7 @@ CbValue* cb_exception_block_execute(CbExceptionBlockNode* node, CbSymtab* symtab
 	// execute code block
 	CbValue* result       = NULL;
 	CbValue* block_result = cb_syntree_eval(node->code_block, symtab);
-	bool error_flag       = block_result == NULL;
+	bool error_flag       = cb_error_get() == 1;
 	
 	switch (node->block_type)
 	{
