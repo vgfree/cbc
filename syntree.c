@@ -431,11 +431,15 @@ CbValue* cb_syntree_eval(CbSyntree* node, CbSymtab* symtab)
 		case SNT_STATEMENTLIST:
 		{
 			CbValue* temp = cb_syntree_eval(node->l, symtab);
-			if (temp)	// Check if returned value is valid
+			if (temp &&				// Check if returned value is valid
+			    !cb_error_get())	// ... and no errors occurred
 			{
 				cb_value_free(temp);
 				result = cb_syntree_eval(node->r, symtab);
 			}
+			else
+				result = temp;		// At least return result of first statement
+			
 			break;
 		}
 		

@@ -51,7 +51,10 @@ CbValue* cb_exception_block_execute(CbExceptionBlockNode* node, CbSymtab* symtab
 		case EXBL_ONERROR:
 			if (error_flag)
 			{
-				cb_error_clear(); // to be able to execute the exception block
+				if (block_result != NULL)
+					cb_value_free(block_result);
+				
+				cb_error_clear();	// to be able to execute the exception block
 				result = cb_syntree_eval(node->exception_block, symtab);
 			}
 			else
@@ -61,11 +64,18 @@ CbValue* cb_exception_block_execute(CbExceptionBlockNode* node, CbSymtab* symtab
 			
 		case EXBL_ALWAYS:
 			cb_value_free(block_result);
+			
+			// always clear error flag in order to execute the exception block
+			cb_error_clear();
 			// always execute exception block
 			result = cb_syntree_eval(node->exception_block, symtab);
 			
-			if (error_flag)		// if an error occurred in the code block
+			if (error_flag)		// if an error occurred in the code block before
+			{
 				cb_error_set();	// -> set error flag
+				cb_value_free(result);
+				result = NULL;	// return invalid result due to the error
+			}
 			
 			break;
 	}
