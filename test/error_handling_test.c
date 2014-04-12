@@ -4,6 +4,9 @@
 
 #include "error_handling_test.h"
 
+#include <ctype.h>
+#include <stdbool.h>
+#include <string.h>
 #include "../error_handling.h"
 #include "../codeblock.h"
 
@@ -21,21 +24,47 @@ static const char cbstr_redeclfunc[]    = "function Foo() 1, end, function Foo()
 static const char cbstr_paramcount1[]   = "function Foo(p) 1, end, Foo('a', 1, True),";
 static const char cbstr_paramcount2[]   = "function Foo() 1, end, Foo(1),";
 static const char cbstr_paramcount3[]   = "function Foo(p1,p2,p3) 1, end, Foo(1, '2'),";
+static const char cbstr_exception_block1[] =
+	"| foo |"\
+	"startseq"\
+	"   startseq"\
+	"      foo := 0,"\
+	"      startseq"\
+	"         SetError('Raising error (1)'),"\
+	"      onerror"\
+	"         foo := 1,"\
+	"      stopseq,"\
+	"      SetError('Raising error (2)'),"\
+	"      foo := foo + 100,"\
+	"   always"\
+	"      foo := foo + 1,"\
+	"   stopseq,"\
+	"   foo := foo + 100,"\
+	"onerror"\
+	"   foo := foo + 1,"\
+	"stopseq,";
 
 static void test_error(CuTest* tc, const char* codeblock_string,
 					   const char* expected_error_message, cb_error_type type);
-static void stream_to_string_helper(FILE* stream, char* string, char read_until);
+static void test_error_and_result(CuTest* tc, const char* codeblock_string,
+								  const char* expected_error_message,
+								  CbValue* expected_result);
+static void stream_to_string_helper(FILE* stream, char* string, bool trim);
 
 
 // #############################################################################
-// test procedures
+// generic test procedures
 // #############################################################################
 
 // -----------------------------------------------------------------------------
-// Generic test procedure to test errors
+// Generic test procedure to test errors (internal)
 // -----------------------------------------------------------------------------
-static void test_error(CuTest* tc, const char* codeblock_string,
-					   const char* expected_error_message, cb_error_type type)
+static void test_error_internal(CuTest* tc,
+							    const char* codeblock_string,
+								const char* expected_error_message,
+								cb_error_type type,
+								CbValue* expected_result,
+								bool check_result)
 {
 	FILE* err_out = tmpfile();
 	cb_set_error_output(err_out);
@@ -43,25 +72,112 @@ static void test_error(CuTest* tc, const char* codeblock_string,
 	Codeblock* cb = codeblock_create();
 	
 	int expected_parsing_result = EXIT_SUCCESS;
-	if (type == CB_ERR_SYNTAX)
+	bool expecting_parser_error = !check_result && type == CB_ERR_SYNTAX;
+	if (expecting_parser_error)
 		expected_parsing_result = EXIT_FAILURE;
 	
 	CuAssertIntEquals(tc, expected_parsing_result,
 					  codeblock_parse_string(cb, codeblock_string));
 	
-	if (type != CB_ERR_SYNTAX)
-		CuAssertIntEquals(tc, EXIT_FAILURE, codeblock_execute(cb));
+	if (!expecting_parser_error)
+	{
+		int expected_execution_result = EXIT_SUCCESS;
+		if (!check_result)
+			expected_execution_result = EXIT_FAILURE;
+		
+		CuAssertIntEquals(tc, expected_execution_result, codeblock_execute(cb));
+	}
 	
 	char stream_content[512];	// allocating 512 bytes should be enough for an
 								// error message
-	// copy first line in the stream to the string buffer
-	stream_to_string_helper(err_out, stream_content, '\n');
+	memset(stream_content, '\0', 512);	// clear memory
+	// copy stream content into string buffer
+	stream_to_string_helper(err_out, stream_content, true);
 	
 	CuAssertStrEquals(tc, expected_error_message, stream_content);
+	
+	if (check_result)
+	{
+		CuAssertPtrNotNull(tc, cb->result);
+		// check execution result type
+		CuAssertIntEquals(tc, expected_result->type, cb->result->type);
+		// check execution result value
+		switch (cb->result->type)
+		{
+			case VT_BOOLEAN:
+				CuAssertIntEquals(tc, expected_result->boolean, cb->result->boolean);
+				break;
+			
+			case VT_NUMERIC:
+				CuAssertIntEquals(tc, expected_result->value, cb->result->value);
+				break;
+			
+			case VT_STRING:
+				CuAssertStrEquals(tc, expected_result->string, cb->result->string);
+				break;
+			
+			default:
+				CuAssertTrue(tc, false);
+				break;
+		}
+	}
 	
 	fclose(err_out),
 	codeblock_free(cb);
 }
+
+// -----------------------------------------------------------------------------
+// Generic test procedure to test errors
+// -----------------------------------------------------------------------------
+static void test_error(CuTest* tc, const char* codeblock_string,
+					   const char* expected_error_message, cb_error_type type)
+{
+	test_error_internal(tc, codeblock_string, expected_error_message, type,
+						NULL, false);
+	return;
+	
+//	FILE* err_out = tmpfile();
+//	cb_set_error_output(err_out);
+//	
+//	Codeblock* cb = codeblock_create();
+//	
+//	int expected_parsing_result = EXIT_SUCCESS;
+//	if (type == CB_ERR_SYNTAX)
+//		expected_parsing_result = EXIT_FAILURE;
+//	
+//	CuAssertIntEquals(tc, expected_parsing_result,
+//					  codeblock_parse_string(cb, codeblock_string));
+//	
+//	if (type != CB_ERR_SYNTAX)
+//		CuAssertIntEquals(tc, EXIT_FAILURE, codeblock_execute(cb));
+//	
+//	char stream_content[512];	// allocating 512 bytes should be enough for an
+//								// error message
+//	memset(stream_content, '\0', 512);	// clear memory
+//	// copy stream content into string buffer
+//	stream_to_string_helper(err_out, stream_content, true);
+//	
+//	CuAssertStrEquals(tc, expected_error_message, stream_content);
+//	
+//	fclose(err_out),
+//	codeblock_free(cb);
+}
+
+// -----------------------------------------------------------------------------
+// Generic test procedure to test errors and codeblock result
+// -----------------------------------------------------------------------------
+static void test_error_and_result(CuTest* tc, const char* codeblock_string,
+								  const char* expected_error_message,
+								  CbValue* expected_result)
+{
+	test_error_internal(tc, codeblock_string, expected_error_message, 0,
+						expected_result, true);
+}
+
+
+// #############################################################################
+// test procedures
+// #############################################################################
 
 // -----------------------------------------------------------------------------
 // Test syntax errors
@@ -69,10 +185,12 @@ static void test_error(CuTest* tc, const char* codeblock_string,
 void test_error_handling_syntax_errors(CuTest *tc)
 {
 	test_error(tc, cbstr_unexptokennum,
-			   "Syntax error: Line 1: Unexpected token NUMBER",
+			   "Syntax error: Line 1: Unexpected token NUMBER\n"\
+			   "Error: Parsing failed due to invalid input",
 			   CB_ERR_SYNTAX);
 	test_error(tc, cbstr_missingcomma,
-			   "Syntax error: Line 1: Unexpected token ENDOFFILE",
+			   "Syntax error: Line 1: Unexpected token ENDOFFILE\n"\
+			   "Error: Parsing failed due to invalid input",
 			   CB_ERR_SYNTAX);
 }
 
@@ -132,6 +250,23 @@ void test_error_global_flag(CuTest *tc)
 	CuAssertIntEquals(tc, 5, cb_error_get());
 	cb_error_set_code(0);
 	CuAssertIntEquals(tc, 0, cb_error_get());
+	cb_error_set_code(-2);
+	CuAssertIntEquals(tc, -2, cb_error_get());
+	cb_error_clear();
+	CuAssertIntEquals(tc, 0, cb_error_get());
+}
+
+// -----------------------------------------------------------------------------
+// Test exception blocks
+// -----------------------------------------------------------------------------
+void test_exception_blocks(CuTest *tc)
+{
+	CbValue* expected_value = cb_numeric_create(3);
+	test_error_and_result(tc, cbstr_exception_block1,
+						  "Runtime error: Raising error (1)\n"\
+						  "Runtime error: Raising error (2)",
+						  expected_value);
+	cb_value_free(expected_value);
 }
 
 
@@ -147,29 +282,34 @@ CuSuite* make_suite_error_handling()
 	SUITE_ADD_TEST(suite, test_error_handling_symbolredecl);
 	SUITE_ADD_TEST(suite, test_error_handling_paramcount);
 	SUITE_ADD_TEST(suite, test_error_global_flag);
+	SUITE_ADD_TEST(suite, test_exception_blocks);
 	return suite;
 }
 
 
 // #############################################################################
-// make suite
+// internal functions
 // #############################################################################
 
 // -----------------------------------------------------------------------------
 // Copy content of a stream to a string
 // -----------------------------------------------------------------------------
-static void stream_to_string_helper(FILE* stream, char* string, char read_until)
+static void stream_to_string_helper(FILE* stream, char* string, bool trim)
 {
-	fseek(stream, 0, SEEK_SET);	// got to beginning of the file
+	fseek(stream, 0, SEEK_SET);	// go to beginning of the file
 	while (!feof(stream))
 	{
 		*string = fgetc(stream);
-		if (*string == read_until)
-		{
-			*string = '\0';	// terminate string
+		if (*string == '\0')
 			break;
-		}
 		else
 			string++;
 	}
+	
+	if (trim)	// trim string
+		while (!isprint(*string))
+		{
+			*string = '\0';
+			string--;
+		}
 }
