@@ -321,3 +321,15 @@ CbValue* bif_seterrorif(CbStack* arg_stack)
 	
 	return result;
 }
+
+// -----------------------------------------------------------------------------
+// GetErrorText() -- Get last thrown error message
+// -----------------------------------------------------------------------------
+CbValue* bif_geterrortext(CbStack* arg_stack)
+{
+	assert(arg_stack->count == 0);
+	
+	CbValue* result = cb_string_create(strdup(cb_error_get_msg()));
+	
+	return result;
+}
