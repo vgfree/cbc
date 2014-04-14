@@ -407,9 +407,9 @@ static CbValue* cb_numeric_operation(enum cb_operation_type type, CbValue* l,
 		case OPR_DIV:
 			if (r->value == 0) // check for division by zero first!
 			{
-				cb_print_error_msg("Division by zero is not allowed");
-				cb_value_free(result);	// free previously allocated value
-				result = NULL;			// assign NULL to indicate failure
+				cb_error_set_msg("Division by zero is not allowed");
+				cb_value_free(result);		// free previously allocated value
+				result = cb_value_create();	// assign empty value
 				break;
 			}
 			
