@@ -21,6 +21,7 @@
 
 // Global error flag
 CbErrorType cb_global_error = 0;
+char* cb_global_error_msg = NULL;
 
 // Default error output stream
 FILE* err_out = NULL;
@@ -157,7 +158,7 @@ void cb_error_set()
 void cb_error_set_msg(const char* message)
 {
 	cb_error_set();
-	cb_print_error(CB_ERR_RUNTIME, -1, message);
+	cb_global_error_msg = strdup(message);	// assign copy of error message
 }
 
 // -----------------------------------------------------------------------------
@@ -166,6 +167,14 @@ void cb_error_set_msg(const char* message)
 CbErrorType cb_error_get()
 {
 	return cb_global_error;
+}
+
+// -----------------------------------------------------------------------------
+// Get global error message
+// -----------------------------------------------------------------------------
+const char* cb_error_get_msg()
+{
+	return cb_global_error_msg;
 }
 
 // -----------------------------------------------------------------------------
