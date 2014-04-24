@@ -92,13 +92,16 @@ static void test_error_internal(CuTest* tc,
 		CuAssertIntEquals(tc, expected_execution_result, codeblock_execute(cb));
 	}
 	
-	char stream_content[512];	// allocating 512 bytes should be enough for an
-								// error message
-	memset(stream_content, '\0', 512);	// clear memory
-	// copy stream content into string buffer
-	stream_to_string_helper(err_out, stream_content, true);
-	
-	CuAssertStrEquals(tc, expected_error_message, stream_content);
+	if (strlen(expected_error_message) > 0)	// is there even an error message?
+	{
+		char stream_content[512];	// allocating 512 bytes should be enough for an
+									// error message
+		memset(stream_content, '\0', 512);	// clear memory
+		// copy stream content into string buffer
+		stream_to_string_helper(err_out, stream_content, true);
+		
+		CuAssertStrEquals(tc, expected_error_message, stream_content);
+	}
 	
 	if (check_result)
 	{
@@ -275,11 +278,13 @@ CuSuite* make_suite_error_handling()
 static void stream_to_string_helper(FILE* stream, char* string, bool trim)
 {
 	fseek(stream, 0, SEEK_SET);	// go to beginning of the file
+	
 	while (!feof(stream))
 	{
 		*string = fgetc(stream);
-		if (*string == '\0')
-			break;
+		
+		if (feof(stream))
+			*string = '\0';
 		else
 			string++;
 	}
