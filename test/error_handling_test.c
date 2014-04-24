@@ -139,32 +139,6 @@ static void test_error(CuTest* tc, const char* codeblock_string,
 	test_error_internal(tc, codeblock_string, expected_error_message, type,
 						NULL, false);
 	return;
-	
-//	FILE* err_out = tmpfile();
-//	cb_set_error_output(err_out);
-//	
-//	Codeblock* cb = codeblock_create();
-//	
-//	int expected_parsing_result = EXIT_SUCCESS;
-//	if (type == CB_ERR_SYNTAX)
-//		expected_parsing_result = EXIT_FAILURE;
-//	
-//	CuAssertIntEquals(tc, expected_parsing_result,
-//					  codeblock_parse_string(cb, codeblock_string));
-//	
-//	if (type != CB_ERR_SYNTAX)
-//		CuAssertIntEquals(tc, EXIT_FAILURE, codeblock_execute(cb));
-//	
-//	char stream_content[512];	// allocating 512 bytes should be enough for an
-//								// error message
-//	memset(stream_content, '\0', 512);	// clear memory
-//	// copy stream content into string buffer
-//	stream_to_string_helper(err_out, stream_content, true);
-//	
-//	CuAssertStrEquals(tc, expected_error_message, stream_content);
-//	
-//	fclose(err_out),
-//	codeblock_free(cb);
 }
 
 // -----------------------------------------------------------------------------
