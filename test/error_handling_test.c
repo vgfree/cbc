@@ -239,9 +239,8 @@ void test_error_global_flag(CuTest *tc)
 // -----------------------------------------------------------------------------
 void test_exception_blocks(CuTest *tc)
 {
-	//CbValue* expected_value = cb_numeric_create(3);
-	CbValue* expected_value = cb_string_create("Raising error (1) / "\
-											   "Raising error (2) / 3");
+	CbValue* expected_value = cb_string_create(strdup("Raising error (1) / "\
+													  "Raising error (2) / 3"));
 	test_error_and_result(tc, cbstr_exception_block1,
 						  "",
 						  expected_value);
