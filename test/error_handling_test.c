@@ -25,24 +25,28 @@ static const char cbstr_paramcount1[]   = "function Foo(p) 1, end, Foo('a', 1, T
 static const char cbstr_paramcount2[]   = "function Foo() 1, end, Foo(1),";
 static const char cbstr_paramcount3[]   = "function Foo(p1,p2,p3) 1, end, Foo(1, '2'),";
 static const char cbstr_exception_block1[] =
-	"| foo |"\
+	"| foo, cMessage |"\
 	"startseq"\
-	"   startseq"\
-	"      foo := 0,"\
-	"      startseq"\
-	"         SetError('Raising error (1)'),"\
-	"      onerror"\
-	"         foo := 1,"\
-	"      stopseq,"\
-	"      SetError('Raising error (2)'),"\
-	"      foo := foo + 100,"\
-	"   always"\
-	"      foo := foo + 1,"\
-	"   stopseq,"\
-	"   foo := foo + 100,"\
+	"	startseq"\
+	"		foo := 0,"\
+	"		startseq"\
+	"			SetError('Raising error (1)'),"\
+	"		onerror"\
+	"			foo      := 1,"\
+	"			cMessage := GetErrorText(),"\
+	"		stopseq,"\
+	"		SetError('Raising error (2)'),"\
+	"		foo := foo + 100,"\
+	"	always"\
+	"		foo      := foo + 1,"\
+	"		cMessage := cMessage + ' / ' + GetErrorText(),"\
+	"	stopseq,"\
+	"	foo := foo + 100,"\
 	"onerror"\
-	"   foo := foo + 1,"\
-	"stopseq,";
+	"	foo := foo + 1,"\
+	"stopseq,"\
+	"cMessage := cMessage + ' / ' + Str(foo),"\
+	"cMessage,";
 
 static void test_error(CuTest* tc, const char* codeblock_string,
 					   const char* expected_error_message, cb_error_type type);
@@ -261,10 +265,11 @@ void test_error_global_flag(CuTest *tc)
 // -----------------------------------------------------------------------------
 void test_exception_blocks(CuTest *tc)
 {
-	CbValue* expected_value = cb_numeric_create(3);
+	//CbValue* expected_value = cb_numeric_create(3);
+	CbValue* expected_value = cb_string_create("Raising error (1) / "\
+											   "Raising error (2) / 3");
 	test_error_and_result(tc, cbstr_exception_block1,
-						  "Runtime error: Raising error (1)\n"\
-						  "Runtime error: Raising error (2)",
+						  "",
 						  expected_value);
 	cb_value_free(expected_value);
 }
