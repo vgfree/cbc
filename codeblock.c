@@ -103,8 +103,15 @@ int codeblock_execute(Codeblock* cb)
 	{
 		clock_t begin = clock();	// begin tracking of execution duration
 		
+		bool error_handling_initialized = cb_error_handling_is_initialized();
+		if (!error_handling_initialized)
+			cb_error_handling_initialize();
+		
 		// execute codeblock
 		cb->result = cb_syntree_eval(cb->ast, cb->symtab);
+		
+		if (!error_handling_initialized)
+			cb_error_handling_finalize();
 		
 		clock_t end  = clock();		// end tracking of execution duration
 		cb->duration = ((double) end - (double) begin) / CLOCKS_PER_SEC;
