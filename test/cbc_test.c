@@ -12,6 +12,8 @@
 #include "syntree_test.h"
 #include "error_handling_test.h"
 
+#include "../error_handling.h"
+
 
 // #############################################################################
 // helper functions
@@ -47,8 +49,11 @@ int main(int argc, char *argv[])
 	CuSuiteAddSuite_Custom(suite, make_suite_syntree());
 	CuSuiteAddSuite_Custom(suite, make_suite_error_handling());
 	
+	cb_error_handling_initialize();	// initialize error handling
 	// run tests
 	CuSuiteRun(suite);
+	cb_error_handling_finalize();	// finalize error handling
+	
 	CuSuiteSummary(suite, output);
 	CuSuiteDetails(suite, output);
 	

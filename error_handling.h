@@ -8,6 +8,7 @@
 
 
 #include <stdio.h>
+#include <stdbool.h>
 
 typedef enum cb_error_type
 {
@@ -42,7 +43,9 @@ void cb_error_set_msg(const char* message);
 CbErrorType cb_error_get();
 const char* cb_error_get_msg();
 void cb_error_clear();
-CbErrorType cb_error_get();
+void cb_error_handling_initialize();
+void cb_error_handling_finalize();
+bool cb_error_handling_is_initialized();
 
 
 #endif // ERROR_HANDLING_H
