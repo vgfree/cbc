@@ -251,8 +251,10 @@ CbValue* cb_syntree_eval(CbSyntree* node, CbSymtab* symtab)
 				break;
 			}
 			
-			// assign right-hand-side expression
-			cb_symbol_variable_assign_value(sr->table_sym, rhs);
+			if (cb_error_get() == 0)
+				// assign right-hand-side expression
+				cb_symbol_variable_assign_value(sr->table_sym, rhs);
+			
 			cb_value_free(rhs);
 			
 			result = cb_value_copy(cb_symbol_variable_get_value(sr->table_sym));
