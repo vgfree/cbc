@@ -233,6 +233,9 @@ void test_error_handling_paramcount(CuTest *tc)
 // -----------------------------------------------------------------------------
 void test_error_global_flag(CuTest *tc)
 {
+	cb_error_handling_initialize();
+	CuAssertIntEquals(tc, true, cb_error_handling_is_initialized());
+	
 	cb_error_set();
 	CuAssertIntEquals(tc, 1, cb_error_get());
 	cb_error_set_code(5);
@@ -243,6 +246,9 @@ void test_error_global_flag(CuTest *tc)
 	CuAssertIntEquals(tc, -2, cb_error_get());
 	cb_error_clear();
 	CuAssertIntEquals(tc, 0, cb_error_get());
+	
+	cb_error_handling_finalize();
+	CuAssertIntEquals(tc, false, cb_error_handling_is_initialized());
 }
 
 // -----------------------------------------------------------------------------
