@@ -195,6 +195,7 @@ CbValue* bif_eval(CbStack* arg_stack)
 	assert(cb_value_is_type(arg, VT_STRING));
 	
 	Codeblock* cb   = codeblock_create();
+	cb->embedded    = true;	// codeblock is embedded
 	CbValue* result = NULL;
 	
 	// Parse codeblock string

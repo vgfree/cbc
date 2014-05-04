@@ -35,6 +35,7 @@ Codeblock* codeblock_create()
 	cb->symtab	  = NULL;
 	cb->ast		  = NULL;
 	cb->result	  = NULL;
+	cb->embedded  = false;
 	
 	return cb;
 }
@@ -109,6 +110,11 @@ int codeblock_execute(Codeblock* cb)
 		
 		// execute codeblock
 		cb->result = cb_syntree_eval(cb->ast, cb->symtab);
+		
+		// check if there was an uncatched error
+		if (cb_error_get() > 0 && !cb->embedded)
+			// print last error message, if executed codeblock is not embedded
+			cb_print_error_msg(cb_error_get_msg());
 		
 		if (!error_handling_initialized)
 			cb_error_handling_finalize();

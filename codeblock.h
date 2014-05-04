@@ -20,6 +20,7 @@ typedef struct
 	CbSyntree* ast;		// abstract syntax-tree -- the code to execute
 	CbValue* result;	// the result, after executing the codeblock
 	double duration;	// execution duration
+	bool embedded;		// determine if codeblock is embedded
 } Codeblock;
 
 
