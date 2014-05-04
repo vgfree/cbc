@@ -55,6 +55,15 @@ static const char cbstr_exception_block2[] =
 	"always"\
 	"	foo := 100,"\
 	"stopseq,";
+static const char cbstr_exception_block3[] =
+	"| foo |"\
+	"foo := 123,"\
+	"startseq"\
+	"   foo := foo / 0,"\
+	"onerror"\
+	"   1,"\
+	"stopseq,"\
+	"foo,";
 
 static void test_error(CuTest* tc, const char* codeblock_string,
 					   const char* expected_error_message, cb_error_type type);
@@ -267,6 +276,11 @@ void test_exception_blocks(CuTest *tc)
 	// Test 2
 	test_error(tc, cbstr_exception_block2, "Error: Division by zero is not allowed",
 	           CB_ERR_RUNTIME);
+	
+	// Test 3
+	expected_value = cb_numeric_create(123);
+	test_error_and_result(tc, cbstr_exception_block3, "", expected_value);
+	cb_value_free(expected_value);
 }
 
 
