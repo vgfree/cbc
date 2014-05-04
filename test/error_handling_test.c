@@ -47,6 +47,14 @@ static const char cbstr_exception_block1[] =
 	"stopseq,"\
 	"cMessage := cMessage + ' / ' + Str(foo),"\
 	"cMessage,";
+static const char cbstr_exception_block2[] =
+	"| foo |"\
+	"foo := 5,"\
+	"startseq"\
+	"	foo := foo / 0,"\
+	"always"\
+	"	foo := 100,"\
+	"stopseq,";
 
 static void test_error(CuTest* tc, const char* codeblock_string,
 					   const char* expected_error_message, cb_error_type type);
@@ -242,12 +250,17 @@ void test_error_global_flag(CuTest *tc)
 // -----------------------------------------------------------------------------
 void test_exception_blocks(CuTest *tc)
 {
+	// Test 1
 	CbValue* expected_value = cb_string_create(strdup("Raising error (1) / "\
 													  "Raising error (2) / 3"));
 	test_error_and_result(tc, cbstr_exception_block1,
 						  "",
 						  expected_value);
 	cb_value_free(expected_value);
+	
+	// Test 2
+	test_error(tc, cbstr_exception_block2, "Error: Division by zero is not allowed",
+	           CB_ERR_RUNTIME);
 }
 
 
