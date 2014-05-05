@@ -20,7 +20,7 @@
 // #############################################################################
 
 // Global error flag
-CbErrorType cb_global_error = 0;
+CbErrorCode cb_global_error = 0;
 char* cb_global_error_msg = NULL;
 
 bool error_handling_initialized;
@@ -141,7 +141,7 @@ void cb_set_error_output(FILE* error_ouput)
 // -----------------------------------------------------------------------------
 // set global error
 // -----------------------------------------------------------------------------
-void cb_error_set_code(CbErrorType code)
+void cb_error_set_code(CbErrorCode code)
 {
 	assert(cb_error_handling_is_initialized());
 	
@@ -175,7 +175,7 @@ void cb_error_set_msg(const char* message)
 // -----------------------------------------------------------------------------
 // Get global error flag
 // -----------------------------------------------------------------------------
-CbErrorType cb_error_get()
+CbErrorCode cb_error_get()
 {
 	assert(cb_error_handling_is_initialized());
 	
