@@ -8,6 +8,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include "../error_handling.h"
+#include "../error_messages.h"
 #include "../codeblock.h"
 
 
@@ -283,6 +284,18 @@ void test_exception_blocks(CuTest *tc)
 	cb_value_free(expected_value);
 }
 
+void test_constant_error_messages(CuTest *tc)
+{
+	CuAssertStrEquals(	tc, "No error",
+						cb_error_get_message_by_code(CB_ERR_CODE_NOERROR));
+	CuAssertStrEquals(	tc, "Division by zero is not allowed",
+						cb_error_get_message_by_code(CB_ERR_CODE_DIVISIONBYZERO));
+	CuAssertStrEquals(	tc, "Unknown error",
+						cb_error_get_message_by_code(CB_ERR_CODE_END));
+	CuAssertStrEquals(	tc, "Unknown error",
+						cb_error_get_message_by_code(CB_ERR_CODE_END + 1));
+}
+
 
 // #############################################################################
 // make suite
@@ -297,6 +310,7 @@ CuSuite* make_suite_error_handling()
 	SUITE_ADD_TEST(suite, test_error_handling_paramcount);
 	SUITE_ADD_TEST(suite, test_error_global_flag);
 	SUITE_ADD_TEST(suite, test_exception_blocks);
+	SUITE_ADD_TEST(suite, test_constant_error_messages);
 	return suite;
 }
 
