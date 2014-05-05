@@ -330,7 +330,11 @@ CbValue* bif_geterrortext(CbStack* arg_stack)
 {
 	assert(arg_stack->count == 0);
 	
-	CbValue* result = cb_string_create(strdup(cb_error_get_msg()));
+	const char* result_str = cb_error_get_msg();
+	if (result_str == NULL)
+		result_str = "";
+	
+	CbValue* result = cb_string_create(strdup(result_str));
 	
 	return result;
 }
