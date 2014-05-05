@@ -2,8 +2,7 @@
  * codeblock_test -- Testing the codeblock_t structure
  ******************************************************************************/
 
-#include "codeblock_test.h"
-
+#include <CuTest.h>
 #include "../codeblock.h"
 #include "../syntree.h"
 #include "../symtab.h"

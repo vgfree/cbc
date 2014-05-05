@@ -2,8 +2,7 @@
  * syntree_test -- Testing abstrct syntax tree structure.
  ******************************************************************************/
 
-#include "syntree_test.h"
-
+#include <CuTest.h>
 #include "../codeblock.h"
 #include "../syntree.h"
 #include "../symref.h"

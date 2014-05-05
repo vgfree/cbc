@@ -2,8 +2,7 @@
  * error_handling_test -- Testing error messages, etc.
  ******************************************************************************/
 
-#include "error_handling_test.h"
-
+#include <CuTest.h>
 #include <ctype.h>
 #include <stdbool.h>
 #include <string.h>

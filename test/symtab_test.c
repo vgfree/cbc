@@ -2,8 +2,7 @@
  * symtab_test -- Testing the symbol-table structure
  ******************************************************************************/
 
-#include "symtab_test.h"
-
+#include <CuTest.h>
 #include "../symtab.h"
 #include "../symbol.h"
 

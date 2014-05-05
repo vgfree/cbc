@@ -2,8 +2,7 @@
  * stack_test -- Testing the stack_t structure
  ******************************************************************************/
 
-#include "stack_test.h"
-
+#include <CuTest.h>
 #include "../stack.h"
 #include "../scope.h"
 

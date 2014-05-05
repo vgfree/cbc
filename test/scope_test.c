@@ -2,8 +2,8 @@
  * scope_test -- Testing the scope_t structure
  ******************************************************************************/
 
-#include "scope_test.h"
-
+#include <stdio.h>
+#include <CuTest.h>
 #include "../scope.h"
 
 // #############################################################################

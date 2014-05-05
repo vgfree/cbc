@@ -2,12 +2,11 @@
  * codeblock_test -- Testing the codeblock_t structure
  ******************************************************************************/
 
+#include <CuTest.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
-#include "generic_codeblock_test.h"
-
 #include "../cbc_parse.h"
 #include "../value.h"
 #include "../codeblock.h"
@@ -17,6 +16,8 @@
 // #############################################################################
 // declarations
 // #############################################################################
+
+#define TEST_FILES_DIR	"./testfiles"
 
 const CbValue expected_results[] = {
 	{VT_NUMERIC, 5},		// Testcase 0

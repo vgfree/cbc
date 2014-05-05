@@ -2,17 +2,8 @@
  * cbc_test -- Codeblock Unit-Test using the 'CuTest' Unit-Test framework
  ******************************************************************************/
 
-#include <stdio.h>
-#include <CuTest.h>
-#include "codeblock_test.h"
-#include "scope_test.h"
-#include "stack_test.h"
-#include "symtab_test.h"
-#include "generic_codeblock_test.h"
-#include "syntree_test.h"
-#include "error_handling_test.h"
-
-#include "../error_handling.h"
+#include <stdlib.h>
+#include "cbc_test.h"
 
 
 // #############################################################################
