@@ -112,7 +112,7 @@ int codeblock_execute(Codeblock* cb)
 		cb->result = cb_syntree_eval(cb->ast, cb->symtab);
 		
 		// check if there was an uncatched error
-		if (cb_error_get() > 0 && !cb->embedded)
+		if (cb_error_is_set() && !cb->embedded)
 			// print last error message, if executed codeblock is not embedded
 			cb_print_error_msg(cb_error_get_msg());
 		

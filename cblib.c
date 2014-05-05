@@ -330,10 +330,15 @@ CbValue* bif_geterrortext(CbStack* arg_stack)
 {
 	assert(arg_stack->count == 0);
 	
-	const char* result_str = cb_error_get_msg();
-	if (result_str == NULL)
-		result_str = "";
-	
+	const char* result_str = "";
+	if (cb_error_is_set())
+	{
+		if (cb_error_get() >= CB_ERR_CODE_CUSTOMERROR)
+			// TODO: Verify message is not NULL!
+			result_str = cb_error_get_msg();
+		else
+			result_str = "[TODO] Set constant error message by error code here!";
+	}
 	CbValue* result = cb_string_create(strdup(result_str));
 	
 	return result;

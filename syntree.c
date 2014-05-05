@@ -214,7 +214,8 @@ CbValue* cb_syntree_eval(CbSyntree* node, CbSymtab* symtab)
 {
 	CbValue* result = NULL;
 	
-	if (cb_error_get() != 0) // Check for errors
+	// Check for uncatched errors
+	if ((cb_error_is_set()) && !cb_error_is_catched())
 		return NULL;
 	
 	switch (node->type)
@@ -251,7 +252,7 @@ CbValue* cb_syntree_eval(CbSyntree* node, CbSymtab* symtab)
 				break;
 			}
 			
-			if (cb_error_get() == 0)
+			if (!cb_error_is_set() || cb_error_is_catched())
 				// assign right-hand-side expression
 				cb_symbol_variable_assign_value(sr->table_sym, rhs);
 			
@@ -433,8 +434,9 @@ CbValue* cb_syntree_eval(CbSyntree* node, CbSymtab* symtab)
 		case SNT_STATEMENTLIST:
 		{
 			CbValue* temp = cb_syntree_eval(node->l, symtab);
-			if (temp &&				// Check if returned value is valid
-			    !cb_error_get())	// ... and no errors occurred
+			
+			// Check if returned value is valid and no uncatched errors occurred
+			if (temp && (!cb_error_is_set() || cb_error_is_catched()))
 			{
 				cb_value_free(temp);
 				result = cb_syntree_eval(node->r, symtab);

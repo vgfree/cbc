@@ -19,6 +19,9 @@
 // declarations
 // #############################################################################
 
+// Error code for custom error messages
+const CbErrorCode CB_ERR_CODE_CUSTOMERROR = CB_ERR_CODE_END + 1;
+
 // Error properties
 static CbErrorCode error_flag;
 static char* error_message;
@@ -139,27 +142,18 @@ void cb_set_error_output(FILE* error_ouput)
 }
 
 // -----------------------------------------------------------------------------
-// set global error
+// Set error flag
 // -----------------------------------------------------------------------------
-void cb_error_set_code(CbErrorCode code)
+void cb_error_set(CbErrorCode code)
 {
 	assert(cb_error_handling_is_initialized());
 	
 	error_flag = code;
+	cb_error_reset_catch();
 }
 
 // -----------------------------------------------------------------------------
-// set global error (default)
-// -----------------------------------------------------------------------------
-void cb_error_set()
-{
-	assert(cb_error_handling_is_initialized());
-	
-	cb_error_set_code(1);
-}
-
-// -----------------------------------------------------------------------------
-// set global error and print error message
+// Set error flag and error message
 // -----------------------------------------------------------------------------
 void cb_error_set_msg(const char* message)
 {
@@ -168,7 +162,7 @@ void cb_error_set_msg(const char* message)
 	if (error_message != NULL)
 		free(error_message);			// free old error message
 	
-	cb_error_set();
+	cb_error_set(CB_ERR_CODE_CUSTOMERROR);
 	error_message = strdup(message);	// assign copy of error message
 }
 
@@ -193,6 +187,16 @@ const char* cb_error_get_msg()
 }
 
 // -----------------------------------------------------------------------------
+// Test if error flag is set
+// -----------------------------------------------------------------------------
+bool cb_error_is_set()
+{
+	assert(cb_error_handling_is_initialized());
+	
+	return error_flag != CB_ERR_CODE_NOERROR;
+}
+
+// -----------------------------------------------------------------------------
 // Clear global error flag
 // -----------------------------------------------------------------------------
 void cb_error_clear()
@@ -203,15 +207,50 @@ void cb_error_clear()
 }
 
 // -----------------------------------------------------------------------------
+// Mark current error as "catched".
+// This means that it won't cause an "onerror"-block to be executed, since the
+// original error is already handled.
+// -----------------------------------------------------------------------------
+void cb_error_catch()
+{
+	assert(cb_error_handling_is_initialized());
+	
+	error_catched = true;
+}
+
+// -----------------------------------------------------------------------------
+// Mark current error as "uncatched".
+// This happens every time a new error occurs.
+// -----------------------------------------------------------------------------
+void cb_error_reset_catch()
+{
+	assert(cb_error_handling_is_initialized());
+	
+	error_catched = false;
+}
+
+// -----------------------------------------------------------------------------
+// Test if current error is catched
+// -----------------------------------------------------------------------------
+bool cb_error_is_catched()
+{
+	assert(cb_error_handling_is_initialized());
+	
+	return error_catched;
+}
+
+// -----------------------------------------------------------------------------
 // Initialize error handling
 // -----------------------------------------------------------------------------
 void cb_error_handling_initialize()
 {
 	if (!cb_error_handling_is_initialized())
 	{
+		error_message = NULL;
+		error_flag    = CB_ERR_CODE_NOERROR;
+		error_catched = false;
+		
 		error_handling_initialized = true;
-		error_message              = NULL;
-		cb_error_clear();
 	}
 }
 
@@ -222,6 +261,7 @@ void cb_error_handling_finalize()
 {
 	if (cb_error_handling_is_initialized())
 	{
+		cb_error_reset_catch();
 		cb_error_clear();
 		if (error_message != NULL)
 			free(error_message);
