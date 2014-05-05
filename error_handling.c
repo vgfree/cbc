@@ -197,6 +197,8 @@ const char* cb_error_get_msg()
 // -----------------------------------------------------------------------------
 void cb_error_clear()
 {
+	assert(cb_error_handling_is_initialized());
+	
 	error_flag = CB_ERR_CODE_NOERROR;
 }
 
@@ -220,11 +222,11 @@ void cb_error_handling_finalize()
 {
 	if (cb_error_handling_is_initialized())
 	{
-		error_handling_initialized = false;
+		cb_error_clear();
 		if (error_message != NULL)
 			free(error_message);
 		
-		cb_error_clear();
+		error_handling_initialized = false;
 	}
 }
 
