@@ -13,6 +13,7 @@
 #include <stdarg.h>
 #include <assert.h>
 #include "error_handling.h"
+#include "error_messages.h"
 
 
 // #############################################################################
@@ -179,11 +180,31 @@ CbErrorCode cb_error_get()
 // -----------------------------------------------------------------------------
 // Get global error message
 // -----------------------------------------------------------------------------
-const char* cb_error_get_msg()
+const char* cb_error_get_custom_message()
 {
 	assert(cb_error_handling_is_initialized());
 	
 	return error_message;
+}
+
+// -----------------------------------------------------------------------------
+// Get error message depending on the error code
+// (custom vs. constant error message)
+// -----------------------------------------------------------------------------
+const char* cb_error_get_message()
+{
+	assert(cb_error_handling_is_initialized());
+	
+	const char* result = "";
+	if (cb_error_is_set())
+	{
+		if (cb_error_get() >= CB_ERR_CODE_CUSTOMERROR)
+			result = cb_error_get_custom_message();
+		else
+			result = cb_error_get_message_by_code(cb_error_get());
+	}
+	
+	return result;
 }
 
 // -----------------------------------------------------------------------------
