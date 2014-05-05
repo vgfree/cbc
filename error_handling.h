@@ -23,7 +23,13 @@ typedef enum cb_yyerror_call_context
 	CB_YYERROR_CC_FLEX
 } cb_yyerror_call_context;
 
-typedef int CbErrorCode;
+typedef enum cb_error_code
+{
+	CB_ERR_CODE_NOERROR = 0,	// 0 indicates "no error"
+	CB_ERR_CODE_DIVISIONBYZERO,	// Division by zero error
+	
+	CB_ERR_CODE_END				// End of enumerations (this is not an error!)
+} CbErrorCode;
 
 // interface functions for flex & bison
 void yyerror(void* call_context, const char* format, ...);

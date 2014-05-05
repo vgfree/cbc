@@ -8,6 +8,7 @@
 #include <assert.h>
 #include "value.h"
 #include "error_handling.h"
+#include "error_messages.h"
 
 #define NO_VALUE_AS_STRING "<no value returned>"
 
@@ -407,7 +408,8 @@ static CbValue* cb_numeric_operation(enum cb_operation_type type, CbValue* l,
 		case OPR_DIV:
 			if (r->value == 0) // check for division by zero first!
 			{
-				cb_error_set_msg("Division by zero is not allowed");
+				cb_error_set_msg(
+					cb_error_get_message_by_code(CB_ERR_CODE_DIVISIONBYZERO));
 				cb_value_free(result);		// free previously allocated value
 				result = cb_value_create();	// assign empty value
 				break;
