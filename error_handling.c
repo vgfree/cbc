@@ -19,14 +19,14 @@
 // declarations
 // #############################################################################
 
-// Global error flag
-CbErrorCode cb_global_error = 0;
-char* cb_global_error_msg = NULL;
-
-bool error_handling_initialized;
+// Error properties
+static CbErrorCode error_flag;
+static char* error_message;
+static bool error_catched;
+static bool error_handling_initialized;
 
 // Default error output stream
-FILE* err_out = NULL;
+static FILE* err_out = NULL;
 
 static void cb_print_error_internal(FILE* output, cb_error_type type, int line,
 									const char* format, va_list* args);
@@ -145,7 +145,7 @@ void cb_error_set_code(CbErrorCode code)
 {
 	assert(cb_error_handling_is_initialized());
 	
-	cb_global_error = code;
+	error_flag = code;
 }
 
 // -----------------------------------------------------------------------------
@@ -165,11 +165,11 @@ void cb_error_set_msg(const char* message)
 {
 	assert(cb_error_handling_is_initialized());
 	
-	if (cb_global_error_msg != NULL)
-		free(cb_global_error_msg);			// free old error message
+	if (error_message != NULL)
+		free(error_message);			// free old error message
 	
 	cb_error_set();
-	cb_global_error_msg = strdup(message);	// assign copy of error message
+	error_message = strdup(message);	// assign copy of error message
 }
 
 // -----------------------------------------------------------------------------
@@ -179,7 +179,7 @@ CbErrorCode cb_error_get()
 {
 	assert(cb_error_handling_is_initialized());
 	
-	return cb_global_error;
+	return error_flag;
 }
 
 // -----------------------------------------------------------------------------
@@ -189,7 +189,7 @@ const char* cb_error_get_msg()
 {
 	assert(cb_error_handling_is_initialized());
 	
-	return cb_global_error_msg;
+	return error_message;
 }
 
 // -----------------------------------------------------------------------------
@@ -197,7 +197,7 @@ const char* cb_error_get_msg()
 // -----------------------------------------------------------------------------
 void cb_error_clear()
 {
-	cb_global_error = 0;
+	error_flag = CB_ERR_CODE_NOERROR;
 }
 
 // -----------------------------------------------------------------------------
@@ -208,7 +208,7 @@ void cb_error_handling_initialize()
 	if (!cb_error_handling_is_initialized())
 	{
 		error_handling_initialized = true;
-		cb_global_error_msg		   = NULL;
+		error_message              = NULL;
 		cb_error_clear();
 	}
 }
@@ -221,8 +221,8 @@ void cb_error_handling_finalize()
 	if (cb_error_handling_is_initialized())
 	{
 		error_handling_initialized = false;
-		if (cb_global_error_msg != NULL)
-			free(cb_global_error_msg);
+		if (error_message != NULL)
+			free(error_message);
 		
 		cb_error_clear();
 	}
