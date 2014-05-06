@@ -16,6 +16,7 @@ struct CbArray
 	CbArrayItem* elements;
 	int block_size;
 	int alloc_size;
+	bool element_ownership;
 };
 
 static bool cb_array_is_full(CbArray* array);
@@ -37,6 +38,9 @@ CbArray* cb_array_create()
 	array->elements   = (CbArrayItem*) malloc(array->block_size);
 	array->alloc_size = array->block_size;
 	
+	// array should own its elements by default
+	array->element_ownership = true;
+	
 	return array;
 }
 
@@ -45,6 +49,14 @@ CbArray* cb_array_create()
 // -----------------------------------------------------------------------------
 void cb_array_free(CbArray* array)
 {
+	if (array->element_ownership)	// if array owns its elements -> free all
+	{
+		int i = 0;
+		for (; i < array->count; i++)
+			if (array->elements[i] != NULL)
+				cb_value_free(array->elements[i]);
+	}
+	
 	free(array->elements);
 	free(array);
 }
