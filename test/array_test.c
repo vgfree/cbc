@@ -22,15 +22,19 @@ void test_array(CuTest *tc)
 	CuAssertIntEquals(tc, VT_NUMERIC, cb_array_get(a, 0)->type);
 	CuAssertIntEquals(tc, 123, cb_array_get(a, 0)->value);
 	
-	int i = 1;
-	for (; i <= 200; i++)
+	cb_array_free(a);
+	a = cb_array_create();
+	
+	int i = 0;
+	for (; i < 100; i++)	// append 100 elements
 	{
 		CuAssertTrue(tc, cb_array_append(a, cb_numeric_create(i)));
 		CuAssertIntEquals(tc, i + 1, cb_array_get_count(a));
 		
-		CuAssertIntEquals(tc, VT_NUMERIC, cb_array_get(a, i)->type);
-		CuAssertIntEquals(tc, i, cb_array_get(a, i)->value);
-		printf("element %d: %d\n", i, cb_array_get(a, i)->value);
+		CbValue* element = cb_array_get(a, i);
+		CuAssertPtrNotNull(tc, element);
+		CuAssertIntEquals(tc, VT_NUMERIC, element->type);
+		CuAssertIntEquals(tc, i, element->value);
 	}
 	
 	cb_array_free(a);
