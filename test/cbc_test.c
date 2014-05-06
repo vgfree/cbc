@@ -39,6 +39,7 @@ int main(int argc, char *argv[])
 	CuSuiteAddSuite_Custom(suite, make_suite_codeblock_generic());
 	CuSuiteAddSuite_Custom(suite, make_suite_syntree());
 	CuSuiteAddSuite_Custom(suite, make_suite_error_handling());
+	CuSuiteAddSuite_Custom(suite, make_suite_array());
 	
 	// run tests
 	CuSuiteRun(suite);

@@ -18,3 +18,4 @@ extern CuSuite* make_suite_symtab();
 extern CuSuite* make_suite_codeblock_generic();
 extern CuSuite* make_suite_syntree();
 extern CuSuite* make_suite_error_handling();
+extern CuSuite* make_suite_array();
