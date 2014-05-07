@@ -79,6 +79,8 @@ bool cb_array_append(CbArray* array, const CbArrayItem item)
 		cb_array_increase_size(array, 1);
 	
 	array->count++;
+	array->elements[array->count - 1] = NULL;	// clear allocated memory
+	
 	return cb_array_set(array, (array->count - 1), item);
 }
 
@@ -89,6 +91,10 @@ bool cb_array_set(CbArray* array, int index, const CbArrayItem item)
 {
 	if (array->count <= index)
 		return false;
+	
+	// free previous element, if necessary
+	if (array->elements[index] != NULL)
+		cb_value_free(array->elements[index]);
 	
 	array->elements[index] = item;
 	return true;
