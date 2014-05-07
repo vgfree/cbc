@@ -22,6 +22,11 @@ void test_array(CuTest *tc)
 	CuAssertIntEquals(tc, VT_NUMERIC, cb_array_get(a, 0)->type);
 	CuAssertIntEquals(tc, 123, cb_array_get(a, 0)->value);
 	
+	CuAssertTrue(tc, cb_array_set(a, 0, cb_numeric_create(321)));
+	CuAssertIntEquals(tc, 1, cb_array_get_count(a));
+	CuAssertIntEquals(tc, VT_NUMERIC, cb_array_get(a, 0)->type);
+	CuAssertIntEquals(tc, 321, cb_array_get(a, 0)->value);
+	
 	cb_array_free(a);
 	a = cb_array_create();
 	
