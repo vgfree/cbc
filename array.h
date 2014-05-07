@@ -25,7 +25,7 @@ void cb_array_free(CbArray* array);
 size_t cb_array_get_count(CbArray* array);
 
 bool cb_array_set(CbArray* array, int index, const CbArrayItem item);
-const CbArrayItem cb_array_get(CbArray* array, int index);
+bool cb_array_get(CbArray* array, int index, CbArrayItem* destination);
 bool cb_array_append(CbArray* array, const CbArrayItem item);
 void cb_array_insert(CbArray* array, int index, const CbArrayItem item);
 void cb_array_remove(CbArray* array, int index);

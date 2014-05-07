@@ -90,7 +90,12 @@ bool cb_array_append(CbArray* array, const CbArrayItem item)
 bool cb_array_set(CbArray* array, int index, const CbArrayItem item)
 {
 	if (array->count <= index)
+	{
+		if (item != NULL)
+			cb_value_free(item);
+		
 		return false;
+	}
 	
 	// free previous element, if necessary
 	if (array->elements[index] != NULL)
@@ -103,12 +108,15 @@ bool cb_array_set(CbArray* array, int index, const CbArrayItem item)
 // -----------------------------------------------------------------------------
 // Get element in array
 // -----------------------------------------------------------------------------
-const CbArrayItem cb_array_get(CbArray* array, int index)
+bool cb_array_get(CbArray* array, int index, CbArrayItem* destination)
 {
 	if (array->count <= index)
-		return NULL;
+		return false;
 	
-	return array->elements[index];
+	if (destination != NULL)
+		*destination = array->elements[index];
+	
+	return true;
 }
 
 
