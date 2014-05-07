@@ -20,6 +20,7 @@ struct CbArray
 };
 
 static bool cb_array_is_full(CbArray* array);
+static bool cb_array_increase_size(CbArray* array, unsigned int blocks);
 
 
 // #############################################################################
@@ -75,16 +76,7 @@ size_t cb_array_get_count(CbArray* array)
 bool cb_array_append(CbArray* array, const CbArrayItem item)
 {
 	if (cb_array_is_full(array))
-	{
-		// resize
-		CbArrayItem* temp = realloc(array->elements,
-		                            array->alloc_size + array->block_size);
-		if (temp == NULL)
-			return false;
-		
-		array->elements   = temp;
-		array->alloc_size = array->alloc_size + array->block_size;
-	}
+		cb_array_increase_size(array, 1);
 	
 	array->count++;
 	return cb_array_set(array, (array->count - 1), item);
@@ -115,7 +107,7 @@ const CbArrayItem cb_array_get(CbArray* array, int index)
 
 
 // #############################################################################
-// interface-functions
+// internal functions
 // #############################################################################
 
 // -----------------------------------------------------------------------------
@@ -124,4 +116,18 @@ const CbArrayItem cb_array_get(CbArray* array, int index)
 static bool cb_array_is_full(CbArray* array)
 {
 	return ((array->count * sizeof(CbArrayItem)) >= array->alloc_size);
+}
+
+// -----------------------------------------------------------------------------
+// Increase array allocation size
+// -----------------------------------------------------------------------------
+static bool cb_array_increase_size(CbArray* array, unsigned int blocks)
+{
+	size_t new_size   = array->alloc_size + (array->block_size * blocks);
+	CbArrayItem* temp = realloc(array->elements, new_size);
+	if (temp == NULL)
+		return false;
+	
+	array->elements   = temp;
+	array->alloc_size = new_size;
 }
