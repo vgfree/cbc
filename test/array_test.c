@@ -4,6 +4,7 @@
 
 #include <stdio.h>
 #include <CuTest.h>
+#include "CuTestCustomUtils.h"
 #include "../array.h"
 #include "../value.h"
 
@@ -12,20 +13,25 @@
 // #############################################################################
 
 // -----------------------------------------------------------------------------
-// Test: test_array()
+// Test: test_array() -- Simple test for CbArray
 // -----------------------------------------------------------------------------
 void test_array(CuTest *tc)
 {
 	CbArray* a = cb_array_create();
 	CuAssertTrue(tc, cb_array_append(a, cb_numeric_create(123)));
 	CuAssertIntEquals(tc, 1, cb_array_get_count(a));
-	CuAssertIntEquals(tc, VT_NUMERIC, cb_array_get(a, 0)->type);
-	CuAssertIntEquals(tc, 123, cb_array_get(a, 0)->value);
+	
+	CbValue* item = NULL;
+	CuAssertTrue(tc, cb_array_get(a, 0, &item));
+	CuAssertIntEquals(tc, VT_NUMERIC, item->type);
+	CuAssertIntEquals(tc, 123, item->value);
 	
 	CuAssertTrue(tc, cb_array_set(a, 0, cb_numeric_create(321)));
 	CuAssertIntEquals(tc, 1, cb_array_get_count(a));
-	CuAssertIntEquals(tc, VT_NUMERIC, cb_array_get(a, 0)->type);
-	CuAssertIntEquals(tc, 321, cb_array_get(a, 0)->value);
+	
+	CuAssertTrue(tc, cb_array_get(a, 0, &item));
+	CuAssertIntEquals(tc, VT_NUMERIC, item->type);
+	CuAssertIntEquals(tc, 321, item->value);
 	
 	cb_array_free(a);
 	a = cb_array_create();
@@ -36,11 +42,75 @@ void test_array(CuTest *tc)
 		CuAssertTrue(tc, cb_array_append(a, cb_numeric_create(i)));
 		CuAssertIntEquals(tc, i + 1, cb_array_get_count(a));
 		
-		CbValue* element = cb_array_get(a, i);
-		CuAssertPtrNotNull(tc, element);
-		CuAssertIntEquals(tc, VT_NUMERIC, element->type);
-		CuAssertIntEquals(tc, i, element->value);
+		CbValue* current_item = NULL;
+		CuAssertTrue(tc, cb_array_get(a, i, &current_item));
+		CuAssertIntEquals(tc, VT_NUMERIC, current_item->type);
+		CuAssertIntEquals(tc, i, current_item->value);
 	}
+	
+	cb_array_free(a);
+}
+
+// -----------------------------------------------------------------------------
+// Test for cb_array_get()
+// -----------------------------------------------------------------------------
+void test_array_get(CuTest *tc)
+{
+	CbValue* item = NULL;;
+	CbArray* a    = cb_array_create();
+	
+	CuAssertFalse(tc, cb_array_get(a, 0, NULL));
+	
+	cb_array_append(a, cb_numeric_create(123));
+	
+	CuAssertTrue(tc, cb_array_get(a, 0, NULL));
+	CuAssertFalse(tc, cb_array_get(a, 1, NULL));
+	CuAssertFalse(tc, cb_array_get(a, 999, NULL));
+	
+	CuAssertTrue(tc, cb_array_get(a, 0, &item));
+	CuAssertIntEquals(tc, VT_NUMERIC, item->type);
+	CuAssertIntEquals(tc, 123, item->value);
+	
+	cb_array_append(a, cb_numeric_create(321));
+	
+	CuAssertTrue(tc, cb_array_get(a, 0, NULL));
+	CuAssertTrue(tc, cb_array_get(a, 1, NULL));
+	CuAssertFalse(tc, cb_array_get(a, 2, NULL));
+	
+	CuAssertTrue(tc, cb_array_get(a, 1, &item));
+	CuAssertIntEquals(tc, VT_NUMERIC, item->type);
+	CuAssertIntEquals(tc, 321, item->value);
+	
+	cb_array_free(a);
+}
+
+// -----------------------------------------------------------------------------
+// Test for cb_array_set()
+// -----------------------------------------------------------------------------
+void test_array_set(CuTest *tc)
+{
+	CbValue* item = NULL;
+	CbArray* a    = cb_array_create();
+	
+	CuAssertFalse(tc, cb_array_set(a, 0, NULL));
+	CuAssertFalse(tc, cb_array_set(a, 1, NULL));
+	CuAssertFalse(tc, cb_array_set(a, 999, NULL));
+	CuAssertFalse(tc, cb_array_set(a, 0, cb_numeric_create(123456)));
+	
+	cb_array_append(a, cb_numeric_create(123));
+	
+	CuAssertTrue(tc, cb_array_get(a, 0, &item));
+	CuAssertIntEquals(tc, VT_NUMERIC, item->type);
+	CuAssertIntEquals(tc, 123, item->value);
+	
+	CuAssertTrue(tc, cb_array_set(a, 0, NULL));
+	CuAssertTrue(tc, cb_array_get(a, 0, NULL));
+	
+	CuAssertTrue(tc, cb_array_set(a, 0, cb_numeric_create(321)));
+	
+	CuAssertTrue(tc, cb_array_get(a, 0, &item));
+	CuAssertIntEquals(tc, VT_NUMERIC, item->type);
+	CuAssertIntEquals(tc, 321, item->value);
 	
 	cb_array_free(a);
 }
@@ -54,5 +124,7 @@ CuSuite* make_suite_array()
 {
 	CuSuite* suite = CuSuiteNew();
 	SUITE_ADD_TEST(suite, test_array);
+	SUITE_ADD_TEST(suite, test_array_get);
+	SUITE_ADD_TEST(suite, test_array_set);
 	return suite;
 }
