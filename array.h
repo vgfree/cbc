@@ -1,5 +1,8 @@
 /*******************************************************************************
- * CbArray -- Generic implementation of a dynamic array structure
+ * CbArray -- Implementation of a dynamic value array structure
+ * 
+ *            The array can hold a dynamic amount of pointers to a
+ *            CbValue-object (defined as CbArrayItem).
  ******************************************************************************/
 
 #ifndef ARRAY_H

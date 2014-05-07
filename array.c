@@ -1,5 +1,5 @@
 /*******************************************************************************
- * CbArray -- Generic implementation of a dynamic array structure
+ * CbArray -- Implementation of a dynamic value array structure
  ******************************************************************************/
 
 #include <stdlib.h>
@@ -95,7 +95,7 @@ bool cb_array_set(CbArray* array, int index, const CbArrayItem item)
 }
 
 // -----------------------------------------------------------------------------
-// Set element in array
+// Get element in array
 // -----------------------------------------------------------------------------
 const CbArrayItem cb_array_get(CbArray* array, int index)
 {
