@@ -15,6 +15,7 @@ struct CbArray
 {
 	size_t count;
 	CbArrayItem* elements;
+	int element_size;
 	int block_size;
 	int alloc_size;
 	bool element_ownership;
@@ -33,12 +34,13 @@ static bool cb_array_increase_size(CbArray* array, unsigned int blocks);
 // -----------------------------------------------------------------------------
 CbArray* cb_array_create()
 {
-	CbArray* array    = (CbArray*) malloc(sizeof(CbArray));
-	array->count      = 0;
+	CbArray* array      = (CbArray*) malloc(sizeof(CbArray));
+	array->count        = 0;
 	// default block size is the size of 16 elements
-	array->block_size = sizeof(CbArrayItem) * 16;
-	array->elements   = (CbArrayItem*) malloc(array->block_size);
-	array->alloc_size = array->block_size;
+	array->element_size = sizeof(CbArrayItem);
+	array->block_size   = array->element_size * 16;
+	array->elements     = (CbArrayItem*) malloc(array->block_size);
+	array->alloc_size   = array->block_size;
 	
 	// array should own its elements by default
 	array->element_ownership = true;
@@ -119,7 +121,7 @@ bool cb_array_insert(CbArray* array, const CbArrayItem item, int index)
 	
 	void* source      = array->elements + index;
 	void* destination = array->elements + index + 1;
-	size_t size       = (array->count - index) * sizeof(CbArrayItem);
+	size_t size       = (array->count - index) * array->element_size;
 	memmove(destination, source, size);
 	
 	bool ownership_backup    = array->element_ownership;
@@ -143,7 +145,7 @@ bool cb_array_remove(CbArray* array, int index)
 	
 	void* source      = array->elements + index + 1;
 	void* destination = array->elements + index;
-	size_t size       = (array->count - (index + 1)) * sizeof(CbArrayItem);
+	size_t size       = (array->count - (index + 1)) * array->element_size;
 	memmove(destination, source, size);
 	
 	array->count--;
@@ -196,7 +198,7 @@ bool cb_array_get(CbArray* array, int index, CbArrayItem* destination)
 // -----------------------------------------------------------------------------
 static bool cb_array_is_full(CbArray* array)
 {
-	return ((array->count * sizeof(CbArrayItem)) >= array->alloc_size);
+	return ((array->count * array->element_size) >= array->alloc_size);
 }
 
 // -----------------------------------------------------------------------------
