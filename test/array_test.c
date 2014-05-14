@@ -56,7 +56,7 @@ void test_array(CuTest *tc)
 // -----------------------------------------------------------------------------
 void test_array_get(CuTest *tc)
 {
-	CbValue* item = NULL;;
+	CbValue* item = NULL;
 	CbArray* a    = cb_array_create();
 	
 	CuAssertFalse(tc, cb_array_get(a, 0, NULL));
@@ -189,6 +189,34 @@ void test_array_remove(CuTest *tc)
 	cb_array_free(a);
 }
 
+// -----------------------------------------------------------------------------
+// Test for cb_array_remove()
+// -----------------------------------------------------------------------------
+void test_array_copy(CuTest *tc)
+{
+	CbValue* item = NULL;
+	CbArray* a    = cb_array_create();
+	
+	int i = 0;
+	for (; i < 20; i++)
+		cb_array_append(a, cb_numeric_create(i));
+	
+	CuAssertIntEquals(tc, 20, cb_array_get_count(a));
+	
+	CbArray* new_array = cb_array_copy(a);
+	
+	for (i = 0; i < 20; i++)
+	{
+		CuAssertTrue(tc, cb_array_get(new_array, i, &item));
+		CuAssertIntEquals(tc, VT_NUMERIC, item->type);
+		CuAssertIntEquals(tc, i, item->value);
+	}
+	
+	cb_array_free(new_array);
+	
+	cb_array_free(a);
+}
+
 
 // #############################################################################
 // make suite
@@ -202,5 +230,6 @@ CuSuite* make_suite_array()
 	SUITE_ADD_TEST(suite, test_array_set);
 	SUITE_ADD_TEST(suite, test_array_insert);
 	SUITE_ADD_TEST(suite, test_array_remove);
+	SUITE_ADD_TEST(suite, test_array_copy);
 	return suite;
 }

@@ -66,6 +66,32 @@ void cb_array_free(CbArray* array)
 }
 
 // -----------------------------------------------------------------------------
+// Copy array
+// -----------------------------------------------------------------------------
+CbArray* cb_array_copy(CbArray* array)
+{
+	CbArray* new_array           = (CbArray*) malloc(sizeof(CbArray));
+	new_array->count             = array->count;
+	new_array->element_size      = array->element_size;
+	new_array->block_size        = array->block_size;
+	new_array->alloc_size        = array->alloc_size;
+	new_array->elements          = (CbArrayItem*) malloc(array->alloc_size);
+	new_array->element_ownership = array->element_ownership;
+	
+	// apply all values within array as well
+	int i = 0;
+	for (; i < array->count; i++)
+	{
+		if (array->element_ownership) // copy values if array owns its elements
+			new_array->elements[i] = cb_value_copy(array->elements[i]);
+		else
+			new_array->elements[i] = array->elements[i];
+	}
+	
+	return new_array;
+}
+
+// -----------------------------------------------------------------------------
 // Get count of elements in array
 // -----------------------------------------------------------------------------
 size_t cb_array_get_count(CbArray* array)

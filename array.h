@@ -21,6 +21,7 @@ typedef CbValue* CbArrayItem;
 // interface functions
 CbArray* cb_array_create();
 void cb_array_free(CbArray* array);
+CbArray* cb_array_copy(CbArray* array);
 
 size_t cb_array_get_count(CbArray* array);
 bool cb_array_get_element_ownership(CbArray* array);
