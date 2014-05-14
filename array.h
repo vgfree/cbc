@@ -23,6 +23,8 @@ CbArray* cb_array_create();
 void cb_array_free(CbArray* array);
 
 size_t cb_array_get_count(CbArray* array);
+bool cb_array_get_element_ownership(CbArray* array);
+void cb_array_set_element_ownership(CbArray* array, bool value);
 
 bool cb_array_set(CbArray* array, int index, const CbArrayItem item);
 bool cb_array_get(CbArray* array, int index, CbArrayItem* destination);

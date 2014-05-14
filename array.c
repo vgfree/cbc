@@ -72,6 +72,22 @@ size_t cb_array_get_count(CbArray* array)
 }
 
 // -----------------------------------------------------------------------------
+// Get element ownership attribute of array
+// -----------------------------------------------------------------------------
+bool cb_array_get_element_ownership(CbArray* array)
+{
+	return array->element_ownership;
+}
+
+// -----------------------------------------------------------------------------
+// Set element ownership of array
+// -----------------------------------------------------------------------------
+void cb_array_set_element_ownership(CbArray* array, bool value)
+{
+	array->element_ownership = value;
+}
+
+// -----------------------------------------------------------------------------
 // Append element to array
 // -----------------------------------------------------------------------------
 bool cb_array_append(CbArray* array, const CbArrayItem item)
@@ -142,7 +158,7 @@ bool cb_array_set(CbArray* array, int index, const CbArrayItem item)
 {
 	if (array->count <= index)
 	{
-		if (item != NULL)
+		if (array->element_ownership && item != NULL)
 			cb_value_free(item);
 		
 		return false;
