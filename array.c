@@ -3,6 +3,7 @@
  ******************************************************************************/
 
 #include <stdlib.h>
+#include <string.h>
 #include "array.h"
 
 
@@ -85,6 +86,56 @@ bool cb_array_append(CbArray* array, const CbArrayItem item)
 }
 
 // -----------------------------------------------------------------------------
+// Insert element in array
+// -----------------------------------------------------------------------------
+bool cb_array_insert(CbArray* array, const CbArrayItem item, int index)
+{
+	bool result = false;
+	
+	if (index >= array->count)
+		return cb_array_append(array, item);
+	
+	if (cb_array_is_full(array))
+		cb_array_increase_size(array, 1);
+	
+	array->count++;
+	array->elements[array->count - 1] = NULL;	// clear allocated memory
+	
+	void* source      = array->elements + index;
+	void* destination = array->elements + index + 1;
+	size_t size       = (array->count - index) * sizeof(CbArrayItem);
+	memmove(destination, source, size);
+	
+	bool ownership_backup    = array->element_ownership;
+	array->element_ownership = false; // temporarily disable element ownership
+	result = cb_array_set(array, index, item);
+	array->element_ownership = ownership_backup; // restore ownership attribute
+	
+	return result;
+}
+
+// -----------------------------------------------------------------------------
+// Delete element from array
+// -----------------------------------------------------------------------------
+bool cb_array_remove(CbArray* array, int index)
+{
+	if (index >= array->count)
+		return false;
+	
+	if (!cb_array_set(array, index, NULL))
+		return false;
+	
+	void* source      = array->elements + index + 1;
+	void* destination = array->elements + index;
+	size_t size       = (array->count - (index + 1)) * sizeof(CbArrayItem);
+	memmove(destination, source, size);
+	
+	array->count--;
+	
+	return true;
+}
+
+// -----------------------------------------------------------------------------
 // Set element in array
 // -----------------------------------------------------------------------------
 bool cb_array_set(CbArray* array, int index, const CbArrayItem item)
@@ -98,7 +149,7 @@ bool cb_array_set(CbArray* array, int index, const CbArrayItem item)
 	}
 	
 	// free previous element, if necessary
-	if (array->elements[index] != NULL)
+	if (array->element_ownership && array->elements[index] != NULL)
 		cb_value_free(array->elements[index]);
 	
 	array->elements[index] = item;
