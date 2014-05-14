@@ -190,7 +190,7 @@ void test_array_remove(CuTest *tc)
 }
 
 // -----------------------------------------------------------------------------
-// Test for cb_array_remove()
+// Test for cb_array_copy()
 // -----------------------------------------------------------------------------
 void test_array_copy(CuTest *tc)
 {
