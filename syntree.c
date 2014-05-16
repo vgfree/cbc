@@ -338,7 +338,7 @@ CbValue* cb_syntree_eval(CbSyntree* node, CbSymtab* symtab)
 			assert(cb_value_is_type(condition, VT_BOOLEAN));
 			
 			// evaluate condition and check its result
-			if (condition->boolean)
+			if (cb_boolean_get(condition))
 			{
 				// condition is ture -> evaluate the true-branch
 				result = cb_syntree_eval(((CbFlowNode*) node)->tb, symtab);
@@ -370,7 +370,7 @@ CbValue* cb_syntree_eval(CbSyntree* node, CbSymtab* symtab)
 			result = cb_value_create();
 			
 			// evaluate true-branch while the condition returns true
-			while (temp->boolean)
+			while (cb_boolean_get(temp))
 			{
 				cb_value_free(temp);
 				if (result)	// TODO:	Check is not necessary since result is
@@ -399,7 +399,7 @@ CbValue* cb_syntree_eval(CbSyntree* node, CbSymtab* symtab)
 			
 			if (l && r) // both values of left and right syntax node must be valid
 			{
-				switch (l->type)
+				switch (cb_value_get_type(l))
 				{
 					case VT_NUMERIC:
 						result = cb_numeric_compare(cmp->cmp_type, l, r);
@@ -466,7 +466,7 @@ CbValue* cb_syntree_eval(CbSyntree* node, CbSymtab* symtab)
 			}
 			
 			// value type of rhs and lhs must be equal!
-			if (!cb_value_is_type(r, l->type))
+			if (!cb_value_is_type(r, cb_value_get_type(l)))
 			{
 				cb_print_error(CB_ERR_RUNTIME, node->line_no,
 							   "Node type of left-hand side differs from right-hand side");
@@ -475,7 +475,7 @@ CbValue* cb_syntree_eval(CbSyntree* node, CbSymtab* symtab)
 				switch (node->type)
 				{
 					case '+':
-						switch (l->type)
+						switch (cb_value_get_type(l))
 						{
 							case VT_NUMERIC:
 								result = cb_numeric_add(l, r);
@@ -504,7 +504,7 @@ CbValue* cb_syntree_eval(CbSyntree* node, CbSymtab* symtab)
 						break;
 					
 					case SNT_LOGICAL_AND:
-						switch (l->type)
+						switch (cb_value_get_type(l))
 						{
 							case VT_NUMERIC:
 								result = cb_numeric_and(l, r);
@@ -521,7 +521,7 @@ CbValue* cb_syntree_eval(CbSyntree* node, CbSymtab* symtab)
 						break;
 					
 					case SNT_LOGICAL_OR:
-						switch (l->type)
+						switch (cb_value_get_type(l))
 						{
 							case VT_NUMERIC:
 								result = cb_numeric_or(l, r);
@@ -551,10 +551,10 @@ CbValue* cb_syntree_eval(CbSyntree* node, CbSymtab* symtab)
 			if (operand == NULL)
 				break;
 			
-			switch (operand->type)
+			switch (cb_value_get_type(operand))
 			{
 				case VT_BOOLEAN:
-					result = cb_boolean_create(!operand->boolean);
+					result = cb_boolean_create(!cb_boolean_get(operand));
 					break;
 				
 				case VT_NUMERIC:
@@ -575,7 +575,10 @@ CbValue* cb_syntree_eval(CbSyntree* node, CbSymtab* symtab)
 		case SNT_UNARYMINUS:
 			result = cb_syntree_eval(node->l, symtab);
 			if (result)
-				result->value = - result->value;
+			{
+				CbNumeric new_value = - cb_numeric_get(result);
+				cb_numeric_set(result, new_value);
+			}
 			break;
 		
 		default:

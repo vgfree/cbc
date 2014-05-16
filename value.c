@@ -17,6 +17,20 @@
 // declarations
 // #############################################################################
 
+struct CbValue
+{
+	// value-type
+	enum cb_value_type type;
+	
+	union
+	{
+		CbNumeric value;
+		CbBoolean boolean;
+		CbString string;
+	};
+};
+
+
 static CbValue* cb_numeric_operation(enum cb_operation_type type, CbValue* l,
 									 CbValue* r);
 static CbValue* cb_boolean_operation(enum cb_operation_type type, CbValue* l,
@@ -75,6 +89,14 @@ void cb_value_free(CbValue* val)
 		free(val->string);
 	
 	free(val);
+}
+
+// -----------------------------------------------------------------------------
+// get value-type
+// -----------------------------------------------------------------------------
+enum cb_value_type cb_value_get_type(const CbValue* val)
+{
+	return val->type;
 }
 
 // -----------------------------------------------------------------------------
@@ -190,6 +212,24 @@ void cb_value_print(const CbValue* val)
 }
 
 // -----------------------------------------------------------------------------
+// get numeric value
+// -----------------------------------------------------------------------------
+CbNumeric cb_numeric_get(const CbValue* val)
+{
+	return val->value;
+}
+
+// -----------------------------------------------------------------------------
+// set numeric value
+// -----------------------------------------------------------------------------
+void cb_numeric_set(CbValue* val, CbNumeric value)
+{
+	assert(cb_value_is_type(val, VT_NUMERIC));
+	
+	val->value = value;
+}
+
+// -----------------------------------------------------------------------------
 // numerical comparison
 // -----------------------------------------------------------------------------
 CbValue* cb_numeric_compare(enum cb_comparison_type type, const CbValue* l,
@@ -273,6 +313,14 @@ CbValue* cb_numeric_not(CbValue* operand)
 }
 
 // -----------------------------------------------------------------------------
+// get string value
+// -----------------------------------------------------------------------------
+CbString cb_string_get(const CbValue* val)
+{
+	return val->string;
+}
+
+// -----------------------------------------------------------------------------
 // string comparison
 // -----------------------------------------------------------------------------
 CbValue* cb_string_compare(enum cb_comparison_type type, const CbValue* l,
@@ -322,6 +370,14 @@ CbValue* cb_string_concat(CbValue* l, CbValue* r)
 	CbValue* result = cb_string_create(buffer);
 	
 	return result;
+}
+
+// -----------------------------------------------------------------------------
+// get boolean value
+// -----------------------------------------------------------------------------
+CbBoolean cb_boolean_get(const CbValue* val)
+{
+	return val->boolean;
 }
 
 // -----------------------------------------------------------------------------

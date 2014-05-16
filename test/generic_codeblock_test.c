@@ -19,7 +19,21 @@
 
 #define TEST_FILES_DIR	"./testfiles"
 
-const CbValue expected_results[] = {
+
+// CbTestValue -- Emulates CbValue, with "public" properties to be able to hold
+//                a list with expected values.
+typedef struct
+{
+	enum cb_value_type type;
+	union
+	{
+		CbNumeric value;
+		CbString  string;
+		CbBoolean boolean;
+	};
+} CbTestValue;
+
+const CbTestValue expected_results[] = {
 	{VT_NUMERIC, 5},		// Testcase 0
 	{VT_NUMERIC, 17},
 	{VT_NUMERIC, -1},
@@ -73,7 +87,7 @@ const CbValue expected_results[] = {
 typedef struct
 {
 	char* cb_string;
-	CbValue expected_result;
+	CbTestValue expected_result;
 } CbTestString;
 
 // logical gates (e.g. AND, OR, NOT) test codeblock strings
@@ -115,7 +129,7 @@ static const CbTestString cbstrings_logical_gates[] = {
 // Test a specific codeblock script file (internal)
 // -----------------------------------------------------------------------------
 static void test_codeblock_file(CuTest *tc, const char* test_file_name,
-								const CbValue* expected_result)
+								const CbTestValue* expected_result)
 {
 	FILE* test_file = fopen(test_file_name, "r");
 	if (!test_file)
@@ -131,19 +145,19 @@ static void test_codeblock_file(CuTest *tc, const char* test_file_name,
 	
 	codeblock_execute(cb);
 	
-	CuAssertIntEquals(tc, expected_result->type, cb->result->type);
+	CuAssertIntEquals(tc, expected_result->type, cb_value_get_type(cb->result));
 	switch (expected_result->type)
 	{
 		case VT_BOOLEAN:
-			CuAssertIntEquals(tc, expected_result->boolean, cb->result->boolean);
+			CuAssertIntEquals(tc, expected_result->boolean, cb_boolean_get(cb->result));
 			break;
 		
 		case VT_NUMERIC:
-			CuAssertIntEquals(tc, expected_result->value, cb->result->value);
+			CuAssertIntEquals(tc, expected_result->value, cb_numeric_get(cb->result));
 			break;
 		
 		case VT_STRING:
-			CuAssertStrEquals(tc, expected_result->string, cb->result->string);
+			CuAssertStrEquals(tc, expected_result->string, cb_string_get(cb->result));
 			break;
 		
 		case VT_UNDEFINED:	// No value has to be checked here!
@@ -168,21 +182,21 @@ void test_codeblock_string(CuTest *tc, const CbTestString* test_data)
 					  codeblock_parse_string(cb, test_data->cb_string));
 	CuAssertIntEquals(tc, EXIT_SUCCESS, codeblock_execute(cb));
 	
-	const CbValue* expected = &(test_data->expected_result);
+	const CbTestValue* expected = &(test_data->expected_result);
 	
-	CuAssertIntEquals(tc, expected->type, cb->result->type);
+	CuAssertIntEquals(tc, expected->type, cb_value_get_type(cb->result));
 	switch (expected->type)
 	{
 		case VT_BOOLEAN:
-			CuAssertIntEquals(tc, expected->boolean, cb->result->boolean);
+			CuAssertIntEquals(tc, expected->boolean, cb_boolean_get(cb->result));
 			break;
 		
 		case VT_NUMERIC:
-			CuAssertIntEquals(tc, expected->value, cb->result->value);
+			CuAssertIntEquals(tc, expected->value, cb_numeric_get(cb->result));
 			break;
 		
 		case VT_STRING:
-			CuAssertStrEquals(tc, expected->string, cb->result->string);
+			CuAssertStrEquals(tc, expected->string, cb_string_get(cb->result));
 			break;
 	}
 	
@@ -200,7 +214,7 @@ void test_codeblock_string(CuTest *tc, const CbTestString* test_data)
 void test_codeblock_all_files(CuTest *tc)
 {
 	int testcase	   = 0;
-	int testcase_count = sizeof(expected_results) / sizeof(CbValue);
+	int testcase_count = sizeof(expected_results) / sizeof(CbTestValue);
 	
 	for (; testcase < testcase_count; testcase++)
 	{

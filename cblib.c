@@ -46,7 +46,8 @@ CbValue* bif_mod(CbStack* arg_stack)
 	cb_stack_pop(arg_stack, (void*) &arg2);	// first pop -> last argument
 	cb_stack_pop(arg_stack, (void*) &arg1);
 	
-	CbValue* result = cb_numeric_create(arg1->value % arg2->value);
+	CbValue* result = cb_numeric_create(cb_numeric_get(arg1) %
+	                                    cb_numeric_get(arg2));
 	
 	cb_value_free(arg1);
 	cb_value_free(arg2);
@@ -65,7 +66,7 @@ CbValue* bif_valtype(CbStack* arg_stack)
 	cb_stack_pop(arg_stack, (void*) &arg);
 	
 	CbValue* result;
-	switch (arg->type)
+	switch (cb_value_get_type(arg))
 	{
 		case VT_BOOLEAN:
 			result = cb_string_create(strdup("L"));
@@ -120,7 +121,7 @@ CbValue* bif_val(CbStack* arg_stack)
 	assert(cb_value_is_type(arg, VT_STRING));
 	
 	CbValue* result = cb_numeric_create(0);	// default result
-	result->value	= strtol(arg->string, NULL, 10);
+	cb_numeric_set(result, strtol(cb_string_get(arg), NULL, 10));
 	
 	cb_value_free(arg);
 	
@@ -144,14 +145,16 @@ CbValue* bif_replicate(CbStack* arg_stack)
 	
 	CbValue* result;
 	
-	if (count->value > 0)
+	if (cb_numeric_get(count) > 0)
 	{
-		char* result_str = (char*) malloc((strlen(str->string) * count->value) + 1);
+		char* input_str  = cb_string_get(str);
+		size_t alloc_size= (strlen(input_str) * cb_numeric_get(count)) + 1;
+		char* result_str = (char*) malloc(alloc_size);
 		*result_str      = '\0';	// terminate string
 		
 		int i = 0;
-		for (; i < count->value; i++)
-			strcat(result_str, str->string);
+		for (; i < cb_numeric_get(count); i++)
+			strcat(result_str, input_str);
 		
 		result = cb_string_create(result_str);
 	}
@@ -176,7 +179,7 @@ CbValue* bif_len(CbStack* arg_stack)
 	
 	assert(cb_value_is_type(arg, VT_STRING));
 	
-	CbValue* result = cb_numeric_create(strlen(arg->string));
+	CbValue* result = cb_numeric_create(strlen(cb_string_get(arg)));
 	
 	cb_value_free(arg);
 	
@@ -200,7 +203,7 @@ CbValue* bif_eval(CbStack* arg_stack)
 	CbValue* result = NULL;
 	
 	// Parse codeblock string
-	int parser_result = codeblock_parse_string(cb, arg->string);
+	int parser_result = codeblock_parse_string(cb, cb_string_get(arg));
 	cb_value_free(arg);
 	
 	if (parser_result == EXIT_SUCCESS)
@@ -229,7 +232,7 @@ CbValue* bif_getenv(CbStack* arg_stack)
 	
 	CbValue* result = NULL;
 	
-	char* value = getenv(arg->string);
+	char* value = getenv(cb_string_get(arg));
 	if (value == NULL)
 		result = cb_string_create("");
 	else
@@ -259,9 +262,9 @@ CbValue* bif_setenv(CbStack* arg_stack)
 	char* value_str = cb_value_to_string(value);
 	
 #ifdef _CBC_PLAT_WNDS
-	int len		 = strlen(name->string) + 1 + strlen(value_str) + 1;
+	int len		 = strlen(cb_string_get(name)) + 1 + strlen(value_str) + 1;
 	char* envstr = (char*) malloc(len);
-	sprintf(envstr, "%s=%s", name->string, value_str);
+	sprintf(envstr, "%s=%s", cb_string_get(name), value_str);
 	error = putenv(envstr);	// set environment variable
 	free(envstr);
 #else
@@ -289,7 +292,7 @@ CbValue* bif_seterror(CbStack* arg_stack)
 	
 	assert(cb_value_is_type(arg, VT_STRING));
 	
-	cb_error_set_msg(arg->string);	// set error and print error message
+	cb_error_set_msg(cb_string_get(arg));	// set error and print error message
 	
 	CbValue* result = cb_value_create();
 	
@@ -315,8 +318,8 @@ CbValue* bif_seterrorif(CbStack* arg_stack)
 	
 	CbValue* result = cb_value_create();
 	
-	if (condition->boolean)
-		cb_error_set_msg(message->string);
+	if (cb_boolean_get(condition))
+		cb_error_set_msg(cb_string_get(message));
 	
 	cb_value_free(condition);
 	cb_value_free(message);

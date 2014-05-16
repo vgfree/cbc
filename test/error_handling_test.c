@@ -124,20 +124,20 @@ static void test_error_internal(CuTest* tc,
 	{
 		CuAssertPtrNotNull(tc, cb->result);
 		// check execution result type
-		CuAssertIntEquals(tc, expected_result->type, cb->result->type);
+		CuAssertIntEquals(tc, cb_value_get_type(expected_result), cb_value_get_type(cb->result));
 		// check execution result value
-		switch (cb->result->type)
+		switch (cb_value_get_type(cb->result))
 		{
 			case VT_BOOLEAN:
-				CuAssertIntEquals(tc, expected_result->boolean, cb->result->boolean);
+				CuAssertIntEquals(tc, cb_boolean_get(expected_result), cb_boolean_get(cb->result));
 				break;
 			
 			case VT_NUMERIC:
-				CuAssertIntEquals(tc, expected_result->value, cb->result->value);
+				CuAssertIntEquals(tc, cb_numeric_get(expected_result), cb_numeric_get(cb->result));
 				break;
 			
 			case VT_STRING:
-				CuAssertStrEquals(tc, expected_result->string, cb->result->string);
+				CuAssertStrEquals(tc, cb_string_get(expected_result), cb_string_get(cb->result));
 				break;
 			
 			default:

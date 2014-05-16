@@ -49,18 +49,7 @@ typedef char*	CbString;
 typedef bool	CbBoolean;
 
 // codeblock-value structure
-typedef struct
-{
-	// value-type
-	enum cb_value_type type;
-	
-	union
-	{
-		CbNumeric value;
-		CbBoolean boolean;
-		CbString string;
-	};
-} CbValue;
+typedef struct CbValue CbValue;
 
 // interface functions
 CbValue* cb_value_create();
@@ -68,13 +57,18 @@ CbValue* cb_numeric_create(CbNumeric value);
 CbValue* cb_boolean_create(CbBoolean boolean);
 CbValue* cb_string_create(CbString string);
 void cb_value_free(CbValue* val);
+
+enum cb_value_type cb_value_get_type(const CbValue* val);
 bool cb_value_is_type(const CbValue* val, enum cb_value_type type);
 void cb_value_assign(const CbValue* source, CbValue* destination);
 void cb_value_assign_and_free_source(CbValue* source, CbValue* destination);
 CbValue* cb_value_copy(const CbValue* val);
 char* cb_value_to_string(const CbValue* val);
 void cb_value_print(const CbValue* val);
+
 // CbNumeric interface functions
+CbNumeric cb_numeric_get(const CbValue* val);
+void cb_numeric_set(CbValue* val, CbNumeric value);
 CbValue* cb_numeric_compare(enum cb_comparison_type type, const CbValue* l,
 							const CbValue* r);
 CbValue* cb_numeric_add(CbValue* l, CbValue* r);
@@ -84,11 +78,15 @@ CbValue* cb_numeric_div(CbValue* l, CbValue* r);
 CbValue* cb_numeric_and(CbValue* l, CbValue* r);
 CbValue* cb_numeric_or(CbValue* l, CbValue* r);
 CbValue* cb_numeric_not(CbValue* operand);
+
 // CbString interface functions
+CbString cb_string_get(const CbValue* val);
 CbValue* cb_string_compare(enum cb_comparison_type type, const CbValue* l,
 						   const CbValue* r);
 CbValue* cb_string_concat(CbValue* l, CbValue* r);
+
 // CbBoolean interface functions
+CbBoolean cb_boolean_get(const CbValue* val);
 CbValue* cb_boolean_compare(enum cb_comparison_type type, const CbValue* l,
 							const CbValue* r);
 CbValue* cb_boolean_and(CbValue* l, CbValue* r);

@@ -29,7 +29,7 @@ CbValue* bif_meld(CbStack* arg_stack)
 	
 	// display message
 	// NOTE: MessageBox() causes memory-leaks in MinGW32!
-	MessageBox(NULL, arg->string, "Information", MB_ICONINFORMATION | MB_OK);
+	MessageBox(NULL, cb_string_get(arg), "Information", MB_ICONINFORMATION | MB_OK);
 	
 	cb_value_free(arg);
 	
