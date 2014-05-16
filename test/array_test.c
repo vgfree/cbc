@@ -3,6 +3,7 @@
  ******************************************************************************/
 
 #include <stdio.h>
+#include <string.h>
 #include <CuTest.h>
 #include "CuTestCustomUtils.h"
 #include "../array.h"
@@ -217,6 +218,31 @@ void test_array_copy(CuTest *tc)
 	cb_array_free(a);
 }
 
+// -----------------------------------------------------------------------------
+// Test CbValArray cb_value_to_string() function
+// -----------------------------------------------------------------------------
+void test_valarray_value_to_string(CuTest *tc)
+{
+	CbArray* a1 = cb_array_create();
+	cb_array_append(a1, cb_boolean_create(true));
+	cb_array_append(a1, cb_numeric_create(-5));
+	cb_array_append(a1, cb_boolean_create(false));
+	cb_array_append(a1, cb_string_create(strdup("bar")));
+	
+	CbArray* a2 = cb_array_create();
+	cb_array_append(a2, cb_numeric_create(1234));
+	cb_array_append(a2, cb_boolean_create(true));
+	cb_array_append(a2, cb_boolean_create(false));
+	cb_array_append(a2, cb_string_create(strdup("foo")));
+	cb_array_append(a2, cb_valarray_create(a1));
+	
+	CbValue* val2 = cb_valarray_create(a2);
+	
+	CuAssertStrEquals(tc, "{}", cb_value_to_string(val2));
+	
+	cb_value_free(val2);
+}
+
 
 // #############################################################################
 // make suite
@@ -231,5 +257,6 @@ CuSuite* make_suite_array()
 	SUITE_ADD_TEST(suite, test_array_insert);
 	SUITE_ADD_TEST(suite, test_array_remove);
 	SUITE_ADD_TEST(suite, test_array_copy);
+	SUITE_ADD_TEST(suite, test_valarray_value_to_string);
 	return suite;
 }
