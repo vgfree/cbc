@@ -7,6 +7,7 @@
 
 
 #include <stdbool.h>
+#include "array_if.h"
 
 #define CB_BOOLEAN_TRUE_STR		"True"
 #define CB_BOOLEAN_FALSE_STR	"False"
@@ -17,7 +18,8 @@ enum cb_value_type
 	CB_VT_UNDEFINED,
 	CB_VT_NUMERIC,
 	CB_VT_BOOLEAN,
-	CB_VT_STRING
+	CB_VT_STRING,
+	CB_VT_VALARRAY
 };
 
 // operation-types
@@ -44,9 +46,10 @@ enum cb_comparison_type
 };
 
 // definition of codeblock-types
-typedef int		CbNumeric;
-typedef char*	CbString;
-typedef bool	CbBoolean;
+typedef int      CbNumeric;
+typedef char*    CbString;
+typedef bool     CbBoolean;
+typedef CbArray* CbValArray;
 
 // codeblock-value structure
 typedef struct CbValue CbValue;
@@ -56,6 +59,7 @@ CbValue* cb_value_create();
 CbValue* cb_numeric_create(CbNumeric value);
 CbValue* cb_boolean_create(CbBoolean boolean);
 CbValue* cb_string_create(CbString string);
+CbValue* cb_valarray_create(CbValArray array);
 void cb_value_free(CbValue* val);
 
 enum cb_value_type cb_value_get_type(const CbValue* val);
@@ -92,6 +96,9 @@ CbValue* cb_boolean_compare(enum cb_comparison_type type, const CbValue* l,
 CbValue* cb_boolean_and(CbValue* l, CbValue* r);
 CbValue* cb_boolean_or(CbValue* l, CbValue* r);
 CbValue* cb_boolean_not(CbValue* operand);
+
+// CbValArray interface functions
+const CbValArray cb_valarray_get(const CbValue* val);
 
 
 #endif // VALUE_H

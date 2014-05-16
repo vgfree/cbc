@@ -11,10 +11,10 @@
 
 #include <stdlib.h>
 #include <stdbool.h>
+#include "array_if.h"
 #include "value.h"
 
-// CbArray struct
-typedef struct CbArray CbArray;
+
 typedef CbValue* CbArrayItem;
 
 

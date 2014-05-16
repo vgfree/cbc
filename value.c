@@ -7,6 +7,7 @@
 #include <string.h>
 #include <assert.h>
 #include "value.h"
+#include "array.h"
 #include "error_handling.h"
 #include "error_messages.h"
 
@@ -27,6 +28,7 @@ struct CbValue
 		CbNumeric value;
 		CbBoolean boolean;
 		CbString string;
+		CbArray* array;
 	};
 };
 
@@ -81,12 +83,24 @@ CbValue* cb_string_create(CbString string)
 }
 
 // -----------------------------------------------------------------------------
+// create an array
+// -----------------------------------------------------------------------------
+CbValue* cb_valarray_create(CbValArray array)
+{
+	CbValue* valarray = cb_value_create();
+	valarray->type    = CB_VT_VALARRAY;
+	valarray->array   = array;
+}
+
+// -----------------------------------------------------------------------------
 // free codeblock-value
 // -----------------------------------------------------------------------------
 void cb_value_free(CbValue* val)
 {
 	if (val->type == CB_VT_STRING && val->string)
 		free(val->string);
+	else if (val->type == CB_VT_VALARRAY && val->array)
+		cb_array_free(val->array);
 	
 	free(val);
 }
@@ -131,6 +145,14 @@ void cb_value_assign(const CbValue* source, CbValue* destination)
 				free(destination->string);
 			// assign new one
 			destination->string = strdup(source->string);
+			break;
+		
+		case CB_VT_VALARRAY:
+			// free old array
+			if (destination->type == CB_VT_VALARRAY && destination->array)
+				cb_array_free(destination->array);
+			// assign new one
+			destination->array = cb_array_copy(source->array);
 			break;
 	}
 	
@@ -192,6 +214,46 @@ char* cb_value_to_string(const CbValue* val)
 		case CB_VT_UNDEFINED:
 			result_buf = strdup(NO_VALUE_AS_STRING);
 			break;
+		
+		case CB_VT_VALARRAY:
+		{
+			// allocate memory for "{}" (including null termination)
+			result_buf  = (char*) malloc(3);
+			*result_buf = '\0';      // terminate string
+			strcat(result_buf, "{"); // open array
+			
+			int i     = 0;
+			int count = cb_array_get_count(val->array);
+			
+			for (; i < count; i++)
+			{
+				CbValue* item = NULL;
+				cb_array_get(val->array, i, &item);
+				char* value_string = NULL;
+				
+				if (item == NULL)
+					value_string = "<NIL>";
+				else
+					value_string = cb_value_to_string(item);
+				
+				int n = 1;
+				if (i < count - 1) // check if there are still elements left
+					n = 2;
+				
+				result_buf = realloc(result_buf, strlen(result_buf) +
+				                                 strlen(value_string) + n);
+				
+				strcat(result_buf, value_string);
+				
+				if (n == 2)
+					// append additional comma for further elements
+					strcat(result_buf, ",");
+			}
+			
+			strcat(result_buf, "}"); // close array
+			
+			break;
+		}
 		
 		default:
 			assert(("Invalid value type", false));
@@ -438,6 +500,14 @@ CbValue* cb_boolean_not(CbValue* operand)
 	assert(cb_value_is_type(operand, CB_VT_BOOLEAN));
 	
 	return cb_boolean_create(! operand->value);
+}
+
+// -----------------------------------------------------------------------------
+// get array
+// -----------------------------------------------------------------------------
+const CbValArray cb_valarray_get(const CbValue* val)
+{
+	return val->array;
 }
 
 
