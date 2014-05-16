@@ -47,7 +47,7 @@ static CbValue* cb_boolean_operation(enum cb_operation_type type, CbValue* l,
 CbValue* cb_value_create()
 {
 	CbValue* val= (CbValue*) malloc(sizeof(CbValue));
-	val->type	= VT_UNDEFINED;
+	val->type	= CB_VT_UNDEFINED;
 }
 
 // -----------------------------------------------------------------------------
@@ -56,7 +56,7 @@ CbValue* cb_value_create()
 CbValue* cb_numeric_create(CbNumeric value)
 {
 	CbValue* val= cb_value_create();
-	val->type	= VT_NUMERIC;
+	val->type	= CB_VT_NUMERIC;
 	val->value	= value;
 }
 
@@ -66,7 +66,7 @@ CbValue* cb_numeric_create(CbNumeric value)
 CbValue* cb_boolean_create(CbBoolean boolean)
 {
 	CbValue* val= cb_value_create();
-	val->type	= VT_BOOLEAN;
+	val->type	= CB_VT_BOOLEAN;
 	val->boolean= boolean;
 }
 
@@ -76,7 +76,7 @@ CbValue* cb_boolean_create(CbBoolean boolean)
 CbValue* cb_string_create(CbString string)
 {
 	CbValue* val= cb_value_create();
-	val->type	= VT_STRING;
+	val->type	= CB_VT_STRING;
 	val->string	= string;
 }
 
@@ -85,7 +85,7 @@ CbValue* cb_string_create(CbString string)
 // -----------------------------------------------------------------------------
 void cb_value_free(CbValue* val)
 {
-	if (val->type == VT_STRING && val->string)
+	if (val->type == CB_VT_STRING && val->string)
 		free(val->string);
 	
 	free(val);
@@ -117,17 +117,17 @@ void cb_value_assign(const CbValue* source, CbValue* destination)
 {
 	switch (source->type)
 	{
-		case VT_NUMERIC:
+		case CB_VT_NUMERIC:
 			destination->value = source->value;
 			break;
 		
-		case VT_BOOLEAN:
+		case CB_VT_BOOLEAN:
 			destination->boolean = source->boolean;
 			break;
 		
-		case VT_STRING:
+		case CB_VT_STRING:
 			// free old string
-			if (destination->type == VT_STRING && destination->string)
+			if (destination->type == CB_VT_STRING && destination->string)
 				free(destination->string);
 			// assign new one
 			destination->string = strdup(source->string);
@@ -171,13 +171,13 @@ char* cb_value_to_string(const CbValue* val)
 	
 	switch (val->type)
 	{
-		case VT_NUMERIC:
+		case CB_VT_NUMERIC:
 			// allocate 128 bytes buffer
 			result_buf = malloc(128);
 			sprintf(result_buf, "%d", val->value);
 			break;
 		
-		case VT_BOOLEAN:
+		case CB_VT_BOOLEAN:
 			if (val->boolean)
 				result_buf = strdup(CB_BOOLEAN_TRUE_STR);
 			else
@@ -185,11 +185,11 @@ char* cb_value_to_string(const CbValue* val)
 			
 			break;
 		
-		case VT_STRING:
+		case CB_VT_STRING:
 			result_buf = strdup(val->string);
 			break;
 		
-		case VT_UNDEFINED:
+		case CB_VT_UNDEFINED:
 			result_buf = strdup(NO_VALUE_AS_STRING);
 			break;
 		
@@ -224,7 +224,7 @@ CbNumeric cb_numeric_get(const CbValue* val)
 // -----------------------------------------------------------------------------
 void cb_numeric_set(CbValue* val, CbNumeric value)
 {
-	assert(cb_value_is_type(val, VT_NUMERIC));
+	assert(cb_value_is_type(val, CB_VT_NUMERIC));
 	
 	val->value = value;
 }
@@ -235,8 +235,8 @@ void cb_numeric_set(CbValue* val, CbNumeric value)
 CbValue* cb_numeric_compare(enum cb_comparison_type type, const CbValue* l,
 							const CbValue* r)
 {
-	assert(cb_value_is_type(l, VT_NUMERIC));
-	assert(cb_value_is_type(r, VT_NUMERIC));
+	assert(cb_value_is_type(l, CB_VT_NUMERIC));
+	assert(cb_value_is_type(r, CB_VT_NUMERIC));
 	
 	CbValue* result = cb_boolean_create(false);
 	
@@ -306,7 +306,7 @@ CbValue* cb_numeric_or(CbValue* l, CbValue* r)
 // -----------------------------------------------------------------------------
 CbValue* cb_numeric_not(CbValue* operand)
 {
-	assert(cb_value_is_type(operand, VT_NUMERIC));
+	assert(cb_value_is_type(operand, CB_VT_NUMERIC));
 	
 	// IMPORTANT: Use bitwise negation (~) !
 	return cb_numeric_create(~ operand->value);
@@ -326,8 +326,8 @@ CbString cb_string_get(const CbValue* val)
 CbValue* cb_string_compare(enum cb_comparison_type type, const CbValue* l,
 						   const CbValue* r)
 {
-	assert(cb_value_is_type(l, VT_STRING));
-	assert(cb_value_is_type(r, VT_STRING));
+	assert(cb_value_is_type(l, CB_VT_STRING));
+	assert(cb_value_is_type(r, CB_VT_STRING));
 	
 	bool not_flag	= false;
 	bool result		= false;
@@ -359,8 +359,8 @@ CbValue* cb_string_compare(enum cb_comparison_type type, const CbValue* l,
 // -----------------------------------------------------------------------------
 CbValue* cb_string_concat(CbValue* l, CbValue* r)
 {
-	assert(cb_value_is_type(l, VT_STRING));
-	assert(cb_value_is_type(r, VT_STRING));
+	assert(cb_value_is_type(l, CB_VT_STRING));
+	assert(cb_value_is_type(r, CB_VT_STRING));
 	
 	char* buffer = (char*) malloc(strlen(l->string) +
 								  strlen(r->string) + 1);
@@ -386,8 +386,8 @@ CbBoolean cb_boolean_get(const CbValue* val)
 CbValue* cb_boolean_compare(enum cb_comparison_type type, const CbValue* l,
 							const CbValue* r)
 {
-	assert(cb_value_is_type(l, VT_BOOLEAN));
-	assert(cb_value_is_type(r, VT_BOOLEAN));
+	assert(cb_value_is_type(l, CB_VT_BOOLEAN));
+	assert(cb_value_is_type(r, CB_VT_BOOLEAN));
 	
 	bool not_flag	= false;
 	CbBoolean result= false;
@@ -435,7 +435,7 @@ CbValue* cb_boolean_or(CbValue* l, CbValue* r)
 // -----------------------------------------------------------------------------
 CbValue* cb_boolean_not(CbValue* operand)
 {
-	assert(cb_value_is_type(operand, VT_BOOLEAN));
+	assert(cb_value_is_type(operand, CB_VT_BOOLEAN));
 	
 	return cb_boolean_create(! operand->value);
 }
@@ -451,8 +451,8 @@ CbValue* cb_boolean_not(CbValue* operand)
 static CbValue* cb_numeric_operation(enum cb_operation_type type, CbValue* l,
 									 CbValue* r)
 {
-	assert(cb_value_is_type(l, VT_NUMERIC));
-	assert(cb_value_is_type(r, VT_NUMERIC));
+	assert(cb_value_is_type(l, CB_VT_NUMERIC));
+	assert(cb_value_is_type(r, CB_VT_NUMERIC));
 	
 	CbValue* result	= cb_numeric_create(0);
 	
@@ -485,8 +485,8 @@ static CbValue* cb_numeric_operation(enum cb_operation_type type, CbValue* l,
 static CbValue* cb_boolean_operation(enum cb_operation_type type, CbValue* l,
 									 CbValue* r)
 {
-	assert(cb_value_is_type(l, VT_BOOLEAN));
-	assert(cb_value_is_type(r, VT_BOOLEAN));
+	assert(cb_value_is_type(l, CB_VT_BOOLEAN));
+	assert(cb_value_is_type(r, CB_VT_BOOLEAN));
 	
 	CbValue* result	= cb_boolean_create(false);
 	

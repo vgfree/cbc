@@ -25,7 +25,7 @@ CbValue* bif_meld(CbStack* arg_stack)
 	CbValue* arg;
 	cb_stack_pop(arg_stack, (void*) &arg);
 	
-	assert(cb_value_is_type(arg, VT_STRING));
+	assert(cb_value_is_type(arg, CB_VT_STRING));
 	
 	// display message
 	// NOTE: MessageBox() causes memory-leaks in MinGW32!

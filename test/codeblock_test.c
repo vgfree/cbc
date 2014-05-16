@@ -24,12 +24,12 @@ void test_codeblock_execute(CuTest *tc)
 	
 	codeblock_execute(cb);	// execute codeblock once
 	
-	CuAssertIntEquals(tc, VT_STRING, cb_value_get_type(cb->result));
+	CuAssertIntEquals(tc, CB_VT_STRING, cb_value_get_type(cb->result));
 	CuAssertStrEquals(tc, "test",	 cb_string_get(cb->result));
 	
 	codeblock_execute(cb);	// execute a second time
 	
-	CuAssertIntEquals(tc, VT_STRING, cb_value_get_type(cb->result));
+	CuAssertIntEquals(tc, CB_VT_STRING, cb_value_get_type(cb->result));
 	CuAssertStrEquals(tc, "test",	 cb_string_get(cb->result));
 	
 	codeblock_free(cb);
@@ -87,7 +87,7 @@ void test_codeblock_execute_complex(CuTest *tc)
 	
 	codeblock_execute(cb);	// execute codeblock once
 	
-	CuAssertIntEquals(tc, VT_STRING,	cb_value_get_type(cb->result));
+	CuAssertIntEquals(tc, CB_VT_STRING,	cb_value_get_type(cb->result));
 	CuAssertStrEquals(tc, "foo is 100",	cb_string_get(cb->result));
 	
 	codeblock_free(cb);

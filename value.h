@@ -14,10 +14,10 @@
 // value-types
 enum cb_value_type
 {
-	VT_UNDEFINED,
-	VT_NUMERIC,
-	VT_BOOLEAN,
-	VT_STRING
+	CB_VT_UNDEFINED,
+	CB_VT_NUMERIC,
+	CB_VT_BOOLEAN,
+	CB_VT_STRING
 };
 
 // operation-types

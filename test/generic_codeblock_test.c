@@ -34,53 +34,53 @@ typedef struct
 } CbTestValue;
 
 const CbTestValue expected_results[] = {
-	{VT_NUMERIC, 5},		// Testcase 0
-	{VT_NUMERIC, 17},
-	{VT_NUMERIC, -1},
-	{VT_NUMERIC, 6},
-	{VT_NUMERIC, 259},
-	{VT_NUMERIC, 13},		// Testcase 5
-	{VT_NUMERIC, -7},
-	{VT_NUMERIC, 15},
-	{VT_NUMERIC, -100},
-	{VT_NUMERIC, 130},
-	{VT_NUMERIC, 12345},	// Testcase 10
-	{VT_UNDEFINED, 0},
-	{VT_UNDEFINED, 0},
-	{VT_NUMERIC, 0},
-	{VT_NUMERIC, 5},
-	{VT_NUMERIC, 1},		// Testcase 15
-	{VT_NUMERIC, 1},
-	{VT_NUMERIC, 5},
-	{VT_NUMERIC, 5},
-	{VT_NUMERIC, 1},
-	{VT_NUMERIC, 5},		// Testcase 20
-	{VT_NUMERIC, 1},
-	{VT_NUMERIC, 1},
-	{VT_NUMERIC, 5},
-	{VT_NUMERIC, 5},
-	{VT_NUMERIC, 1},		// Testcase 25
-	{VT_NUMERIC, 5},
-	{VT_NUMERIC, 5},
-	{VT_NUMERIC, 5},
-	{VT_NUMERIC, 14},
-	{VT_NUMERIC, 2},		// Testcase 30
-	{VT_NUMERIC, 15},
-	{VT_NUMERIC, 30},
-	{VT_NUMERIC, 0},
-	{VT_STRING, (CbNumeric) "\"foo\", \"bar\""},	// Cast to cbnumeric to
+	{CB_VT_NUMERIC, 5},		// Testcase 0
+	{CB_VT_NUMERIC, 17},
+	{CB_VT_NUMERIC, -1},
+	{CB_VT_NUMERIC, 6},
+	{CB_VT_NUMERIC, 259},
+	{CB_VT_NUMERIC, 13},		// Testcase 5
+	{CB_VT_NUMERIC, -7},
+	{CB_VT_NUMERIC, 15},
+	{CB_VT_NUMERIC, -100},
+	{CB_VT_NUMERIC, 130},
+	{CB_VT_NUMERIC, 12345},	// Testcase 10
+	{CB_VT_UNDEFINED, 0},
+	{CB_VT_UNDEFINED, 0},
+	{CB_VT_NUMERIC, 0},
+	{CB_VT_NUMERIC, 5},
+	{CB_VT_NUMERIC, 1},		// Testcase 15
+	{CB_VT_NUMERIC, 1},
+	{CB_VT_NUMERIC, 5},
+	{CB_VT_NUMERIC, 5},
+	{CB_VT_NUMERIC, 1},
+	{CB_VT_NUMERIC, 5},		// Testcase 20
+	{CB_VT_NUMERIC, 1},
+	{CB_VT_NUMERIC, 1},
+	{CB_VT_NUMERIC, 5},
+	{CB_VT_NUMERIC, 5},
+	{CB_VT_NUMERIC, 1},		// Testcase 25
+	{CB_VT_NUMERIC, 5},
+	{CB_VT_NUMERIC, 5},
+	{CB_VT_NUMERIC, 5},
+	{CB_VT_NUMERIC, 14},
+	{CB_VT_NUMERIC, 2},		// Testcase 30
+	{CB_VT_NUMERIC, 15},
+	{CB_VT_NUMERIC, 30},
+	{CB_VT_NUMERIC, 0},
+	{CB_VT_STRING, (CbNumeric) "\"foo\", \"bar\""},	// Cast to cbnumeric to
 													// avoid compiler-warning
-	{VT_BOOLEAN, true},		// Testcase 35
-	{VT_BOOLEAN, true},
-	{VT_BOOLEAN, false},
-	{VT_BOOLEAN, false},
-	{VT_BOOLEAN, true},
-	{VT_STRING, (CbNumeric) "string1"},	// Testcase 40
-	{VT_NUMERIC, 118},
-	{VT_NUMERIC, 8},
-	{VT_NUMERIC, 0},
-	{VT_STRING, (CbNumeric) "1234567890"},
-	{VT_STRING, (CbNumeric) "LNCU"}		// Testcase 45
+	{CB_VT_BOOLEAN, true},		// Testcase 35
+	{CB_VT_BOOLEAN, true},
+	{CB_VT_BOOLEAN, false},
+	{CB_VT_BOOLEAN, false},
+	{CB_VT_BOOLEAN, true},
+	{CB_VT_STRING, (CbNumeric) "string1"},	// Testcase 40
+	{CB_VT_NUMERIC, 118},
+	{CB_VT_NUMERIC, 8},
+	{CB_VT_NUMERIC, 0},
+	{CB_VT_STRING, (CbNumeric) "1234567890"},
+	{CB_VT_STRING, (CbNumeric) "LNCU"}		// Testcase 45
 };
 
 // CbTestString -- Combination of a test codeblock string and the expected result
@@ -93,30 +93,30 @@ typedef struct
 // logical gates (e.g. AND, OR, NOT) test codeblock strings
 static const CbTestString cbstrings_logical_gates[] = {
 	// boolean
-	{"True and False,", {VT_BOOLEAN, false}},
-	{"True and True,", {VT_BOOLEAN, true}},
-	{"False and False,", {VT_BOOLEAN, false}},
-	{"True or False,", {VT_BOOLEAN, true}},
-	{"True or True,", {VT_BOOLEAN, true}},
-	{"False or False,", {VT_BOOLEAN, false}},
-	{"not False,", {VT_BOOLEAN, true}},
-	{"not True,", {VT_BOOLEAN, false}},
+	{"True and False,", {CB_VT_BOOLEAN, false}},
+	{"True and True,", {CB_VT_BOOLEAN, true}},
+	{"False and False,", {CB_VT_BOOLEAN, false}},
+	{"True or False,", {CB_VT_BOOLEAN, true}},
+	{"True or True,", {CB_VT_BOOLEAN, true}},
+	{"False or False,", {CB_VT_BOOLEAN, false}},
+	{"not False,", {CB_VT_BOOLEAN, true}},
+	{"not True,", {CB_VT_BOOLEAN, false}},
 	{
 		"| foo, bar | foo := True, bar := False, not (foo and bar),",
-		{VT_BOOLEAN, true}
+		{CB_VT_BOOLEAN, true}
 	},
 	// numeric
-	{"15 and 31,", {VT_NUMERIC, 15}},
-	{"31 and 15,", {VT_NUMERIC, 15}},
-	{"15 and 15,", {VT_NUMERIC, 15}},
-	{"15 or 31,", {VT_NUMERIC, 31}},
-	{"31 or 15,", {VT_NUMERIC, 31}},
-	{"123 or 456,", {VT_NUMERIC, 507}},
-	{"not 5,", {VT_NUMERIC, -6}},
-	{"not 123456,", {VT_NUMERIC, -123457}},
+	{"15 and 31,", {CB_VT_NUMERIC, 15}},
+	{"31 and 15,", {CB_VT_NUMERIC, 15}},
+	{"15 and 15,", {CB_VT_NUMERIC, 15}},
+	{"15 or 31,", {CB_VT_NUMERIC, 31}},
+	{"31 or 15,", {CB_VT_NUMERIC, 31}},
+	{"123 or 456,", {CB_VT_NUMERIC, 507}},
+	{"not 5,", {CB_VT_NUMERIC, -6}},
+	{"not 123456,", {CB_VT_NUMERIC, -123457}},
 	{
 		"| foo, bar | foo := 31, bar := 15, not (foo and bar),",
-		{VT_NUMERIC, -16}
+		{CB_VT_NUMERIC, -16}
 	}
 };
 
@@ -148,19 +148,19 @@ static void test_codeblock_file(CuTest *tc, const char* test_file_name,
 	CuAssertIntEquals(tc, expected_result->type, cb_value_get_type(cb->result));
 	switch (expected_result->type)
 	{
-		case VT_BOOLEAN:
+		case CB_VT_BOOLEAN:
 			CuAssertIntEquals(tc, expected_result->boolean, cb_boolean_get(cb->result));
 			break;
 		
-		case VT_NUMERIC:
+		case CB_VT_NUMERIC:
 			CuAssertIntEquals(tc, expected_result->value, cb_numeric_get(cb->result));
 			break;
 		
-		case VT_STRING:
+		case CB_VT_STRING:
 			CuAssertStrEquals(tc, expected_result->string, cb_string_get(cb->result));
 			break;
 		
-		case VT_UNDEFINED:	// No value has to be checked here!
+		case CB_VT_UNDEFINED:	// No value has to be checked here!
 			break;
 		
 		default:
@@ -187,15 +187,15 @@ void test_codeblock_string(CuTest *tc, const CbTestString* test_data)
 	CuAssertIntEquals(tc, expected->type, cb_value_get_type(cb->result));
 	switch (expected->type)
 	{
-		case VT_BOOLEAN:
+		case CB_VT_BOOLEAN:
 			CuAssertIntEquals(tc, expected->boolean, cb_boolean_get(cb->result));
 			break;
 		
-		case VT_NUMERIC:
+		case CB_VT_NUMERIC:
 			CuAssertIntEquals(tc, expected->value, cb_numeric_get(cb->result));
 			break;
 		
-		case VT_STRING:
+		case CB_VT_STRING:
 			CuAssertStrEquals(tc, expected->string, cb_string_get(cb->result));
 			break;
 	}

@@ -128,15 +128,15 @@ static void test_error_internal(CuTest* tc,
 		// check execution result value
 		switch (cb_value_get_type(cb->result))
 		{
-			case VT_BOOLEAN:
+			case CB_VT_BOOLEAN:
 				CuAssertIntEquals(tc, cb_boolean_get(expected_result), cb_boolean_get(cb->result));
 				break;
 			
-			case VT_NUMERIC:
+			case CB_VT_NUMERIC:
 				CuAssertIntEquals(tc, cb_numeric_get(expected_result), cb_numeric_get(cb->result));
 				break;
 			
-			case VT_STRING:
+			case CB_VT_STRING:
 				CuAssertStrEquals(tc, cb_string_get(expected_result), cb_string_get(cb->result));
 				break;
 			

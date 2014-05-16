@@ -68,19 +68,19 @@ CbValue* bif_valtype(CbStack* arg_stack)
 	CbValue* result;
 	switch (cb_value_get_type(arg))
 	{
-		case VT_BOOLEAN:
+		case CB_VT_BOOLEAN:
 			result = cb_string_create(strdup("L"));
 			break;
 		
-		case VT_NUMERIC:
+		case CB_VT_NUMERIC:
 			result = cb_string_create(strdup("N"));
 			break;
 		
-		case VT_STRING:
+		case CB_VT_STRING:
 			result = cb_string_create(strdup("C"));
 			break;
 		
-		case VT_UNDEFINED:
+		case CB_VT_UNDEFINED:
 		default:
 			result = cb_string_create(strdup("U"));
 			break;
@@ -118,7 +118,7 @@ CbValue* bif_val(CbStack* arg_stack)
 	CbValue* arg;
 	cb_stack_pop(arg_stack, (void*) &arg);
 	
-	assert(cb_value_is_type(arg, VT_STRING));
+	assert(cb_value_is_type(arg, CB_VT_STRING));
 	
 	CbValue* result = cb_numeric_create(0);	// default result
 	cb_numeric_set(result, strtol(cb_string_get(arg), NULL, 10));
@@ -140,8 +140,8 @@ CbValue* bif_replicate(CbStack* arg_stack)
 	cb_stack_pop(arg_stack, (void*) &count);
 	cb_stack_pop(arg_stack, (void*) &str);
 	
-	assert(cb_value_is_type(str, VT_STRING));
-	assert(cb_value_is_type(count, VT_NUMERIC));
+	assert(cb_value_is_type(str, CB_VT_STRING));
+	assert(cb_value_is_type(count, CB_VT_NUMERIC));
 	
 	CbValue* result;
 	
@@ -177,7 +177,7 @@ CbValue* bif_len(CbStack* arg_stack)
 	CbValue* arg;
 	cb_stack_pop(arg_stack, (void*) &arg);
 	
-	assert(cb_value_is_type(arg, VT_STRING));
+	assert(cb_value_is_type(arg, CB_VT_STRING));
 	
 	CbValue* result = cb_numeric_create(strlen(cb_string_get(arg)));
 	
@@ -196,7 +196,7 @@ CbValue* bif_eval(CbStack* arg_stack)
 	CbValue* arg;
 	cb_stack_pop(arg_stack, (void*) &arg);
 	
-	assert(cb_value_is_type(arg, VT_STRING));
+	assert(cb_value_is_type(arg, CB_VT_STRING));
 	
 	Codeblock* cb   = codeblock_create();
 	cb->embedded    = true;	// codeblock is embedded
@@ -228,7 +228,7 @@ CbValue* bif_getenv(CbStack* arg_stack)
 	CbValue* arg;
 	cb_stack_pop(arg_stack, (void*) &arg);
 	
-	assert(cb_value_is_type(arg, VT_STRING));
+	assert(cb_value_is_type(arg, CB_VT_STRING));
 	
 	CbValue* result = NULL;
 	
@@ -255,7 +255,7 @@ CbValue* bif_setenv(CbStack* arg_stack)
 	cb_stack_pop(arg_stack, (void*) &value);
 	cb_stack_pop(arg_stack, (void*) &name);
 	
-	assert(cb_value_is_type(name, VT_STRING));
+	assert(cb_value_is_type(name, CB_VT_STRING));
 	
 	CbValue* result = NULL;
 	int error		= 0;
@@ -290,7 +290,7 @@ CbValue* bif_seterror(CbStack* arg_stack)
 	CbValue* arg;
 	cb_stack_pop(arg_stack, (void*) &arg);
 	
-	assert(cb_value_is_type(arg, VT_STRING));
+	assert(cb_value_is_type(arg, CB_VT_STRING));
 	
 	cb_error_set_msg(cb_string_get(arg));	// set error and print error message
 	
@@ -313,8 +313,8 @@ CbValue* bif_seterrorif(CbStack* arg_stack)
 	cb_stack_pop(arg_stack, (void*) &message);	// first pop -> last argument
 	cb_stack_pop(arg_stack, (void*) &condition);
 	
-	assert(cb_value_is_type(condition, VT_BOOLEAN));
-	assert(cb_value_is_type(message, VT_STRING));
+	assert(cb_value_is_type(condition, CB_VT_BOOLEAN));
+	assert(cb_value_is_type(message, CB_VT_STRING));
 	
 	CbValue* result = cb_value_create();
 	

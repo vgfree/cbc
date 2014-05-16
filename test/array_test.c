@@ -23,14 +23,14 @@ void test_array(CuTest *tc)
 	
 	CbValue* item = NULL;
 	CuAssertTrue(tc, cb_array_get(a, 0, &item));
-	CuAssertIntEquals(tc, VT_NUMERIC, cb_value_get_type(item));
+	CuAssertIntEquals(tc, CB_VT_NUMERIC, cb_value_get_type(item));
 	CuAssertIntEquals(tc, 123, cb_numeric_get(item));
 	
 	CuAssertTrue(tc, cb_array_set(a, 0, cb_numeric_create(321)));
 	CuAssertIntEquals(tc, 1, cb_array_get_count(a));
 	
 	CuAssertTrue(tc, cb_array_get(a, 0, &item));
-	CuAssertIntEquals(tc, VT_NUMERIC, cb_value_get_type(item));
+	CuAssertIntEquals(tc, CB_VT_NUMERIC, cb_value_get_type(item));
 	CuAssertIntEquals(tc, 321, cb_numeric_get(item));
 	
 	cb_array_free(a);
@@ -44,7 +44,7 @@ void test_array(CuTest *tc)
 		
 		CbValue* current_item = NULL;
 		CuAssertTrue(tc, cb_array_get(a, i, &current_item));
-		CuAssertIntEquals(tc, VT_NUMERIC, cb_value_get_type(current_item));
+		CuAssertIntEquals(tc, CB_VT_NUMERIC, cb_value_get_type(current_item));
 		CuAssertIntEquals(tc, i, cb_numeric_get(current_item));
 	}
 	
@@ -68,7 +68,7 @@ void test_array_get(CuTest *tc)
 	CuAssertFalse(tc, cb_array_get(a, 999, NULL));
 	
 	CuAssertTrue(tc, cb_array_get(a, 0, &item));
-	CuAssertIntEquals(tc, VT_NUMERIC, cb_value_get_type(item));
+	CuAssertIntEquals(tc, CB_VT_NUMERIC, cb_value_get_type(item));
 	CuAssertIntEquals(tc, 123, cb_numeric_get(item));
 	
 	cb_array_append(a, cb_numeric_create(321));
@@ -78,7 +78,7 @@ void test_array_get(CuTest *tc)
 	CuAssertFalse(tc, cb_array_get(a, 2, NULL));
 	
 	CuAssertTrue(tc, cb_array_get(a, 1, &item));
-	CuAssertIntEquals(tc, VT_NUMERIC, cb_value_get_type(item));
+	CuAssertIntEquals(tc, CB_VT_NUMERIC, cb_value_get_type(item));
 	CuAssertIntEquals(tc, 321, cb_numeric_get(item));
 	
 	cb_array_free(a);
@@ -100,7 +100,7 @@ void test_array_set(CuTest *tc)
 	cb_array_append(a, cb_numeric_create(123));
 	
 	CuAssertTrue(tc, cb_array_get(a, 0, &item));
-	CuAssertIntEquals(tc, VT_NUMERIC, cb_value_get_type(item));
+	CuAssertIntEquals(tc, CB_VT_NUMERIC, cb_value_get_type(item));
 	CuAssertIntEquals(tc, 123, cb_numeric_get(item));
 	
 	CuAssertTrue(tc, cb_array_set(a, 0, NULL));
@@ -109,7 +109,7 @@ void test_array_set(CuTest *tc)
 	CuAssertTrue(tc, cb_array_set(a, 0, cb_numeric_create(321)));
 	
 	CuAssertTrue(tc, cb_array_get(a, 0, &item));
-	CuAssertIntEquals(tc, VT_NUMERIC, cb_value_get_type(item));
+	CuAssertIntEquals(tc, CB_VT_NUMERIC, cb_value_get_type(item));
 	CuAssertIntEquals(tc, 321, cb_numeric_get(item));
 	
 	cb_array_free(a);
@@ -130,11 +130,11 @@ void test_array_insert(CuTest *tc)
 	CuAssertIntEquals(tc, 10, cb_array_get_count(a));
 	
 	CuAssertTrue(tc, cb_array_get(a, 5, &item));
-	CuAssertIntEquals(tc, VT_NUMERIC, cb_value_get_type(item));
+	CuAssertIntEquals(tc, CB_VT_NUMERIC, cb_value_get_type(item));
 	CuAssertIntEquals(tc, 5, cb_numeric_get(item));
 	
 	CuAssertTrue(tc, cb_array_get(a, 6, &item));
-	CuAssertIntEquals(tc, VT_NUMERIC, cb_value_get_type(item));
+	CuAssertIntEquals(tc, CB_VT_NUMERIC, cb_value_get_type(item));
 	CuAssertIntEquals(tc, 6, cb_numeric_get(item));
 	
 	CuAssertTrue(tc, cb_array_insert(a, cb_numeric_create(-5), 5));
@@ -142,11 +142,11 @@ void test_array_insert(CuTest *tc)
 	CuAssertIntEquals(tc, 11, cb_array_get_count(a));
 	
 	CuAssertTrue(tc, cb_array_get(a, 5, &item));
-	CuAssertIntEquals(tc, VT_NUMERIC, cb_value_get_type(item));
+	CuAssertIntEquals(tc, CB_VT_NUMERIC, cb_value_get_type(item));
 	CuAssertIntEquals(tc, -5, cb_numeric_get(item));
 	
 	CuAssertTrue(tc, cb_array_get(a, 6, &item));
-	CuAssertIntEquals(tc, VT_NUMERIC, cb_value_get_type(item));
+	CuAssertIntEquals(tc, CB_VT_NUMERIC, cb_value_get_type(item));
 	CuAssertIntEquals(tc, 5, cb_numeric_get(item));
 	
 	cb_array_free(a);
@@ -167,11 +167,11 @@ void test_array_remove(CuTest *tc)
 	CuAssertIntEquals(tc, 10, cb_array_get_count(a));
 	
 	CuAssertTrue(tc, cb_array_get(a, 5, &item));
-	CuAssertIntEquals(tc, VT_NUMERIC, cb_value_get_type(item));
+	CuAssertIntEquals(tc, CB_VT_NUMERIC, cb_value_get_type(item));
 	CuAssertIntEquals(tc, 5, cb_numeric_get(item));
 	
 	CuAssertTrue(tc, cb_array_get(a, 6, &item));
-	CuAssertIntEquals(tc, VT_NUMERIC, cb_value_get_type(item));
+	CuAssertIntEquals(tc, CB_VT_NUMERIC, cb_value_get_type(item));
 	CuAssertIntEquals(tc, 6, cb_numeric_get(item));
 	
 	CuAssertTrue(tc, cb_array_remove(a, 5));
@@ -179,11 +179,11 @@ void test_array_remove(CuTest *tc)
 	CuAssertIntEquals(tc, 9, cb_array_get_count(a));
 	
 	CuAssertTrue(tc, cb_array_get(a, 5, &item));
-	CuAssertIntEquals(tc, VT_NUMERIC, cb_value_get_type(item));
+	CuAssertIntEquals(tc, CB_VT_NUMERIC, cb_value_get_type(item));
 	CuAssertIntEquals(tc, 6, cb_numeric_get(item));
 	
 	CuAssertTrue(tc, cb_array_get(a, 6, &item));
-	CuAssertIntEquals(tc, VT_NUMERIC, cb_value_get_type(item));
+	CuAssertIntEquals(tc, CB_VT_NUMERIC, cb_value_get_type(item));
 	CuAssertIntEquals(tc, 7, cb_numeric_get(item));
 	
 	cb_array_free(a);
@@ -208,7 +208,7 @@ void test_array_copy(CuTest *tc)
 	for (i = 0; i < 20; i++)
 	{
 		CuAssertTrue(tc, cb_array_get(new_array, i, &item));
-		CuAssertIntEquals(tc, VT_NUMERIC, cb_value_get_type(item));
+		CuAssertIntEquals(tc, CB_VT_NUMERIC, cb_value_get_type(item));
 		CuAssertIntEquals(tc, i, cb_numeric_get(item));
 	}
 	

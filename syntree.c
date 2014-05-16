@@ -335,7 +335,7 @@ CbValue* cb_syntree_eval(CbSyntree* node, CbSymtab* symtab)
 			if (condition == NULL)
 				break;
 			
-			assert(cb_value_is_type(condition, VT_BOOLEAN));
+			assert(cb_value_is_type(condition, CB_VT_BOOLEAN));
 			
 			// evaluate condition and check its result
 			if (cb_boolean_get(condition))
@@ -364,7 +364,7 @@ CbValue* cb_syntree_eval(CbSyntree* node, CbSymtab* symtab)
 			if (temp == NULL)
 				break;
 			
-			assert(cb_value_is_type(temp, VT_BOOLEAN));
+			assert(cb_value_is_type(temp, CB_VT_BOOLEAN));
 			
 			// default result (in case the while-loop won't be entered)
 			result = cb_value_create();
@@ -401,15 +401,15 @@ CbValue* cb_syntree_eval(CbSyntree* node, CbSymtab* symtab)
 			{
 				switch (cb_value_get_type(l))
 				{
-					case VT_NUMERIC:
+					case CB_VT_NUMERIC:
 						result = cb_numeric_compare(cmp->cmp_type, l, r);
 						break;
 					
-					case VT_STRING:
+					case CB_VT_STRING:
 						result = cb_string_compare(cmp->cmp_type, l, r);
 						break;
 					
-					case VT_BOOLEAN:
+					case CB_VT_BOOLEAN:
 						result = cb_boolean_compare(cmp->cmp_type, l, r);
 						break;
 				}
@@ -477,11 +477,11 @@ CbValue* cb_syntree_eval(CbSyntree* node, CbSymtab* symtab)
 					case '+':
 						switch (cb_value_get_type(l))
 						{
-							case VT_NUMERIC:
+							case CB_VT_NUMERIC:
 								result = cb_numeric_add(l, r);
 								break;
 							
-							case VT_STRING:
+							case CB_VT_STRING:
 								result = cb_string_concat(l, r);
 								break;
 							
@@ -506,11 +506,11 @@ CbValue* cb_syntree_eval(CbSyntree* node, CbSymtab* symtab)
 					case SNT_LOGICAL_AND:
 						switch (cb_value_get_type(l))
 						{
-							case VT_NUMERIC:
+							case CB_VT_NUMERIC:
 								result = cb_numeric_and(l, r);
 								break;
 							
-							case VT_BOOLEAN:
+							case CB_VT_BOOLEAN:
 								result = cb_boolean_and(l, r);
 								break;
 							
@@ -523,11 +523,11 @@ CbValue* cb_syntree_eval(CbSyntree* node, CbSymtab* symtab)
 					case SNT_LOGICAL_OR:
 						switch (cb_value_get_type(l))
 						{
-							case VT_NUMERIC:
+							case CB_VT_NUMERIC:
 								result = cb_numeric_or(l, r);
 								break;
 							
-							case VT_BOOLEAN:
+							case CB_VT_BOOLEAN:
 								result = cb_boolean_or(l, r);
 								break;
 							
@@ -553,11 +553,11 @@ CbValue* cb_syntree_eval(CbSyntree* node, CbSymtab* symtab)
 			
 			switch (cb_value_get_type(operand))
 			{
-				case VT_BOOLEAN:
+				case CB_VT_BOOLEAN:
 					result = cb_boolean_create(!cb_boolean_get(operand));
 					break;
 				
-				case VT_NUMERIC:
+				case CB_VT_NUMERIC:
 					result = cb_numeric_not(operand);
 					break;
 				
