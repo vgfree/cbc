@@ -218,7 +218,7 @@ char* cb_value_to_string(const CbValue* val)
 		case CB_VT_VALARRAY:
 		{
 			// allocate memory for "{}" (including null termination)
-			result_buf  = (char*) malloc(3);
+			result_buf  = (char*) malloc(2);
 			*result_buf = '\0';      // terminate string
 			strcat(result_buf, "{"); // open array
 			
@@ -244,12 +244,14 @@ char* cb_value_to_string(const CbValue* val)
 				                                 strlen(value_string) + n);
 				
 				strcat(result_buf, value_string);
+				free(value_string); // free temporary value_string
 				
 				if (n == 2)
 					// append additional comma for further elements
 					strcat(result_buf, ",");
 			}
 			
+			result_buf = realloc(result_buf, strlen(result_buf) + 2);
 			strcat(result_buf, "}"); // close array
 			
 			break;
