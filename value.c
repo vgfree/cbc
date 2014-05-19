@@ -222,8 +222,9 @@ char* cb_value_to_string(const CbValue* val)
 			*result_buf = '\0';      // terminate string
 			strcat(result_buf, "{"); // open array
 			
-			int i     = 0;
-			int count = cb_array_get_count(val->array);
+			int i             = 0;
+			int count         = cb_array_get_count(val->array);
+			bool last_element = false;
 			
 			for (; i < count; i++)
 			{
@@ -236,17 +237,31 @@ char* cb_value_to_string(const CbValue* val)
 				else
 					value_string = cb_value_to_string(item);
 				
-				int n = 1;
-				if (i < count - 1) // check if there are still elements left
-					n = 2;
+				int n = 2;
+				
+				// check if there are still elements left
+				last_element = (i == count - 1);
+				if (last_element)
+					n = 1;
+				
+				// if item is a string...
+				bool string_value = item->type == CB_VT_STRING;
+				if (string_value)
+					n += 2; // increase memory by 2
 				
 				result_buf = realloc(result_buf, strlen(result_buf) +
 				                                 strlen(value_string) + n);
 				
+				if (string_value)
+					strcat(result_buf, "\""); // add additional double quotes
+				
 				strcat(result_buf, value_string);
 				free(value_string); // free temporary value_string
 				
-				if (n == 2)
+				if (string_value)
+					strcat(result_buf, "\""); // add additional double quotes
+				
+				if (!last_element)
 					// append additional comma for further elements
 					strcat(result_buf, ",");
 			}

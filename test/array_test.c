@@ -239,7 +239,7 @@ void test_valarray_value_to_string(CuTest *tc)
 	CbValue* val2 = cb_valarray_create(a2);
 	
 	char* value_string = cb_value_to_string(val2);
-	CuAssertStrEquals(tc, "{1234,True,False,foo,{True,-5,False,bar}}", value_string);
+	CuAssertStrEquals(tc, "{1234,True,False,\"foo\",{True,-5,False,\"bar\"}}", value_string);
 	
 	free(value_string);
 	cb_value_free(val2);
