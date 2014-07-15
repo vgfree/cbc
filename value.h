@@ -7,7 +7,7 @@
 
 
 #include <stdbool.h>
-#include "array_if.h"
+#include "array.h"
 
 #define CB_BOOLEAN_TRUE_STR		"True"
 #define CB_BOOLEAN_FALSE_STR	"False"
@@ -46,10 +46,10 @@ enum cb_comparison_type
 };
 
 // definition of codeblock-types
-typedef int      CbNumeric;
-typedef char*    CbString;
-typedef bool     CbBoolean;
-typedef CbArray* CbValArray;
+typedef int             CbNumeric;
+typedef char*           CbString;
+typedef bool            CbBoolean;
+typedef struct CbArray* CbValArray;
 
 // codeblock-value structure
 typedef struct CbValue CbValue;
