@@ -80,6 +80,10 @@ CbValue* bif_valtype(CbStack* arg_stack)
 			result = cb_string_create(strdup("C"));
 			break;
 		
+		case CB_VT_VALARRAY:
+			result = cb_string_create(strdup("A"));
+			break;
+		
 		case CB_VT_UNDEFINED:
 		default:
 			result = cb_string_create(strdup("U"));

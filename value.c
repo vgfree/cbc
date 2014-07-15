@@ -229,7 +229,7 @@ char* cb_value_to_string(const CbValue* val)
 			for (; i < count; i++)
 			{
 				CbValue* item = NULL;
-				cb_array_get(val->array, i, &item);
+				cb_array_get(val->array, i, (CbArrayItem*) &item);
 				char* value_string = NULL;
 				
 				if (item == NULL)

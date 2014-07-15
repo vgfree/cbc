@@ -58,6 +58,8 @@ void cb_array_free(CbArray* array)
 		int i = 0;
 		for (; i < array->count; i++)
 			if (array->elements[i] != NULL)
+                // TODO: Implement a destructor callback function to dynamically
+                //       free items.
 				cb_value_free(array->elements[i]);
 	}
 	
