@@ -247,12 +247,19 @@ CbValue* cb_syntree_eval(CbSyntree* node, CbSymtab* symtab)
         
 		case SNT_VALARRAY:
 			result = cb_array_node_eval((CbArrayNode*) node, symtab);
-			break;
-		
+            break;
+        
 		case SNT_VALARRAY_ACCESS:
-			result = cb_array_access_node_eval((CbArrayAccessNode*) node, symtab);
+        {
+            CbValue* value = cb_array_access_node_eval((CbArrayAccessNode*) node, symtab);
+            if (value)
+                result = cb_value_copy(value);
+            else
+                result = NULL;
+            
 			break;
-		
+		}
+        
 		case SNT_SYMREF:
 		{
 			CbSymref* sr = (CbSymref*) node;
