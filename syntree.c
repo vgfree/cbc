@@ -13,6 +13,7 @@
 #include "funcdecl.h"
 #include "exception_block_node.h"
 #include "array_node.h"
+#include "array_access_node.h"
 #include "error_handling.h"
 
 
@@ -200,6 +201,10 @@ void cb_syntree_free(CbSyntree* node)
 			break;
 		}
         
+        case SNT_VALARRAY_ACCESS:
+			free(((CbArrayAccessNode*) node)->sym_id);
+			break;
+        
 		case SNT_COMPARISON:
 			cb_syntree_free(((CbComparisonNode*) node)->l);
 			cb_syntree_free(((CbComparisonNode*) node)->r);
@@ -242,6 +247,10 @@ CbValue* cb_syntree_eval(CbSyntree* node, CbSymtab* symtab)
         
 		case SNT_VALARRAY:
 			result = cb_array_node_eval((CbArrayNode*) node, symtab);
+			break;
+		
+		case SNT_VALARRAY_ACCESS:
+			result = cb_array_access_node_eval((CbArrayAccessNode*) node, symtab);
 			break;
 		
 		case SNT_SYMREF:

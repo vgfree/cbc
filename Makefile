@@ -15,7 +15,8 @@ SRC				:= 	$(LEXER) $(PARSER) \
 					codeblock.c symbol.c symtab.c function.c value.c strlist.c \
 					syntree.c symref.c funccall.c funcdecl.c scope.c stack.c \
 					array.c builtin.c cblib.c cbgui.c error_handling.c \
-					exception_block_node.c error_messages.c array_node.c
+					exception_block_node.c error_messages.c array_node.c \
+					array_access_node.c
 OBJ				:= $(SRC:%.c=%.o)
 
 SRC_CBC			:= main.c $(SRC)

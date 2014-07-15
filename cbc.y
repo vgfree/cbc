@@ -8,6 +8,7 @@
 #include "funcdecl.h"
 #include "exception_block_node.h"
 #include "array_node.h"
+#include "array_access_node.h"
 #include "strlist.h"
 #include "error_handling.h"
 
@@ -271,6 +272,11 @@ expr:
 	| symref					{ $$ = $1; }
 	| IDENTIFIER '(' args ')'	{
 									$$ = cb_funccall_create($1, $3);
+									$$->line_no = yylineno;
+									free($1);	// free duplicated string
+								}
+	| IDENTIFIER '[' NUMBER ']'	{
+									$$ = cb_array_access_node_create($1, $3);
 									$$->line_no = yylineno;
 									free($1);	// free duplicated string
 								}
