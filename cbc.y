@@ -7,6 +7,7 @@
 #include "funccall.h"
 #include "funcdecl.h"
 #include "exception_block_node.h"
+#include "array_node.h"
 #include "strlist.h"
 #include "error_handling.h"
 
@@ -308,6 +309,8 @@ expr:
 									$$ = cb_syntree_create(SNT_LOGICAL_NOT, $2, NULL);
 								}
 	| '(' expr ')'				{ $$ = $2; }
+	| '{' exprlist '}'			{ $$ = cb_valarray_node_create($2); }
+	| '{' '}'			        { $$ = cb_valarray_node_create(NULL); }
 	| '-' expr					{
 									$$ = cb_syntree_create(SNT_UNARYMINUS, $2,
 														   NULL);

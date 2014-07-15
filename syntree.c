@@ -12,6 +12,7 @@
 #include "funccall.h"
 #include "funcdecl.h"
 #include "exception_block_node.h"
+#include "array_node.h"
 #include "error_handling.h"
 
 
@@ -186,6 +187,19 @@ void cb_syntree_free(CbSyntree* node)
 			cb_value_free(((CbConstvalNode*) node)->value);
 			break;
 		
+		case SNT_VALARRAY:
+        {
+            CbStrlist* item = ((CbValArrayNode*) node)->values;
+            while (item)
+            {
+                cb_syntree_free((CbSyntree*) item->data);
+                item = item->next;
+            }
+			cb_strlist_free(((CbValArrayNode*) node)->values);
+            
+			break;
+		}
+        
 		case SNT_COMPARISON:
 			cb_syntree_free(((CbComparisonNode*) node)->l);
 			cb_syntree_free(((CbComparisonNode*) node)->r);
@@ -224,6 +238,10 @@ CbValue* cb_syntree_eval(CbSyntree* node, CbSymtab* symtab)
 		case SNT_CONSTBOOL:
 		case SNT_CONSTSTR:
 			result = cb_value_copy(((CbConstvalNode*) node)->value);
+			break;
+        
+		case SNT_VALARRAY:
+			result = cb_valarray_node_eval((CbValArrayNode*) node, symtab);
 			break;
 		
 		case SNT_SYMREF:

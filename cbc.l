@@ -88,7 +88,7 @@
 			}
 			
 			/* single character operators */
-[-+*/,()|]	{ return *yytext; }
+[-+*/,(){}|]	{ return *yytext; }
 			
 			/* comparison operators */
 "="			{ yylval.cmp = CMP_EQ; return COMPARE; }
