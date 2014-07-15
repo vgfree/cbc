@@ -189,13 +189,13 @@ void cb_syntree_free(CbSyntree* node)
 		
 		case SNT_VALARRAY:
         {
-            CbStrlist* item = ((CbValArrayNode*) node)->values;
+            CbStrlist* item = ((CbArrayNode*) node)->values;
             while (item)
             {
                 cb_syntree_free((CbSyntree*) item->data);
                 item = item->next;
             }
-			cb_strlist_free(((CbValArrayNode*) node)->values);
+			cb_strlist_free(((CbArrayNode*) node)->values);
             
 			break;
 		}
@@ -241,7 +241,7 @@ CbValue* cb_syntree_eval(CbSyntree* node, CbSymtab* symtab)
 			break;
         
 		case SNT_VALARRAY:
-			result = cb_valarray_node_eval((CbValArrayNode*) node, symtab);
+			result = cb_array_node_eval((CbArrayNode*) node, symtab);
 			break;
 		
 		case SNT_SYMREF:

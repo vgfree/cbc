@@ -309,8 +309,8 @@ expr:
 									$$ = cb_syntree_create(SNT_LOGICAL_NOT, $2, NULL);
 								}
 	| '(' expr ')'				{ $$ = $2; }
-	| '{' exprlist '}'			{ $$ = cb_valarray_node_create($2); }
-	| '{' '}'			        { $$ = cb_valarray_node_create(NULL); }
+	| '{' exprlist '}'			{ $$ = cb_array_node_create($2); }
+	| '{' '}'			        { $$ = cb_array_node_create(NULL); }
 	| '-' expr					{
 									$$ = cb_syntree_create(SNT_UNARYMINUS, $2,
 														   NULL);
