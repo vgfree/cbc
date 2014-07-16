@@ -342,3 +342,43 @@ CbValue* bif_geterrortext(CbStack* arg_stack)
     
     return result;
 }
+
+// -----------------------------------------------------------------------------
+// ALen() -- Get array element count
+// -----------------------------------------------------------------------------
+CbValue* bif_alen(CbStack* arg_stack)
+{
+    assert(arg_stack->count == 1);
+    CbValue* valarray;
+    cb_stack_pop(arg_stack, (void*) &valarray);
+    
+    assert(cb_value_is_type(valarray, CB_VT_VALARRAY));
+    
+    CbArray* array  = cb_valarray_get(valarray);
+    CbValue* result = cb_numeric_create(cb_array_get_count(array));
+    
+    return result;
+}
+
+// -----------------------------------------------------------------------------
+// AAdd() -- Add an element to the array
+// -----------------------------------------------------------------------------
+CbValue* bif_aadd(CbStack* arg_stack)
+{
+    assert(arg_stack->count == 2);
+    CbValue* valarray;
+    CbValue* value;
+    cb_stack_pop(arg_stack, (void*) &value);
+    cb_stack_pop(arg_stack, (void*) &valarray);
+    
+    // param value can be any type
+    assert(cb_value_is_type(valarray, CB_VT_VALARRAY));
+    
+    CbArray* array  = cb_valarray_get(valarray);
+    cb_array_append(array, (CbArrayItem) value);
+    
+    // return new length of array
+    CbValue* result = cb_numeric_create(cb_array_get_count(array));
+    
+    return result;
+}
