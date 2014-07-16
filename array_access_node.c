@@ -1,5 +1,6 @@
 /*******************************************************************************
  * CbArrayAccessNode -- Represents an access to an array element in the
+ *                      syntax tree.
  ******************************************************************************/
 
 #include <stdlib.h>
