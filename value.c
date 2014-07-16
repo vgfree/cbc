@@ -536,6 +536,9 @@ CbValue* cb_valarray_get_element(const CbValue* val, int index)
 {
     assert(cb_value_is_type(val, CB_VT_VALARRAY));
     
+#ifndef _CBC_ARRAY_INDEX_STARTS_WITH_ZERO
+    index--;
+#endif // not _CBC_ARRAY_INDEX_
     CbValue* element = NULL;
     if (cb_array_get(val->array, index, (CbArrayItem*) &element))
         return element;
@@ -551,6 +554,9 @@ bool cb_valarray_set_element(const CbValue* val, int index,
 {
     assert(cb_value_is_type(val, CB_VT_VALARRAY));
     
+#ifndef _CBC_ARRAY_INDEX_STARTS_WITH_ZERO
+    index--;
+#endif // not _CBC_ARRAY_INDEX_
     return cb_array_set(val->array, index, (const CbArrayItem) element);
 }
 

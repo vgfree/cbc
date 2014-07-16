@@ -42,13 +42,9 @@ CbValue* cb_array_access_node_eval(const CbArrayAccessNode* node,
         return NULL; // an error occurred
     
     const CbValue* valarray = cb_symbol_variable_get_value(node->table_sym);
+    CbValue* element        = cb_valarray_get_element(valarray, node->index);
     
-    assert(cb_value_is_type(valarray, CB_VT_VALARRAY)); // must be an array
-    
-    CbArray* array   = cb_valarray_get(valarray);
-    CbValue* element = NULL;
-    
-    if (cb_array_get(array, node->index, (CbArrayItem*) &element))
+    if (element)
         return element;
     else
     {
