@@ -1,13 +1,13 @@
 // Testcase for category 'misc'
-1400			// line 1
-- 630			// line 2
-- 13			// line 3
-- 75			// line 4
-- 50			// line 5
-- 10			// line 6
-- 35			// line 7
-- 100			// line 8
-- 100			// line 9
-- 200			// line 10
-- (60 + 4 + 5)	// line 11
-,				// line 12,
+1400           // line 1
+- 630          // line 2
+- 13           // line 3
+- 75           // line 4
+- 50           // line 5
+- 10           // line 6
+- 35           // line 7
+- 100          // line 8
+- 100          // line 9
+- 200          // line 10
+- (60 + 4 + 5) // line 11
+,              // line 12,
