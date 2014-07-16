@@ -18,7 +18,8 @@
 // -----------------------------------------------------------------------------
 void test_array(CuTest *tc)
 {
-    CbArray* a = cb_array_create();
+    CbArray* a = cb_array_create_with_ownership((CbArrayItemDestructor) cb_value_free,
+                                                (CbArrayItemCopy) cb_value_copy);
     CuAssertTrue(tc, cb_array_append(a, cb_numeric_create(123)));
     CuAssertIntEquals(tc, 1, cb_array_get_count(a));
     
@@ -35,7 +36,8 @@ void test_array(CuTest *tc)
     CuAssertIntEquals(tc, 321, cb_numeric_get(item));
     
     cb_array_free(a);
-    a = cb_array_create();
+    a = cb_array_create_with_ownership((CbArrayItemDestructor) cb_value_free,
+                                       (CbArrayItemCopy) cb_value_copy);
     
     int i = 0;
     for (; i < 100; i++)    // append 100 elements
@@ -58,7 +60,8 @@ void test_array(CuTest *tc)
 void test_array_get(CuTest *tc)
 {
     CbValue* item = NULL;
-    CbArray* a    = cb_array_create();
+    CbArray* a    = cb_array_create_with_ownership((CbArrayItemDestructor) cb_value_free,
+                                                   (CbArrayItemCopy) cb_value_copy);
     
     CuAssertFalse(tc, cb_array_get(a, 0, NULL));
     
@@ -91,7 +94,8 @@ void test_array_get(CuTest *tc)
 void test_array_set(CuTest *tc)
 {
     CbValue* item = NULL;
-    CbArray* a    = cb_array_create();
+    CbArray* a    = cb_array_create_with_ownership((CbArrayItemDestructor) cb_value_free,
+                                                   (CbArrayItemCopy) cb_value_copy);
     
     CuAssertFalse(tc, cb_array_set(a, 0, NULL));
     CuAssertFalse(tc, cb_array_set(a, 1, NULL));
@@ -122,7 +126,8 @@ void test_array_set(CuTest *tc)
 void test_array_insert(CuTest *tc)
 {
     CbValue* item = NULL;
-    CbArray* a    = cb_array_create();
+    CbArray* a    = cb_array_create_with_ownership((CbArrayItemDestructor) cb_value_free,
+                                                   (CbArrayItemCopy) cb_value_copy);
     
     int i = 0;
     for (; i < 10; i++)
@@ -159,7 +164,8 @@ void test_array_insert(CuTest *tc)
 void test_array_remove(CuTest *tc)
 {
     CbValue* item = NULL;
-    CbArray* a    = cb_array_create();
+    CbArray* a    = cb_array_create_with_ownership((CbArrayItemDestructor) cb_value_free,
+                                                   (CbArrayItemCopy) cb_value_copy);
     
     int i = 0;
     for (; i < 10; i++)
@@ -196,7 +202,8 @@ void test_array_remove(CuTest *tc)
 void test_array_copy(CuTest *tc)
 {
     CbValue* item = NULL;
-    CbArray* a    = cb_array_create();
+    CbArray* a    = cb_array_create_with_ownership((CbArrayItemDestructor) cb_value_free,
+                                                   (CbArrayItemCopy) cb_value_copy);
     
     int i = 0;
     for (; i < 20; i++)
@@ -223,13 +230,15 @@ void test_array_copy(CuTest *tc)
 // -----------------------------------------------------------------------------
 void test_valarray_value_to_string(CuTest *tc)
 {
-    CbArray* a1 = cb_array_create();
+    CbArray* a1 = cb_array_create_with_ownership((CbArrayItemDestructor) cb_value_free,
+                                                 (CbArrayItemCopy) cb_value_copy);
     cb_array_append(a1, cb_boolean_create(true));
     cb_array_append(a1, cb_numeric_create(-5));
     cb_array_append(a1, cb_boolean_create(false));
     cb_array_append(a1, cb_string_create(strdup("bar")));
     
-    CbArray* a2 = cb_array_create();
+    CbArray* a2 = cb_array_create_with_ownership((CbArrayItemDestructor) cb_value_free,
+                                                 (CbArrayItemCopy) cb_value_copy);
     cb_array_append(a2, cb_numeric_create(1234));
     cb_array_append(a2, cb_boolean_create(true));
     cb_array_append(a2, cb_boolean_create(false));

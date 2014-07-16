@@ -4,6 +4,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 #include "array.h"
 
 
@@ -19,6 +20,8 @@ struct CbArray
     int block_size;
     int alloc_size;
     bool element_ownership;
+    CbArrayItemDestructor element_destructor_cb;
+    CbArrayItemCopy element_copy_cb;
 };
 
 static bool cb_array_is_full(CbArray* array);
@@ -42,8 +45,23 @@ CbArray* cb_array_create()
     array->elements     = (CbArrayItem*) malloc(array->block_size);
     array->alloc_size   = array->block_size;
     
-    // array should own its elements by default
-    array->element_ownership = true;
+    // array should not own its elements by default, since there is no
+    // destructor callback available yet
+    array->element_ownership     = false;
+    array->element_destructor_cb = NULL;
+    array->element_copy_cb       = NULL;
+    
+    return array;
+}
+
+// -----------------------------------------------------------------------------
+// Constructor
+// -----------------------------------------------------------------------------
+CbArray* cb_array_create_with_ownership(CbArrayItemDestructor destructor_cb,
+                                        CbArrayItemCopy copy_cb)
+{
+    CbArray* array = cb_array_create();
+    cb_array_enable_element_ownership(array, destructor_cb, copy_cb);
     
     return array;
 }
@@ -58,9 +76,7 @@ void cb_array_free(CbArray* array)
         int i = 0;
         for (; i < array->count; i++)
             if (array->elements[i] != NULL)
-                // TODO: Implement a destructor callback function to dynamically
-                //       free items.
-                cb_value_free(array->elements[i]);
+                array->element_destructor_cb(array->elements[i]);
     }
     
     free(array->elements);
@@ -72,20 +88,22 @@ void cb_array_free(CbArray* array)
 // -----------------------------------------------------------------------------
 CbArray* cb_array_copy(CbArray* array)
 {
-    CbArray* new_array           = (CbArray*) malloc(sizeof(CbArray));
-    new_array->count             = array->count;
-    new_array->element_size      = array->element_size;
-    new_array->block_size        = array->block_size;
-    new_array->alloc_size        = array->alloc_size;
-    new_array->elements          = (CbArrayItem*) malloc(array->alloc_size);
-    new_array->element_ownership = array->element_ownership;
+    CbArray* new_array               = (CbArray*) malloc(sizeof(CbArray));
+    new_array->count                 = array->count;
+    new_array->element_size          = array->element_size;
+    new_array->block_size            = array->block_size;
+    new_array->alloc_size            = array->alloc_size;
+    new_array->elements              = (CbArrayItem*) malloc(array->alloc_size);
+    new_array->element_ownership     = array->element_ownership;
+    new_array->element_destructor_cb = array->element_destructor_cb;
+    new_array->element_copy_cb       = array->element_copy_cb;
     
     // apply all values within array as well
     int i = 0;
     for (; i < array->count; i++)
     {
         if (array->element_ownership) // copy values if array owns its elements
-            new_array->elements[i] = cb_value_copy(array->elements[i]);
+            new_array->elements[i] = array->element_copy_cb(array->elements[i]);
         else
             new_array->elements[i] = array->elements[i];
     }
@@ -110,11 +128,27 @@ bool cb_array_get_element_ownership(CbArray* array)
 }
 
 // -----------------------------------------------------------------------------
-// Set element ownership of array
+// Enable element ownership
 // -----------------------------------------------------------------------------
-void cb_array_set_element_ownership(CbArray* array, bool value)
+void cb_array_enable_element_ownership(CbArray* array,
+                                       CbArrayItemDestructor destructor_cb,
+                                       CbArrayItemCopy copy_cb)
 {
-    array->element_ownership = value;
+    assert(destructor_cb != NULL);
+    assert(copy_cb != NULL);
+    
+    array->element_ownership     = true;
+    array->element_destructor_cb = destructor_cb;
+    array->element_copy_cb       = copy_cb;
+}
+// -----------------------------------------------------------------------------
+// Disable element ownership
+// -----------------------------------------------------------------------------
+void cb_array_disable_element_ownership(CbArray* array)
+{
+    array->element_ownership     = false;
+    array->element_destructor_cb = NULL;
+    array->element_copy_cb       = NULL;
 }
 
 // -----------------------------------------------------------------------------
@@ -189,14 +223,14 @@ bool cb_array_set(CbArray* array, int index, const CbArrayItem item)
     if (array->count <= index)
     {
         if (array->element_ownership && item != NULL)
-            cb_value_free(item);
+            array->element_destructor_cb(item);
         
         return false;
     }
     
     // free previous element, if necessary
     if (array->element_ownership && array->elements[index] != NULL)
-        cb_value_free(array->elements[index]);
+        array->element_destructor_cb(array->elements[index]);
     
     array->elements[index] = item;
     return true;

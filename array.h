@@ -11,21 +11,27 @@
 
 #include <stdlib.h>
 #include <stdbool.h>
-#include "value.h"
 
 
 typedef struct CbArray CbArray;
 typedef void* CbArrayItem;
+typedef void (*CbArrayItemDestructor)(CbArrayItem item);
+typedef CbArrayItem (*CbArrayItemCopy)(const CbArrayItem item);
 
 
 // interface functions
 CbArray* cb_array_create();
+CbArray* cb_array_create_with_ownership(CbArrayItemDestructor destructor_cb,
+                                        CbArrayItemCopy copy_cb);
 void cb_array_free(CbArray* array);
 CbArray* cb_array_copy(CbArray* array);
 
 size_t cb_array_get_count(CbArray* array);
 bool cb_array_get_element_ownership(CbArray* array);
-void cb_array_set_element_ownership(CbArray* array, bool value);
+void cb_array_enable_element_ownership(CbArray* array,
+                                       CbArrayItemDestructor destructor_cb,
+                                       CbArrayItemCopy copy_cb);
+void cb_array_disable_element_ownership(CbArray* array);
 
 bool cb_array_set(CbArray* array, int index, const CbArrayItem item);
 bool cb_array_get(CbArray* array, int index, CbArrayItem* destination);

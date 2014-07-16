@@ -31,7 +31,8 @@ CbSyntree* cb_array_node_create(CbStrlist* values)
 CbValue* cb_array_node_eval(const CbArrayNode* node, CbSymtab* symtab)
 {
     CbStrlist* item  = node->values;
-    CbArray*   array = cb_array_create();
+    CbArray*   array = cb_array_create_with_ownership((CbArrayItemDestructor) cb_value_free,
+                                                      (CbArrayItemCopy) cb_value_copy);
     
     while (item)
     {
