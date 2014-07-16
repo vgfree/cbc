@@ -16,7 +16,7 @@ SRC            := $(LEXER) $(PARSER) \
                   syntree.c symref.c funccall.c funcdecl.c scope.c stack.c \
                   array.c builtin.c cblib.c cbgui.c error_handling.c \
                   exception_block_node.c error_messages.c array_node.c \
-                  array_access_node.c
+                  array_access_node.c array_assignment_node.c
 OBJ            := $(SRC:%.c=%.o)
 
 SRC_CBC        := main.c $(SRC)

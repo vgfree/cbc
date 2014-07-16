@@ -524,7 +524,34 @@ CbValue* cb_boolean_not(CbValue* operand)
 // -----------------------------------------------------------------------------
 const CbValArray cb_valarray_get(const CbValue* val)
 {
+    assert(cb_value_is_type(val, CB_VT_VALARRAY));
+    
     return val->array;
+}
+
+// -----------------------------------------------------------------------------
+// get array element
+// -----------------------------------------------------------------------------
+CbValue* cb_valarray_get_element(const CbValue* val, int index)
+{
+    assert(cb_value_is_type(val, CB_VT_VALARRAY));
+    
+    CbValue* element = NULL;
+    if (cb_array_get(val->array, index, (CbArrayItem*) &element))
+        return element;
+    else
+        return NULL;
+}
+
+// -----------------------------------------------------------------------------
+// set array element
+// -----------------------------------------------------------------------------
+bool cb_valarray_set_element(const CbValue* val, int index,
+                             const CbValue* element)
+{
+    assert(cb_value_is_type(val, CB_VT_VALARRAY));
+    
+    return cb_array_set(val->array, index, (const CbArrayItem) element);
 }
 
 

@@ -99,6 +99,9 @@ CbValue* cb_boolean_not(CbValue* operand);
 
 // CbValArray interface functions
 const CbValArray cb_valarray_get(const CbValue* val);
+CbValue* cb_valarray_get_element(const CbValue* val, int index);
+bool cb_valarray_set_element(const CbValue* val, int index,
+                             const CbValue* element);
 
 
 #endif // VALUE_H

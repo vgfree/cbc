@@ -28,6 +28,7 @@ enum cb_syntree_node_type
     SNT_CONSTSTR,
     SNT_VALARRAY,
     SNT_VALARRAY_ACCESS,
+    SNT_VALARRAY_ASSIGNMENT,
     SNT_SYMREF,
     SNT_FLOW_IF,
     SNT_FLOW_WHILE,

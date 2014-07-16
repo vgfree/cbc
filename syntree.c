@@ -14,6 +14,7 @@
 #include "exception_block_node.h"
 #include "array_node.h"
 #include "array_access_node.h"
+#include "array_assignment_node.h"
 #include "error_handling.h"
 
 
@@ -205,6 +206,15 @@ void cb_syntree_free(CbSyntree* node)
             free(((CbArrayAccessNode*) node)->sym_id);
             break;
         
+        case SNT_VALARRAY_ASSIGNMENT:
+        {
+            CbArrayAssignmentNode* array_assignment_node =
+                ((CbArrayAssignmentNode*) node);
+            free(array_assignment_node->sym_id);
+            cb_syntree_free(array_assignment_node->value_node);
+            break;
+        }
+        
         case SNT_COMPARISON:
             cb_syntree_free(((CbComparisonNode*) node)->l);
             cb_syntree_free(((CbComparisonNode*) node)->r);
@@ -252,6 +262,18 @@ CbValue* cb_syntree_eval(CbSyntree* node, CbSymtab* symtab)
         case SNT_VALARRAY_ACCESS:
         {
             CbValue* value = cb_array_access_node_eval((CbArrayAccessNode*) node, symtab);
+            if (value)
+                result = cb_value_copy(value);
+            else
+                result = NULL;
+            
+            break;
+        }
+        
+        case SNT_VALARRAY_ASSIGNMENT:
+        {
+            CbValue* value =
+                cb_array_assignment_node_eval((CbArrayAssignmentNode*) node, symtab);
             if (value)
                 result = cb_value_copy(value);
             else
