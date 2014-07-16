@@ -1,8 +1,8 @@
 /*******************************************************************************
  * Codeblock -- Implementation of the codeblock execution-environment.
  * 
- *  	This struct is basically wraps the abstract syntax-tree, its result and
- *  	the the global symbol-table.
+ *      This struct is basically wraps the abstract syntax-tree, its result and
+ *      the the global symbol-table.
  ******************************************************************************/
 
 #ifndef CODEBLOCK_H
@@ -16,11 +16,11 @@
 
 typedef struct
 {
-	CbSymtab* symtab;	// reference to the global symbol-table
-	CbSyntree* ast;		// abstract syntax-tree -- the code to execute
-	CbValue* result;	// the result, after executing the codeblock
-	double duration;	// execution duration
-	bool embedded;		// determine if codeblock is embedded
+    CbSymtab* symtab; // reference to the global symbol-table
+    CbSyntree* ast;   // abstract syntax-tree -- the code to execute
+    CbValue* result;  // the result, after executing the codeblock
+    double duration;  // execution duration
+    bool embedded;    // determine if codeblock is embedded
 } Codeblock;
 
 

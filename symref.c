@@ -21,13 +21,13 @@
 // -----------------------------------------------------------------------------
 CbSyntree* cb_symref_create(char* identifier)
 {
-	CbSymref* node	= malloc(sizeof(CbSymref));
-	node->type		= SNT_SYMREF;
-	node->line_no	= 0;
-	node->sym_id	= strdup(identifier);
-	node->table_sym	= NULL;
-	
-	return (CbSyntree*) node;
+    CbSymref* node  = malloc(sizeof(CbSymref));
+    node->type      = SNT_SYMREF;
+    node->line_no   = 0;
+    node->sym_id    = strdup(identifier);
+    node->table_sym = NULL;
+    
+    return (CbSyntree*) node;
 }
 
 // -----------------------------------------------------------------------------
@@ -37,20 +37,20 @@ CbSyntree* cb_symref_create(char* identifier)
 // -----------------------------------------------------------------------------
 int cb_symref_set_symbol_from_table(CbSymref* node, CbSymtab* symtab)
 {
-	CbSymbol* table_sym = node->table_sym;
-	
-	// get symbol-reference
-	CbSymbol* dummy = cb_symtab_lookup(symtab, node->sym_id, false);
-	
-	if (!dummy) // if there is no such a symbol -> error
-	{
-		cb_print_error(CB_ERR_RUNTIME, node->line_no, "Undefined symbol: %s",
-					   node->sym_id);
-		return EXIT_FAILURE;
-	}
-	
-	// symbol was found -> store reference
-	node->table_sym = dummy;
-	
-	return EXIT_SUCCESS;
+    CbSymbol* table_sym = node->table_sym;
+    
+    // get symbol-reference
+    CbSymbol* dummy = cb_symtab_lookup(symtab, node->sym_id, false);
+    
+    if (!dummy) // if there is no such a symbol -> error
+    {
+        cb_print_error(CB_ERR_RUNTIME, node->line_no, "Undefined symbol: %s",
+                       node->sym_id);
+        return EXIT_FAILURE;
+    }
+    
+    // symbol was found -> store reference
+    node->table_sym = dummy;
+    
+    return EXIT_SUCCESS;
 }

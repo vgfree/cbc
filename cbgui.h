@@ -1,5 +1,5 @@
 /*******************************************************************************
- * cbgui --	Collection of builtin GUI functions.
+ * cbgui -- Collection of builtin GUI functions.
  ******************************************************************************/
 
 #ifndef CBGUI_H

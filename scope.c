@@ -16,11 +16,11 @@
 // -----------------------------------------------------------------------------
 CbScope* cb_scope_create(char* context, int level)
 {
-	CbScope* scope = malloc(sizeof(CbScope));
-	scope->context = strdup(context);
-	scope->level   = level;
-	
-	return scope;
+    CbScope* scope = malloc(sizeof(CbScope));
+    scope->context = strdup(context);
+    scope->level   = level;
+    
+    return scope;
 }
 
 // -----------------------------------------------------------------------------
@@ -28,8 +28,8 @@ CbScope* cb_scope_create(char* context, int level)
 // -----------------------------------------------------------------------------
 void cb_scope_free(CbScope* scope)
 {
-	free(scope->context);
-	free(scope);
+    free(scope->context);
+    free(scope);
 }
 
 // -----------------------------------------------------------------------------
@@ -37,11 +37,11 @@ void cb_scope_free(CbScope* scope)
 // -----------------------------------------------------------------------------
 bool cb_scope_equals(const CbScope* scope1, const CbScope* scope2)
 {
-	if (scope1 == NULL && scope2 == NULL)
-		return true;	// if both arguments are NULL -> scopes are still equal!
-	else if (scope1 == NULL || scope2 == NULL)
-		return false;
-	else
-		return (scope1->level == scope2->level &&
-				strcmp(scope1->context, scope2->context) == 0);
+    if (scope1 == NULL && scope2 == NULL)
+        return true;    // if both arguments are NULL -> scopes are still equal!
+    else if (scope1 == NULL || scope2 == NULL)
+        return false;
+    else
+        return (scope1->level == scope2->level &&
+                strcmp(scope1->context, scope2->context) == 0);
 }

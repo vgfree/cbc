@@ -21,7 +21,7 @@ typedef struct
     enum cb_syntree_node_type type; // node-type is SNT_FUNC_CALL
     int line_no;                    // line number
     char* sym_id;                   // array identifier
-	CbSymbol* table_sym;			// reference to the instance in the symbol-table
+    CbSymbol* table_sym;            // reference to the instance in the symbol-table
     int index;                      // index of the element
 } CbArrayAccessNode;
 

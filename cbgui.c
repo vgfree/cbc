@@ -1,5 +1,5 @@
 /*******************************************************************************
- * cbgui --	Collection of builtin GUI functions.
+ * cbgui -- Collection of builtin GUI functions.
  ******************************************************************************/
 
 #ifdef _CBC_PLAT_WNDS
@@ -20,19 +20,20 @@
 // -----------------------------------------------------------------------------
 CbValue* bif_meld(CbStack* arg_stack)
 {
-	assert(arg_stack->count == 1);
-	
-	CbValue* arg;
-	cb_stack_pop(arg_stack, (void*) &arg);
-	
-	assert(cb_value_is_type(arg, CB_VT_STRING));
-	
-	// display message
-	// NOTE: MessageBox() causes memory-leaks in MinGW32!
-	MessageBox(NULL, cb_string_get(arg), "Information", MB_ICONINFORMATION | MB_OK);
-	
-	cb_value_free(arg);
-	
-	return cb_value_create();	// return empty value
+    assert(arg_stack->count == 1);
+    
+    CbValue* arg;
+    cb_stack_pop(arg_stack, (void*) &arg);
+    
+    assert(cb_value_is_type(arg, CB_VT_STRING));
+    
+    // display message
+    // NOTE: MessageBox() causes memory-leaks in MinGW32!
+    MessageBox(NULL, cb_string_get(arg), "Information",
+               MB_ICONINFORMATION | MB_OK);
+    
+    cb_value_free(arg);
+    
+    return cb_value_create(); // return empty value
 }
 #endif // _CBC_PLAT_WNDS

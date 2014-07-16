@@ -1,7 +1,7 @@
 /*******************************************************************************
  * CbArrayNode -- Represents an array in the syntax tree.
  * 
- *  	This structure is part of the abstract syntax-tree 'CbSyntree'.
+ *      This structure is part of the abstract syntax-tree 'CbSyntree'.
  ******************************************************************************/
 
 #ifndef ARRAY_NODE_H
@@ -16,9 +16,9 @@
 // array node
 typedef struct
 {
-	enum cb_syntree_node_type type;	// node-type is SNT_FUNC_CALL
-	int line_no;					// line number
-	CbStrlist* values;				// values of the array
+    enum cb_syntree_node_type type; // node-type is SNT_FUNC_CALL
+    int line_no;                    // line number
+    CbStrlist* values;              // values of the array
 } CbArrayNode;
 
 

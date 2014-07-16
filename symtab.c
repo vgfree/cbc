@@ -14,14 +14,14 @@
 // -----------------------------------------------------------------------------
 CbSymtab* cb_symtab_create()
 {
-	CbSymtab* st	= (CbSymtab*) malloc(sizeof(CbSymtab));
-	st->first		= NULL;
-	st->last		= NULL;
-	st->current		= NULL;
-	st->size		= 0;
-	st->scope_stack = cb_stack_create();
-	
-	return st;
+    CbSymtab* st    = (CbSymtab*) malloc(sizeof(CbSymtab));
+    st->first       = NULL;
+    st->last        = NULL;
+    st->current     = NULL;
+    st->size        = 0;
+    st->scope_stack = cb_stack_create();
+    
+    return st;
 }
 
 // -----------------------------------------------------------------------------
@@ -29,18 +29,18 @@ CbSymtab* cb_symtab_create()
 // -----------------------------------------------------------------------------
 void cb_symtab_free(CbSymtab* st)
 {
-	assert(st);
-	
-	CbSymbol* current = st->first;
-	while (current)
-	{
-		CbSymbol* temp	= current;
-		current			= cb_symbol_get_next(current);
-		cb_symbol_free(temp);
-	}
-	
-	cb_stack_free(st->scope_stack);
-	free(st);
+    assert(st);
+    
+    CbSymbol* current = st->first;
+    while (current)
+    {
+        CbSymbol* temp = current;
+        current        = cb_symbol_get_next(current);
+        cb_symbol_free(temp);
+    }
+    
+    cb_stack_free(st->scope_stack);
+    free(st);
 }
 
 // -----------------------------------------------------------------------------
@@ -48,34 +48,34 @@ void cb_symtab_free(CbSymtab* st)
 // -----------------------------------------------------------------------------
 CbSymbol* cb_symtab_append(CbSymtab* st, CbSymbol* s)
 {
-	assert(st);
-	assert(s);
-	assert(cb_symbol_get_next(s)     == NULL); // allow appending single symbols
-	assert(cb_symbol_get_previous(s) == NULL); // only
-	
-	if (cb_symtab_is_empty(st))
-	{
-		st->first	= s;
-		st->current	= s;
-	}
-	else
-	{
-		const char* symbol_id = cb_symbol_get_id(s);
-		if (cb_symtab_lookup(st, symbol_id, true) != NULL)
-		{
-			cb_print_error(CB_ERR_RUNTIME, -1, "Cannot redeclare symbol: %s",
-						   symbol_id);
-			return NULL;
-		}
-		
-		cb_symbol_connect(st->last, s);
-	}
-	
-	cb_symbol_set_scope(s, cb_stack_get_top_item(st->scope_stack));
-	st->last = s;
-	st->size++;
-	
-	return st->last;
+    assert(st);
+    assert(s);
+    assert(cb_symbol_get_next(s)     == NULL); // allow appending single symbols
+    assert(cb_symbol_get_previous(s) == NULL); // only
+    
+    if (cb_symtab_is_empty(st))
+    {
+        st->first   = s;
+        st->current = s;
+    }
+    else
+    {
+        const char* symbol_id = cb_symbol_get_id(s);
+        if (cb_symtab_lookup(st, symbol_id, true) != NULL)
+        {
+            cb_print_error(CB_ERR_RUNTIME, -1, "Cannot redeclare symbol: %s",
+                           symbol_id);
+            return NULL;
+        }
+        
+        cb_symbol_connect(st->last, s);
+    }
+    
+    cb_symbol_set_scope(s, cb_stack_get_top_item(st->scope_stack));
+    st->last = s;
+    st->size++;
+    
+    return st->last;
 }
 
 // -----------------------------------------------------------------------------
@@ -84,45 +84,45 @@ CbSymbol* cb_symtab_append(CbSymtab* st, CbSymbol* s)
 // -----------------------------------------------------------------------------
 CbSymbol* cb_symtab_dispatch(CbSymtab* st, const char* id)
 {
-	CbSymbol* found = cb_symtab_lookup(st, id, true);
-	
-	if (found)
-	{
-		CbSymbol* prev = cb_symbol_get_previous(found);
-		CbSymbol* next = cb_symbol_get_next(found);
-		
-		cb_symbol_set_previous(found, NULL);
-		cb_symbol_set_next(found, NULL);
-		
-		// remove references to dispatched item
-		if (prev) cb_symbol_set_next(prev, NULL);
-		if (next) cb_symbol_set_previous(next, NULL);
-		// connect free items
-		if (prev && next)
-			cb_symbol_connect(prev, next);
-		
-		// update first, last and current item-references
-		if (st->current == found)
-			st->current = next;
-		if (st->last == found)
-		{
-			if (next == NULL && (st->size - 1) > 0)
-				st->last = prev;
-			else
-				st->last = next;
-		}
-		if (st->first == found)
-		{
-			if (prev == NULL && (st->size - 1) > 0)
-				st->first = next;
-			else
-				st->first = prev;
-		}
-		
-		st->size--;
-	}
-	
-	return found;
+    CbSymbol* found = cb_symtab_lookup(st, id, true);
+    
+    if (found)
+    {
+        CbSymbol* prev = cb_symbol_get_previous(found);
+        CbSymbol* next = cb_symbol_get_next(found);
+        
+        cb_symbol_set_previous(found, NULL);
+        cb_symbol_set_next(found, NULL);
+        
+        // remove references to dispatched item
+        if (prev) cb_symbol_set_next(prev, NULL);
+        if (next) cb_symbol_set_previous(next, NULL);
+        // connect free items
+        if (prev && next)
+            cb_symbol_connect(prev, next);
+        
+        // update first, last and current item-references
+        if (st->current == found)
+            st->current = next;
+        if (st->last == found)
+        {
+            if (next == NULL && (st->size - 1) > 0)
+                st->last = prev;
+            else
+                st->last = next;
+        }
+        if (st->first == found)
+        {
+            if (prev == NULL && (st->size - 1) > 0)
+                st->first = next;
+            else
+                st->first = prev;
+        }
+        
+        st->size--;
+    }
+    
+    return found;
 }
 
 // -----------------------------------------------------------------------------
@@ -130,10 +130,10 @@ CbSymbol* cb_symtab_dispatch(CbSymtab* st, const char* id)
 // -----------------------------------------------------------------------------
 void cb_symtab_remove(CbSymtab* st, const char* id)
 {
-	CbSymbol* s = cb_symtab_dispatch(st, id);
-	
-	if (s)
-		cb_symbol_free(s);
+    CbSymbol* s = cb_symtab_dispatch(st, id);
+    
+    if (s)
+        cb_symbol_free(s);
 }
 
 // -----------------------------------------------------------------------------
@@ -143,30 +143,30 @@ void cb_symtab_remove(CbSymtab* st, const char* id)
 // -----------------------------------------------------------------------------
 CbSymbol* cb_symtab_lookup(CbSymtab* st, const char* id, bool exact_scope)
 {
-	CbSymbol* current	= st->first;
-	CbSymbol* result	= NULL;
-	
-	while (current)
-	{
-		if (strcmp(id, cb_symbol_get_id(current)) == 0)
-		{
-			if (cb_scope_equals(cb_symbol_get_scope(current),
-							 cb_stack_get_top_item(st->scope_stack)))
-			{
-				result = current;
-				break;	// Correct symbol was found -> break
-			}
-			// NULL-scope means, that the current symbol is in global scope.
-			// -> Can potentially be used, if there is no local declaration.
-			else if (!exact_scope && (cb_symbol_get_scope(current) == NULL))
-				// Do not break in this case,
-				// since there could still be a local declaration of the symbol!
-				result = current;
-		}
-		current = cb_symbol_get_next(current);
-	}
-	
-	return result;
+    CbSymbol* current = st->first;
+    CbSymbol* result  = NULL;
+    
+    while (current)
+    {
+        if (strcmp(id, cb_symbol_get_id(current)) == 0)
+        {
+            if (cb_scope_equals(cb_symbol_get_scope(current),
+                                cb_stack_get_top_item(st->scope_stack)))
+            {
+                result = current;
+                break;    // Correct symbol was found -> break
+            }
+            // NULL-scope means, that the current symbol is in global scope.
+            // -> Can potentially be used, if there is no local declaration.
+            else if (!exact_scope && (cb_symbol_get_scope(current) == NULL))
+                // Do not break in this case,
+                // since there could still be a local declaration of the symbol!
+                result = current;
+        }
+        current = cb_symbol_get_next(current);
+    }
+    
+    return result;
 }
 
 // -----------------------------------------------------------------------------
@@ -175,12 +175,12 @@ CbSymbol* cb_symtab_lookup(CbSymtab* st, const char* id, bool exact_scope)
 // -----------------------------------------------------------------------------
 CbSymbol* cb_symtab_next(CbSymtab* st)
 {
-	CbSymbol* result = cb_symbol_get_next(cb_symtab_current(st));
-	
-	if (result)
-		st->current	= result;
-	
-	return result;
+    CbSymbol* result = cb_symbol_get_next(cb_symtab_current(st));
+    
+    if (result)
+        st->current = result;
+    
+    return result;
 }
 
 // -----------------------------------------------------------------------------
@@ -188,7 +188,7 @@ CbSymbol* cb_symtab_next(CbSymtab* st)
 // -----------------------------------------------------------------------------
 CbSymbol* cb_symtab_current(CbSymtab* st)
 {
-	return st->current;
+    return st->current;
 }
 
 // -----------------------------------------------------------------------------
@@ -197,12 +197,12 @@ CbSymbol* cb_symtab_current(CbSymtab* st)
 // -----------------------------------------------------------------------------
 CbSymbol* cb_symtab_previous(CbSymtab* st)
 {
-	CbSymbol* result = cb_symbol_get_previous(cb_symtab_current(st));
-	
-	if (result)
-		st->current	= result;
-	
-	return result;
+    CbSymbol* result = cb_symbol_get_previous(cb_symtab_current(st));
+    
+    if (result)
+        st->current = result;
+    
+    return result;
 }
 
 // -----------------------------------------------------------------------------
@@ -210,7 +210,7 @@ CbSymbol* cb_symtab_previous(CbSymtab* st)
 // -----------------------------------------------------------------------------
 bool cb_symtab_is_empty(CbSymtab* st)
 {
-	return st->size == 0;
+    return st->size == 0;
 }
 
 // -----------------------------------------------------------------------------
@@ -218,8 +218,8 @@ bool cb_symtab_is_empty(CbSymtab* st)
 // -----------------------------------------------------------------------------
 void cb_symtab_enter_scope(CbSymtab* st, char* context)
 {
-	CbScope* new_scope = cb_scope_create(context, st->scope_stack->count + 1);
-	cb_stack_push(st->scope_stack, new_scope);
+    CbScope* new_scope = cb_scope_create(context, st->scope_stack->count + 1);
+    cb_stack_push(st->scope_stack, new_scope);
 }
 
 // -----------------------------------------------------------------------------
@@ -227,24 +227,24 @@ void cb_symtab_enter_scope(CbSymtab* st, char* context)
 // -----------------------------------------------------------------------------
 void cb_symtab_leave_scope(CbSymtab* st)
 {
-	// Remove all local symbols in the current scope.
-	// Begin with last symbol in the symbol-table, because recently appended
-	// symbols are always at the end of the table!
-	CbSymbol* current = st->last;
-	while (current)
-	{
-		CbSymbol* temp = current;
-		current		   = cb_symbol_get_previous(current);
-		
-		if (cb_scope_equals(cb_symbol_get_scope(temp),
-						 (CbScope*) cb_stack_get_top_item(st->scope_stack)))
-			// TODO: Use a different method to dispatch and remove the symbol.
-			// Since symtab_dispatch() calls symtab_lookup() this could be a
-			// quite slow operation!
-			cb_symtab_remove(st, cb_symbol_get_id(temp));
-	}
-	
-	CbScope* current_scope;
-	cb_stack_pop(st->scope_stack, (void*) &current_scope);	// pop and
-	cb_scope_free(current_scope);							// free current scope
+    // Remove all local symbols in the current scope.
+    // Begin with last symbol in the symbol-table, because recently appended
+    // symbols are always at the end of the table!
+    CbSymbol* current = st->last;
+    while (current)
+    {
+        CbSymbol* temp = current;
+        current        = cb_symbol_get_previous(current);
+        
+        if (cb_scope_equals(cb_symbol_get_scope(temp),
+                         (CbScope*) cb_stack_get_top_item(st->scope_stack)))
+            // TODO: Use a different method to dispatch and remove the symbol.
+            // Since symtab_dispatch() calls symtab_lookup() this could be a
+            // quite slow operation!
+            cb_symtab_remove(st, cb_symbol_get_id(temp));
+    }
+    
+    CbScope* current_scope;
+    cb_stack_pop(st->scope_stack, (void*) &current_scope); // pop and
+    cb_scope_free(current_scope);                          // free current scope
 }

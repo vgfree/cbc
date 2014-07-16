@@ -15,8 +15,8 @@ typedef struct CbStackItem CbStackItem;
 // stack_t struct
 typedef struct
 {
-	CbStackItem* top;
-	size_t count;
+    CbStackItem* top;
+    size_t count;
 } CbStack;
 
 

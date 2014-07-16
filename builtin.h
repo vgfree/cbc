@@ -1,6 +1,6 @@
 /*******************************************************************************
  * builtin -- Collection of functions to register builtin and pre-defined
- *  		  symbols like functions and variables/constants.
+ *            symbols like functions and variables/constants.
  ******************************************************************************/
 
 #ifndef BUILTIN_H
@@ -17,7 +17,7 @@ typedef CbValue* (*CbBuiltinFunctionRef) (CbStack*);
 
 // interface functions
 int register_builtin_func(CbSymtab* symtab, char* identifier,
-						  CbBuiltinFunctionRef func, int expected_param_count);
+                          CbBuiltinFunctionRef func, int expected_param_count);
 int register_builtin_all(CbSymtab* symtab);
 
 

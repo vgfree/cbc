@@ -17,11 +17,11 @@
 
 struct symbol_table
 {
-	CbSymbol* first;
-	CbSymbol* last;
-	CbSymbol* current;
-	size_t size;
-	CbStack* scope_stack;
+    CbSymbol* first;
+    CbSymbol* last;
+    CbSymbol* current;
+    size_t size;
+    CbStack* scope_stack;
 };
 
 

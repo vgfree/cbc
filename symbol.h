@@ -1,9 +1,9 @@
 /*******************************************************************************
  * CbSymbol -- Implementation of a symbol-structure.
  * 
- *  	A symbol can either be a variable or a function.
- *  	Every symbol contains a symbol-identifier, the type and the value of
- *  	the symbol.
+ *      A symbol can either be a variable or a function.
+ *      Every symbol contains a symbol-identifier, the type and the value of
+ *      the symbol.
  ******************************************************************************/
 
 #ifndef SYMBOL_H
@@ -17,9 +17,9 @@
 // type of the symbol
 enum cb_symbol_type
 {
-	SYM_TYPE_UNDEFINED = 0,
-	SYM_TYPE_VARIABLE,
-	SYM_TYPE_FUNCTION
+    SYM_TYPE_UNDEFINED = 0,
+    SYM_TYPE_VARIABLE,
+    SYM_TYPE_FUNCTION
 };
 
 typedef struct CbSymbol CbSymbol;

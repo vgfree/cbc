@@ -1,8 +1,8 @@
 /*******************************************************************************
  * CbExceptionBlockNode -- Exception-handling construct
  * 
- *  	This structure is part of the abstract syntax-tree CbSyntree.
- *  	It uses the node-type SNT_EXCEPTION_BLOCK.
+ *      This structure is part of the abstract syntax-tree CbSyntree.
+ *      It uses the node-type SNT_EXCEPTION_BLOCK.
  *
  *      The construct would look like this:
  *         startseq
@@ -23,19 +23,19 @@
 // exception block type
 enum cb_exception_block_type
 {
-	EXBL_ONERROR,
-	EXBL_ALWAYS
+    EXBL_ONERROR,
+    EXBL_ALWAYS
 };
 
 // exception block node
 typedef struct
 {
-	enum cb_syntree_node_type type;	// node-type is SNT_EXCEPTION_HANDLING
-	int line_no;					// line number
-	enum cb_exception_block_type block_type; // type of the exception-block
-	CbSyntree* code_block;			// code that could cause an error
-	CbSyntree* exception_block;		// code that will be executed when an error
-									// occurs
+    enum cb_syntree_node_type type; // node-type is SNT_EXCEPTION_HANDLING
+    int line_no;                    // line number
+    enum cb_exception_block_type block_type; // type of the exception-block
+    CbSyntree* code_block;          // code that could cause an error
+    CbSyntree* exception_block;     // code that will be executed when an error
+                                    // occurs
 } CbExceptionBlockNode;
 
 

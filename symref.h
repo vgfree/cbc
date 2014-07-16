@@ -1,8 +1,8 @@
 /*******************************************************************************
  * CbSymref -- CbSyntree-node, that references a symbol in the symbol-table.
  * 
- *  	This structure is part of the abstract syntax-tree CbSyntree.
- *  	It uses the node-type SNT_SYMREF.
+ *      This structure is part of the abstract syntax-tree CbSyntree.
+ *      It uses the node-type SNT_SYMREF.
  ******************************************************************************/
 
 #ifndef SYMREF_H
@@ -16,10 +16,10 @@
 // symbol-reference node
 typedef struct
 {
-	enum cb_syntree_node_type type;	// node-type is SNT_SYMREF
-	int line_no;					// line number
-	char* sym_id;					// symbol identifier
-	CbSymbol* table_sym;			// reference to the instance in the symbol-table
+    enum cb_syntree_node_type type; // node-type is SNT_SYMREF
+    int line_no;                    // line number
+    char* sym_id;                   // symbol identifier
+    CbSymbol* table_sym;            // reference to the instance in the symbol-table
 } CbSymref;
 
 

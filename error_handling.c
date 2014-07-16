@@ -33,9 +33,9 @@ static bool error_handling_initialized;
 static FILE* err_out = NULL;
 
 static void cb_print_error_internal(FILE* output, cb_error_type type, int line,
-									const char* format, va_list* args);
+                                    const char* format, va_list* args);
 static void cb_print_error_msg_internal(FILE* output, const char* format,
-										va_list* args);
+                                        va_list* args);
 static void cb_appropriately_set_default_error_output_internal();
 
 
@@ -49,55 +49,55 @@ static void cb_appropriately_set_default_error_output_internal();
 // -----------------------------------------------------------------------------
 void yyerror(void* call_context, const char* format, ...)
 {
-	extern int yylineno;
-	
-	switch ((cb_yyerror_call_context) call_context)
-	{
-		case CB_YYERROR_CC_FLEX:
-		{
-			cb_appropriately_set_default_error_output_internal();
-			va_list arglist;
-			va_start(arglist, format);
-			cb_print_error_internal(err_out, CB_ERR_SYNTAX, yylineno, format,
-									&arglist);
-			va_end(arglist);
-			break;
-		}
-		
-		case CB_YYERROR_CC_BISON:
-		default:			// treat unknown call context as a call from bison
-		{
+    extern int yylineno;
+    
+    switch ((cb_yyerror_call_context) call_context)
+    {
+        case CB_YYERROR_CC_FLEX:
+        {
+            cb_appropriately_set_default_error_output_internal();
+            va_list arglist;
+            va_start(arglist, format);
+            cb_print_error_internal(err_out, CB_ERR_SYNTAX, yylineno, format,
+                                    &arglist);
+            va_end(arglist);
+            break;
+        }
+        
+        case CB_YYERROR_CC_BISON:
+        default: // treat unknown call context as a call from bison
+        {
 #ifdef _CBC_USE_CUSTOM_YYERROR_MESSAGE
-			#include "cbc_parse.h"	// this is necessary for yy_get_token_string() !
-			
-			cb_print_error(CB_ERR_SYNTAX, yylineno, "Unexpected token %s",
-						   yy_get_token_string(&yychar));
+            #include "cbc_parse.h" // this is necessary for yy_get_token_string() !
+            
+            cb_print_error(CB_ERR_SYNTAX, yylineno, "Unexpected token %s",
+                           yy_get_token_string(&yychar));
 #else
-			// allocate base buffer
-			size_t base_len = strlen(format) + 1;
-			char* buffer = (char*) malloc(base_len);
-			
-			va_list arglist;
-			va_start(arglist, format);
-			
-			size_t needed = vsnprintf(buffer, base_len, format, arglist);
-			// if there were any additional arguments passed to the function,
-			// the buffer needs to be increased.
-			if (needed > base_len)
-			{
-				buffer = (char*) realloc(buffer, needed);
-				vsprintf(buffer, format, arglist);
-			}
-			
-			cb_print_error(CB_ERR_SYNTAX, yylineno, buffer);
-			
-			free(buffer);	// always free the allocated buffer
-			
-			va_end(arglist);
+            // allocate base buffer
+            size_t base_len = strlen(format) + 1;
+            char* buffer = (char*) malloc(base_len);
+            
+            va_list arglist;
+            va_start(arglist, format);
+            
+            size_t needed = vsnprintf(buffer, base_len, format, arglist);
+            // if there were any additional arguments passed to the function,
+            // the buffer needs to be increased.
+            if (needed > base_len)
+            {
+                buffer = (char*) realloc(buffer, needed);
+                vsprintf(buffer, format, arglist);
+            }
+            
+            cb_print_error(CB_ERR_SYNTAX, yylineno, buffer);
+            
+            free(buffer); // always free the allocated buffer
+            
+            va_end(arglist);
 #endif // _CBC_USE_CUSTOM_YYERROR_MESSAGE
-			break;
-		}
-	}
+            break;
+        }
+    }
 }
 
 
@@ -110,12 +110,12 @@ void yyerror(void* call_context, const char* format, ...)
 // -----------------------------------------------------------------------------
 void cb_print_error(cb_error_type type, int line, const char* format, ...)
 {
-	cb_appropriately_set_default_error_output_internal();
-	
-	va_list arglist;
-	va_start(arglist, format);
-	cb_print_error_internal(err_out, type, line, format, &arglist);
-	va_end(arglist);
+    cb_appropriately_set_default_error_output_internal();
+    
+    va_list arglist;
+    va_start(arglist, format);
+    cb_print_error_internal(err_out, type, line, format, &arglist);
+    va_end(arglist);
 }
 
 // -----------------------------------------------------------------------------
@@ -123,13 +123,13 @@ void cb_print_error(cb_error_type type, int line, const char* format, ...)
 // -----------------------------------------------------------------------------
 void cb_print_error_msg(const char* format, ...)
 {
-	cb_appropriately_set_default_error_output_internal();
-	
-	va_list arglist;
-	fprintf(err_out, "Error: ");
-	va_start(arglist, format);
-	cb_print_error_msg_internal(err_out, format, &arglist);
-	va_end(arglist);
+    cb_appropriately_set_default_error_output_internal();
+    
+    va_list arglist;
+    fprintf(err_out, "Error: ");
+    va_start(arglist, format);
+    cb_print_error_msg_internal(err_out, format, &arglist);
+    va_end(arglist);
 }
 
 // -----------------------------------------------------------------------------
@@ -137,9 +137,9 @@ void cb_print_error_msg(const char* format, ...)
 // -----------------------------------------------------------------------------
 void cb_set_error_output(FILE* error_ouput)
 {
-	assert(error_ouput);
-	
-	err_out = error_ouput;
+    assert(error_ouput);
+    
+    err_out = error_ouput;
 }
 
 // -----------------------------------------------------------------------------
@@ -147,10 +147,10 @@ void cb_set_error_output(FILE* error_ouput)
 // -----------------------------------------------------------------------------
 void cb_error_set(CbErrorCode code)
 {
-	assert(cb_error_handling_is_initialized());
-	
-	error_flag = code;
-	cb_error_reset_catch();
+    assert(cb_error_handling_is_initialized());
+    
+    error_flag = code;
+    cb_error_reset_catch();
 }
 
 // -----------------------------------------------------------------------------
@@ -158,13 +158,13 @@ void cb_error_set(CbErrorCode code)
 // -----------------------------------------------------------------------------
 void cb_error_set_msg(const char* message)
 {
-	assert(cb_error_handling_is_initialized());
-	
-	if (error_message != NULL)
-		free(error_message);			// free old error message
-	
-	cb_error_set(CB_ERR_CODE_CUSTOMERROR);
-	error_message = strdup(message);	// assign copy of error message
+    assert(cb_error_handling_is_initialized());
+    
+    if (error_message != NULL)
+        free(error_message); // free old error message
+    
+    cb_error_set(CB_ERR_CODE_CUSTOMERROR);
+    error_message = strdup(message); // assign copy of error message
 }
 
 // -----------------------------------------------------------------------------
@@ -172,9 +172,9 @@ void cb_error_set_msg(const char* message)
 // -----------------------------------------------------------------------------
 CbErrorCode cb_error_get()
 {
-	assert(cb_error_handling_is_initialized());
-	
-	return error_flag;
+    assert(cb_error_handling_is_initialized());
+    
+    return error_flag;
 }
 
 // -----------------------------------------------------------------------------
@@ -182,9 +182,9 @@ CbErrorCode cb_error_get()
 // -----------------------------------------------------------------------------
 const char* cb_error_get_custom_message()
 {
-	assert(cb_error_handling_is_initialized());
-	
-	return error_message;
+    assert(cb_error_handling_is_initialized());
+    
+    return error_message;
 }
 
 // -----------------------------------------------------------------------------
@@ -193,18 +193,18 @@ const char* cb_error_get_custom_message()
 // -----------------------------------------------------------------------------
 const char* cb_error_get_message()
 {
-	assert(cb_error_handling_is_initialized());
-	
-	const char* result = "";
-	if (cb_error_is_set())
-	{
-		if (cb_error_get() >= CB_ERR_CODE_CUSTOMERROR)
-			result = cb_error_get_custom_message();
-		else
-			result = cb_error_get_message_by_code(cb_error_get());
-	}
-	
-	return result;
+    assert(cb_error_handling_is_initialized());
+    
+    const char* result = "";
+    if (cb_error_is_set())
+    {
+        if (cb_error_get() >= CB_ERR_CODE_CUSTOMERROR)
+            result = cb_error_get_custom_message();
+        else
+            result = cb_error_get_message_by_code(cb_error_get());
+    }
+    
+    return result;
 }
 
 // -----------------------------------------------------------------------------
@@ -212,9 +212,9 @@ const char* cb_error_get_message()
 // -----------------------------------------------------------------------------
 bool cb_error_is_set()
 {
-	assert(cb_error_handling_is_initialized());
-	
-	return error_flag != CB_ERR_CODE_NOERROR;
+    assert(cb_error_handling_is_initialized());
+    
+    return error_flag != CB_ERR_CODE_NOERROR;
 }
 
 // -----------------------------------------------------------------------------
@@ -222,9 +222,9 @@ bool cb_error_is_set()
 // -----------------------------------------------------------------------------
 void cb_error_clear()
 {
-	assert(cb_error_handling_is_initialized());
-	
-	error_flag = CB_ERR_CODE_NOERROR;
+    assert(cb_error_handling_is_initialized());
+    
+    error_flag = CB_ERR_CODE_NOERROR;
 }
 
 // -----------------------------------------------------------------------------
@@ -234,9 +234,9 @@ void cb_error_clear()
 // -----------------------------------------------------------------------------
 void cb_error_catch()
 {
-	assert(cb_error_handling_is_initialized());
-	
-	error_catched = true;
+    assert(cb_error_handling_is_initialized());
+    
+    error_catched = true;
 }
 
 // -----------------------------------------------------------------------------
@@ -245,9 +245,9 @@ void cb_error_catch()
 // -----------------------------------------------------------------------------
 void cb_error_reset_catch()
 {
-	assert(cb_error_handling_is_initialized());
-	
-	error_catched = false;
+    assert(cb_error_handling_is_initialized());
+    
+    error_catched = false;
 }
 
 // -----------------------------------------------------------------------------
@@ -255,9 +255,9 @@ void cb_error_reset_catch()
 // -----------------------------------------------------------------------------
 bool cb_error_is_catched()
 {
-	assert(cb_error_handling_is_initialized());
-	
-	return error_catched;
+    assert(cb_error_handling_is_initialized());
+    
+    return error_catched;
 }
 
 // -----------------------------------------------------------------------------
@@ -265,14 +265,14 @@ bool cb_error_is_catched()
 // -----------------------------------------------------------------------------
 void cb_error_handling_initialize()
 {
-	if (!cb_error_handling_is_initialized())
-	{
-		error_message = NULL;
-		error_flag    = CB_ERR_CODE_NOERROR;
-		error_catched = false;
-		
-		error_handling_initialized = true;
-	}
+    if (!cb_error_handling_is_initialized())
+    {
+        error_message = NULL;
+        error_flag    = CB_ERR_CODE_NOERROR;
+        error_catched = false;
+        
+        error_handling_initialized = true;
+    }
 }
 
 // -----------------------------------------------------------------------------
@@ -280,15 +280,15 @@ void cb_error_handling_initialize()
 // -----------------------------------------------------------------------------
 void cb_error_handling_finalize()
 {
-	if (cb_error_handling_is_initialized())
-	{
-		cb_error_reset_catch();
-		cb_error_clear();
-		if (error_message != NULL)
-			free(error_message);
-		
-		error_handling_initialized = false;
-	}
+    if (cb_error_handling_is_initialized())
+    {
+        cb_error_reset_catch();
+        cb_error_clear();
+        if (error_message != NULL)
+            free(error_message);
+        
+        error_handling_initialized = false;
+    }
 }
 
 // -----------------------------------------------------------------------------
@@ -296,7 +296,7 @@ void cb_error_handling_finalize()
 // -----------------------------------------------------------------------------
 bool cb_error_handling_is_initialized()
 {
-	return error_handling_initialized;
+    return error_handling_initialized;
 }
 
 
@@ -308,37 +308,37 @@ bool cb_error_handling_is_initialized()
 // Format and print message including additional information (internal)
 // -----------------------------------------------------------------------------
 static void cb_print_error_internal(FILE* output, cb_error_type type, int line,
-									const char* format, va_list* args)
+                                    const char* format, va_list* args)
 {
-	switch (type)
-	{
-		case CB_ERR_RUNTIME:
-			fprintf(output, "Runtime error: ");
-			break;
-		
-		case CB_ERR_SYNTAX:
-			fprintf(output, "Syntax error: ");
-			break;
-		
-		default:
-			fprintf(output, "Unknown error: ");
-			break;
-	}
-	
-	if (line > 0)
-		fprintf(output, "Line %d: ", line);
-	
-	cb_print_error_msg_internal(output, format, args);
+    switch (type)
+    {
+        case CB_ERR_RUNTIME:
+            fprintf(output, "Runtime error: ");
+            break;
+        
+        case CB_ERR_SYNTAX:
+            fprintf(output, "Syntax error: ");
+            break;
+        
+        default:
+            fprintf(output, "Unknown error: ");
+            break;
+    }
+    
+    if (line > 0)
+        fprintf(output, "Line %d: ", line);
+    
+    cb_print_error_msg_internal(output, format, args);
 }
 
 // -----------------------------------------------------------------------------
 // Format and print message (internal)
 // -----------------------------------------------------------------------------
 static void cb_print_error_msg_internal(FILE* output, const char* format,
-										va_list* args)
+                                        va_list* args)
 {
-	vfprintf(output, format, *args);	// print formatted message
-	fprintf(output, "\n");
+    vfprintf(output, format, *args); // print formatted message
+    fprintf(output, "\n");
 }
 
 // -----------------------------------------------------------------------------
@@ -346,7 +346,7 @@ static void cb_print_error_msg_internal(FILE* output, const char* format,
 // -----------------------------------------------------------------------------
 static void cb_appropriately_set_default_error_output_internal()
 {
-	// set default error output stream if necessary
-	if (!err_out)
-		err_out = stderr;
+    // set default error output stream if necessary
+    if (!err_out)
+        err_out = stderr;
 }

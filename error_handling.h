@@ -12,23 +12,23 @@
 
 typedef enum cb_error_type
 {
-	CB_ERR_UNKNOWN,
-	CB_ERR_SYNTAX,
-	CB_ERR_RUNTIME
+    CB_ERR_UNKNOWN,
+    CB_ERR_SYNTAX,
+    CB_ERR_RUNTIME
 } cb_error_type;
 
 typedef enum cb_yyerror_call_context
 {
-	CB_YYERROR_CC_BISON = 0,
-	CB_YYERROR_CC_FLEX
+    CB_YYERROR_CC_BISON = 0,
+    CB_YYERROR_CC_FLEX
 } cb_yyerror_call_context;
 
 typedef enum cb_error_code
 {
-	CB_ERR_CODE_NOERROR = 0,	// 0 indicates "no error"
-	CB_ERR_CODE_DIVISIONBYZERO,	// Division by zero error
-	
-	CB_ERR_CODE_END				// End of enumerations (this is not an error!)
+    CB_ERR_CODE_NOERROR = 0,    // 0 indicates "no error"
+    CB_ERR_CODE_DIVISIONBYZERO, // Division by zero error
+    
+    CB_ERR_CODE_END             // End of enumerations (this is not an error!)
 } CbErrorCode;
 
 // Error code for custom error messages

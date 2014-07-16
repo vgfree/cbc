@@ -23,36 +23,36 @@
 // -----------------------------------------------------------------------------
 int main(int argc, char* argv[])
 {
-	bool parse_file = argc > 1;	// determine whether to parse a file
-	FILE* input		= NULL;
-	
-	if (parse_file)
-	{
-		input = fopen(argv[1], "r");
-		if (!input)
-		{
-			cb_print_error_msg("Unable to open file `%s'", argv[1]);
-			return EXIT_FAILURE;
-		}
-	}
+    bool parse_file = argc > 1; // determine whether to parse a file
+    FILE* input     = NULL;
+    
+    if (parse_file)
+    {
+        input = fopen(argv[1], "r");
+        if (!input)
+        {
+            cb_print_error_msg("Unable to open file `%s'", argv[1]);
+            return EXIT_FAILURE;
+        }
+    }
 
-	Codeblock* cb	  = codeblock_create();
-	int parser_result = codeblock_parse_file(cb, input);
-	
-	if (parse_file)		// if a file was parsed
-		fclose(input);	// -> close file stream
-	
-	if (parser_result         == EXIT_SUCCESS &&
-		codeblock_execute(cb) == EXIT_SUCCESS)	// execute ...
-	{
-		cb_value_print(cb->result);				// and print result
-		
+    Codeblock* cb     = codeblock_create();
+    int parser_result = codeblock_parse_file(cb, input);
+    
+    if (parse_file)    // if a file was parsed
+        fclose(input); // -> close file stream
+    
+    if (parser_result         == EXIT_SUCCESS &&
+        codeblock_execute(cb) == EXIT_SUCCESS) // execute ...
+    {
+        cb_value_print(cb->result);            // and print result
+        
 #ifdef _CBC_TRACK_EXECUTION_TIME
-		printf("\nExecution duration: %f seconds", cb->duration);
+        printf("\nExecution duration: %f seconds", cb->duration);
 #endif // _CBC_TRACK_EXECUTION_TIME
-	}
-	
-	codeblock_free(cb);	// cleanup
-	
-	return 0;
+    }
+    
+    codeblock_free(cb); // cleanup
+    
+    return 0;
 }

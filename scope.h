@@ -11,8 +11,8 @@
 // scope_t struct
 typedef struct
 {
-	char* context;	// scope context -- e.g. function-name
-	int level;		// scope level
+    char* context; // scope context -- e.g. function-name
+    int level;     // scope level
 } CbScope;
 
 

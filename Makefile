@@ -2,41 +2,41 @@
 # Codeblock compiler/interpreter "cbc" makefile
 # ##############################################################################
 
-TARGET			:= cbc
+TARGET         := cbc
 
-SRC_LEXER		:= cbc.l
-SRC_PARSER		:= cbc.y
-LEXER			:= $(TARGET)_lex.c
-INC_LEXER		:= $(TARGET)_lex.h
-PARSER			:= $(TARGET)_parse.c
-INC_PARSER		:= $(PARSER:%.c=%.h)
+SRC_LEXER      := cbc.l
+SRC_PARSER     := cbc.y
+LEXER          := $(TARGET)_lex.c
+INC_LEXER      := $(TARGET)_lex.h
+PARSER         := $(TARGET)_parse.c
+INC_PARSER     := $(PARSER:%.c=%.h)
 
-SRC				:= 	$(LEXER) $(PARSER) \
-					codeblock.c symbol.c symtab.c function.c value.c strlist.c \
-					syntree.c symref.c funccall.c funcdecl.c scope.c stack.c \
-					array.c builtin.c cblib.c cbgui.c error_handling.c \
-					exception_block_node.c error_messages.c array_node.c \
-					array_access_node.c
-OBJ				:= $(SRC:%.c=%.o)
+SRC            := $(LEXER) $(PARSER) \
+                  codeblock.c symbol.c symtab.c function.c value.c strlist.c \
+                  syntree.c symref.c funccall.c funcdecl.c scope.c stack.c \
+                  array.c builtin.c cblib.c cbgui.c error_handling.c \
+                  exception_block_node.c error_messages.c array_node.c \
+                  array_access_node.c
+OBJ            := $(SRC:%.c=%.o)
 
-SRC_CBC			:= main.c $(SRC)
-OBJ_CBC			:= $(SRC_CBC:%.c=%.o)
+SRC_CBC        := main.c $(SRC)
+OBJ_CBC        := $(SRC_CBC:%.c=%.o)
 
-CFLAGS_COMMON	:=	-D _CBC_DEFAULT_FUNC_RESULT_SYMBOL \
-					-D _CBC_USE_CUSTOM_YYERROR_MESSAGE
+CFLAGS_COMMON  := -D _CBC_DEFAULT_FUNC_RESULT_SYMBOL \
+                  -D _CBC_USE_CUSTOM_YYERROR_MESSAGE
 ifeq ($(OS), Windows_NT)
-CFLAGS_COMMON	:= $(CFLAGS_COMMON) -D _CBC_PLAT_WNDS
+CFLAGS_COMMON  := $(CFLAGS_COMMON) -D _CBC_PLAT_WNDS
 endif
 
-CFLAGS			:=	-g -D _CBC_DEBUG $(CFLAGS_COMMON)
-CFLAGS_RELEASE	:=	-D _CBC_TRACK_EXECUTION_TIME $(CFLAGS_COMMON)
-LDFLAGS			:= 
+CFLAGS         :=    -g -D _CBC_DEBUG $(CFLAGS_COMMON)
+CFLAGS_RELEASE :=    -D _CBC_TRACK_EXECUTION_TIME $(CFLAGS_COMMON)
+LDFLAGS        := 
 
-LEX				:= flex
-YACC			:= bison
+LEX            := flex
+YACC           := bison
 
-TEST_DIR		:= test
-TEST_DEP_FILE	:= $(TEST_DIR)/test.dep
+TEST_DIR       := test
+TEST_DEP_FILE  := $(TEST_DIR)/test.dep
 
 
 # ------------------------------------------------------------------------------
@@ -116,5 +116,5 @@ clean: clean-cbc
 clean-all: clean-cbc clean-test
 
 
-.PHONY:	clean clean-all clean-cbc clean-test test runtest build debug release \
-		default make-depfile
+.PHONY: clean clean-all clean-cbc clean-test test runtest build debug release \
+	default make-depfile
