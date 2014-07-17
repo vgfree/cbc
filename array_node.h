@@ -19,12 +19,14 @@ typedef struct
     enum cb_syntree_node_type type; // node-type is SNT_FUNC_CALL
     int line_no;                    // line number
     CbStrlist* values;              // values of the array
+    CbValue* valarray;              // array value instance
 } CbArrayNode;
 
 
 // interface functions
 CbSyntree* cb_array_node_create(CbStrlist* values);
-CbValue* cb_array_node_eval(const CbArrayNode* node, CbSymtab* symtab);
+void cb_array_node_free(CbArrayNode* node);
+CbValue* cb_array_node_eval(CbArrayNode* node, CbSymtab* symtab);
 
 
 #endif // ARRAY_NODE_H

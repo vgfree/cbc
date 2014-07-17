@@ -21,14 +21,34 @@ CbSyntree* cb_array_node_create(CbStrlist* values)
     node->type        = SNT_VALARRAY;
     node->line_no     = 0;
     node->values      = values;
+    node->valarray    = NULL;
     
     return (CbSyntree*) node;
 }
 
 // -----------------------------------------------------------------------------
-// constructor
+// destructor
 // -----------------------------------------------------------------------------
-CbValue* cb_array_node_eval(const CbArrayNode* node, CbSymtab* symtab)
+void cb_array_node_free(CbArrayNode* node)
+{
+    CbStrlist* item = node->values;
+    while (item)
+    {
+        cb_syntree_free((CbSyntree*) item->data);
+        item = item->next;
+    }
+    
+    cb_strlist_free(node->values);
+    if (node->valarray)
+        cb_value_free(node->valarray);
+    
+    free(node);
+}
+
+// -----------------------------------------------------------------------------
+// evaluation
+// -----------------------------------------------------------------------------
+CbValue* cb_array_node_eval(CbArrayNode* node, CbSymtab* symtab)
 {
     CbStrlist* item  = node->values;
     CbArray*   array = cb_array_create_with_ownership((CbArrayItemDestructor) cb_value_free,
@@ -41,5 +61,8 @@ CbValue* cb_array_node_eval(const CbArrayNode* node, CbSymtab* symtab)
         item = item->next;
     }
     
-    return cb_valarray_create(array);
+    // finally, wrap the array instance in a value reference to force a
+    // "call by reference" of the array instead of "call by value"
+    node->valarray = cb_valarray_create(array);
+    return cb_valref_create(node->valarray);
 }

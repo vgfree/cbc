@@ -115,6 +115,11 @@ CbSyntree* cb_comparison_create(enum cb_comparison_type type,
 // -----------------------------------------------------------------------------
 void cb_syntree_free(CbSyntree* node)
 {
+    // the destructor_used flag indicates whether a "new" destructor was
+    // already used to free the syntax tree node, so its not necessary anymore
+    // to free the node at the end of this function separately
+    bool destructor_used = false;
+    
     switch (node->type)
     {
         // two child-nodes
@@ -190,17 +195,9 @@ void cb_syntree_free(CbSyntree* node)
             break;
         
         case SNT_VALARRAY:
-        {
-            CbStrlist* item = ((CbArrayNode*) node)->values;
-            while (item)
-            {
-                cb_syntree_free((CbSyntree*) item->data);
-                item = item->next;
-            }
-            cb_strlist_free(((CbArrayNode*) node)->values);
-            
+            cb_array_node_free((CbArrayNode*) node);
+            destructor_used = true;
             break;
-        }
         
         case SNT_VALARRAY_ACCESS:
             free(((CbArrayAccessNode*) node)->sym_id);
@@ -230,8 +227,11 @@ void cb_syntree_free(CbSyntree* node)
             // the syntax tree is being freed anyway
             break;
     }
-    // always free node itself at the end
-    free(node);
+    
+    if (!destructor_used)
+        // free node itself at the end, if there was no "new" destructor used to
+        // free the node
+        free(node);
 }
 
 // -----------------------------------------------------------------------------
@@ -261,7 +261,8 @@ CbValue* cb_syntree_eval(CbSyntree* node, CbSymtab* symtab)
         
         case SNT_VALARRAY_ACCESS:
         {
-            CbValue* value = cb_array_access_node_eval((CbArrayAccessNode*) node, symtab);
+            CbValue* value = cb_array_access_node_eval(
+                                 (CbArrayAccessNode*) node, symtab);
             if (value)
                 result = cb_value_copy(value);
             else
@@ -273,7 +274,8 @@ CbValue* cb_syntree_eval(CbSyntree* node, CbSymtab* symtab)
         case SNT_VALARRAY_ASSIGNMENT:
         {
             CbValue* value =
-                cb_array_assignment_node_eval((CbArrayAssignmentNode*) node, symtab);
+                cb_array_assignment_node_eval((CbArrayAssignmentNode*) node,
+                                              symtab);
             if (value)
                 result = cb_value_copy(value);
             else

@@ -41,7 +41,10 @@ CbValue* cb_array_access_node_eval(const CbArrayAccessNode* node,
     if (cb_symref_set_symbol_from_table((CbSymref*) node, symtab) == EXIT_FAILURE)
         return NULL; // an error occurred
     
-    const CbValue* valarray = cb_symbol_variable_get_value(node->table_sym);
+    const CbValue* valref   = cb_symbol_variable_get_value(node->table_sym);
+    assert(cb_value_is_type(valref, CB_VT_REFERENCE));
+    const CbValue* valarray = cb_valref_get(valref);
+    assert(cb_value_is_type(valarray, CB_VT_VALARRAY));
     CbValue* element        = cb_valarray_get_element(valarray, node->index);
     
     if (element)

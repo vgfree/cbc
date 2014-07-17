@@ -349,13 +349,18 @@ CbValue* bif_geterrortext(CbStack* arg_stack)
 CbValue* bif_alen(CbStack* arg_stack)
 {
     assert(arg_stack->count == 1);
-    CbValue* valarray;
-    cb_stack_pop(arg_stack, (void*) &valarray);
     
+    CbValue* valref;
+    cb_stack_pop(arg_stack, (void*) &valref);
+    assert(cb_value_is_type(valref, CB_VT_REFERENCE));
+    
+    CbValue* valarray = cb_valref_get(valref);
     assert(cb_value_is_type(valarray, CB_VT_VALARRAY));
     
     CbArray* array  = cb_valarray_get(valarray);
     CbValue* result = cb_numeric_create(cb_array_get_count(array));
+    
+    cb_value_free(valref);
     
     return result;
 }
@@ -366,12 +371,15 @@ CbValue* bif_alen(CbStack* arg_stack)
 CbValue* bif_aadd(CbStack* arg_stack)
 {
     assert(arg_stack->count == 2);
-    CbValue* valarray;
-    CbValue* value;
-    cb_stack_pop(arg_stack, (void*) &value);
-    cb_stack_pop(arg_stack, (void*) &valarray);
     
-    // param value can be any type
+    CbValue* valref;
+    CbValue* value;
+    cb_stack_pop(arg_stack, (void*) &value); // value can be any type
+    
+    cb_stack_pop(arg_stack, (void*) &valref); // array is wrapped in a reference
+    assert(cb_value_is_type(valref, CB_VT_REFERENCE));
+    
+    CbValue* valarray = cb_valref_get(valref);
     assert(cb_value_is_type(valarray, CB_VT_VALARRAY));
     
     CbArray* array  = cb_valarray_get(valarray);
@@ -379,6 +387,9 @@ CbValue* bif_aadd(CbStack* arg_stack)
     
     // return new length of array
     CbValue* result = cb_numeric_create(cb_array_get_count(array));
+    
+    cb_value_free(valref);
+    // do not free value here, since the array took ownership of it
     
     return result;
 }
