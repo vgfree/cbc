@@ -11,7 +11,8 @@
 #include "error_handling.h"
 #include "error_messages.h"
 
-#define NO_VALUE_AS_STRING "<no value returned>"
+#define NO_VALUE_AS_STRING  "<no value returned>"
+#define REFERENCE_AS_STRING "<reference>"
 
 
 // #############################################################################
@@ -28,7 +29,8 @@ struct CbValue
         CbNumeric value;
         CbBoolean boolean;
         CbString string;
-        CbArray* array;
+        CbValArray array;
+        CbValRef reference;
     };
 };
 
@@ -93,6 +95,16 @@ CbValue* cb_valarray_create(CbValArray array)
 }
 
 // -----------------------------------------------------------------------------
+// create a value reference
+// -----------------------------------------------------------------------------
+CbValue* cb_valref_create(const CbValRef reference)
+{
+    CbValue* valref   = cb_value_create();
+    valref->type      = CB_VT_REFERENCE;
+    valref->reference = reference;
+}
+
+// -----------------------------------------------------------------------------
 // free codeblock-value
 // -----------------------------------------------------------------------------
 void cb_value_free(CbValue* val)
@@ -119,6 +131,17 @@ enum cb_value_type cb_value_get_type(const CbValue* val)
 bool cb_value_is_type(const CbValue* val, enum cb_value_type type)
 {
     if (val->type == type)
+        return true;
+    else
+        return false;
+}
+
+// -----------------------------------------------------------------------------
+// check if value is a complex type
+// -----------------------------------------------------------------------------
+bool cb_value_is_complex(const CbValue* val)
+{
+    if (val->type == CB_VT_VALARRAY)
         return true;
     else
         return false;
@@ -153,6 +176,10 @@ void cb_value_assign(const CbValue* source, CbValue* destination)
                 cb_array_free(destination->array);
             // assign new one
             destination->array = cb_array_copy(source->array);
+            break;
+        
+        case CB_VT_REFERENCE:
+            destination->reference = source->reference;
             break;
     }
     
@@ -271,6 +298,12 @@ char* cb_value_to_string(const CbValue* val)
             
             break;
         }
+        
+        case CB_VT_REFERENCE:
+            result_buf = (char*)
+                         malloc((strlen(REFERENCE_AS_STRING) + 1) + 11);
+            sprintf(result_buf, REFERENCE_AS_STRING " 0x%p", val->reference);
+            break;
         
         default:
             assert(("Invalid value type", false));
@@ -558,6 +591,16 @@ bool cb_valarray_set_element(const CbValue* val, int index,
     index--;
 #endif // not _CBC_ARRAY_INDEX_
     return cb_array_set(val->array, index, (const CbArrayItem) element);
+}
+
+// -----------------------------------------------------------------------------
+// get value reference
+// -----------------------------------------------------------------------------
+const CbValRef cb_valref_get(const CbValue* val)
+{
+    assert(cb_value_is_type(val, CB_VT_REFERENCE));
+    
+    return val->reference;
 }
 
 

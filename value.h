@@ -19,7 +19,8 @@ enum cb_value_type
     CB_VT_NUMERIC,
     CB_VT_BOOLEAN,
     CB_VT_STRING,
-    CB_VT_VALARRAY
+    CB_VT_VALARRAY,
+    CB_VT_REFERENCE
 };
 
 // operation-types
@@ -50,6 +51,7 @@ typedef int             CbNumeric;
 typedef char*           CbString;
 typedef bool            CbBoolean;
 typedef struct CbArray* CbValArray;
+typedef struct CbValue* CbValRef;
 
 // codeblock-value structure
 typedef struct CbValue CbValue;
@@ -60,10 +62,12 @@ CbValue* cb_numeric_create(CbNumeric value);
 CbValue* cb_boolean_create(CbBoolean boolean);
 CbValue* cb_string_create(CbString string);
 CbValue* cb_valarray_create(CbValArray array);
+CbValue* cb_valref_create(const CbValRef reference);
 void cb_value_free(CbValue* val);
 
 enum cb_value_type cb_value_get_type(const CbValue* val);
 bool cb_value_is_type(const CbValue* val, enum cb_value_type type);
+bool cb_value_is_complex(const CbValue* val);
 void cb_value_assign(const CbValue* source, CbValue* destination);
 void cb_value_assign_and_free_source(CbValue* source, CbValue* destination);
 CbValue* cb_value_copy(const CbValue* val);
@@ -102,6 +106,9 @@ const CbValArray cb_valarray_get(const CbValue* val);
 CbValue* cb_valarray_get_element(const CbValue* val, int index);
 bool cb_valarray_set_element(const CbValue* val, int index,
                              const CbValue* element);
+
+// CbValArray interface functions
+const CbValRef cb_valref_get(const CbValue* val);
 
 
 #endif // VALUE_H
