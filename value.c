@@ -301,7 +301,7 @@ char* cb_value_to_string(const CbValue* val)
         
         case CB_VT_REFERENCE:
             result_buf = (char*)
-                         malloc((strlen(REFERENCE_AS_STRING) + 1) + 11);
+                         malloc((strlen(REFERENCE_AS_STRING) + 1) + 12);
             sprintf(result_buf, REFERENCE_AS_STRING " 0x%p", val->reference);
             break;
         
