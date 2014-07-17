@@ -393,3 +393,29 @@ CbValue* bif_aadd(CbStack* arg_stack)
     
     return result;
 }
+
+// -----------------------------------------------------------------------------
+// ADelete() -- Delete an element in the array
+// -----------------------------------------------------------------------------
+CbValue* bif_adelete(CbStack* arg_stack)
+{
+    assert(arg_stack->count == 2);
+    
+    CbValue* valref;
+    CbValue* index;
+    cb_stack_pop(arg_stack, (void*) &index);
+    assert(cb_value_is_type(index, CB_VT_NUMERIC));
+    
+    cb_stack_pop(arg_stack, (void*) &valref);
+    assert(cb_value_is_type(valref, CB_VT_REFERENCE));
+    
+    CbValue* valarray = cb_valref_get(valref);
+    assert(cb_value_is_type(valarray, CB_VT_VALARRAY));
+    
+    cb_valarray_delete_element(valarray, cb_numeric_get(index));
+    
+    cb_value_free(valref);
+    cb_value_free(index);
+    
+    return cb_value_create(); // return empty value
+}

@@ -106,6 +106,7 @@ const CbValArray cb_valarray_get(const CbValue* val);
 CbValue* cb_valarray_get_element(const CbValue* val, int index);
 bool cb_valarray_set_element(const CbValue* val, int index,
                              const CbValue* element);
+bool cb_valarray_delete_element(const CbValue* val, int index);
 
 // CbValArray interface functions
 const CbValRef cb_valref_get(const CbValue* val);

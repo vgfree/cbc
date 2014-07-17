@@ -300,9 +300,14 @@ char* cb_value_to_string(const CbValue* val)
         }
         
         case CB_VT_REFERENCE:
-            result_buf = (char*)
-                         malloc((strlen(REFERENCE_AS_STRING) + 1) + 12);
-            sprintf(result_buf, REFERENCE_AS_STRING " 0x%p", val->reference);
+            if (cb_value_is_type(val->reference, CB_VT_VALARRAY))
+                result_buf = cb_value_to_string(val->reference);
+            else
+            {
+                result_buf = (char*)
+                             malloc((strlen(REFERENCE_AS_STRING) + 1) + 12);
+                sprintf(result_buf, REFERENCE_AS_STRING " 0x%p", val->reference);
+            }
             break;
         
         default:
@@ -591,6 +596,19 @@ bool cb_valarray_set_element(const CbValue* val, int index,
     index--;
 #endif // not _CBC_ARRAY_INDEX_
     return cb_array_set(val->array, index, (const CbArrayItem) element);
+}
+
+// -----------------------------------------------------------------------------
+// delete array element
+// -----------------------------------------------------------------------------
+bool cb_valarray_delete_element(const CbValue* val, int index)
+{
+    assert(cb_value_is_type(val, CB_VT_VALARRAY));
+    
+#ifndef _CBC_ARRAY_INDEX_STARTS_WITH_ZERO
+    index--;
+#endif // not _CBC_ARRAY_INDEX_
+    return cb_array_remove(val->array, index);
 }
 
 // -----------------------------------------------------------------------------

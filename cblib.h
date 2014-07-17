@@ -29,6 +29,7 @@ CbValue* bif_seterrorif(CbStack* arg_stack);
 CbValue* bif_geterrortext(CbStack* arg_stack);
 CbValue* bif_alen(CbStack* arg_stack);
 CbValue* bif_aadd(CbStack* arg_stack);
+CbValue* bif_adelete(CbStack* arg_stack);
 
 
 #endif // CBLIB_H
