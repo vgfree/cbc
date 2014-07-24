@@ -20,23 +20,41 @@
 // -----------------------------------------------------------------------------
 // constructor
 // -----------------------------------------------------------------------------
-CbSyntree* cb_array_access_node_create(const char* identifier, int index)
+CbSyntree* cb_array_access_node_create(const char* identifier,
+                                       CbStrlist* indices)
 {
     CbArrayAccessNode* node = malloc(sizeof(CbArrayAccessNode));
     node->type        = SNT_VALARRAY_ACCESS;
     node->line_no     = 0;
     node->sym_id      = strdup(identifier);
     node->table_sym   = NULL;
-    node->index       = index;
+    node->indices     = indices;
     
     return (CbSyntree*) node;
 }
 
 // -----------------------------------------------------------------------------
+// destructor
+// -----------------------------------------------------------------------------
+void cb_array_access_node_free(CbArrayAccessNode* node)
+{
+    CbStrlist* item = node->indices;
+    while (item)
+    {
+        cb_syntree_free((CbSyntree*) item->data);
+        item = item->next;
+    }
+    
+    cb_strlist_free(node->indices);
+    free(node->sym_id);
+    free(node);
+}
+
+// -----------------------------------------------------------------------------
 // evaluation
 // -----------------------------------------------------------------------------
-CbValue* cb_array_access_node_eval(const CbArrayAccessNode* node,
-                                   CbSymtab* symtab)
+const CbValue* cb_array_access_node_eval(const CbArrayAccessNode* node,
+                                         CbSymtab* symtab)
 {
     if (cb_symref_set_symbol_from_table((CbSymref*) node, symtab) == EXIT_FAILURE)
         return NULL; // an error occurred
@@ -45,7 +63,24 @@ CbValue* cb_array_access_node_eval(const CbArrayAccessNode* node,
     assert(cb_value_is_type(valref, CB_VT_REFERENCE));
     const CbValue* valarray = cb_valref_get(valref);
     assert(cb_value_is_type(valarray, CB_VT_VALARRAY));
-    CbValue* element        = cb_valarray_get_element(valarray, node->index);
+    
+    const CbValue* element = valarray;
+    CbStrlist* item  = node->indices;
+    while (item)
+    {
+        CbValue* index = cb_syntree_eval((CbSyntree*) item->data, symtab);
+        assert(cb_value_is_type(index, CB_VT_NUMERIC));
+        if (cb_value_is_type(element, CB_VT_REFERENCE))
+            element = cb_valref_get(element);
+        
+        element = cb_valarray_get_element(element, cb_numeric_get(index));
+        if (!element)
+            break;
+        
+        cb_value_free(index);
+        item = item->next;
+    }
+    
     
     if (element)
         return element;

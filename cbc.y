@@ -276,7 +276,7 @@ expr:
                                     $$->line_no = yylineno;
                                     free($1); // free duplicated string
                                 }
-    | IDENTIFIER '[' NUMBER ']' {
+    | IDENTIFIER '[' exprlist ']' {
                                     $$ = cb_array_access_node_create($1, $3);
                                     $$->line_no = yylineno;
                                     free($1); // free duplicated string

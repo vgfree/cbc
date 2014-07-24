@@ -2,6 +2,7 @@
  * CbArrayNode -- Represents an array in the syntax tree.
  ******************************************************************************/
 
+#include <stdio.h>
 #include <stdlib.h>
 #include "array_node.h"
 #include "syntree.h"
@@ -61,6 +62,9 @@ CbValue* cb_array_node_eval(CbArrayNode* node, CbSymtab* symtab)
         item = item->next;
     }
     
+    // if node is evaluated multiple times -> free old valarray first
+    if (node->valarray)
+        cb_value_free(node->valarray);
     // finally, wrap the array instance in a value reference to force a
     // "call by reference" of the array instead of "call by value"
     node->valarray = cb_valarray_create(array);

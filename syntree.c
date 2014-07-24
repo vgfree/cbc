@@ -200,7 +200,8 @@ void cb_syntree_free(CbSyntree* node)
             break;
         
         case SNT_VALARRAY_ACCESS:
-            free(((CbArrayAccessNode*) node)->sym_id);
+            cb_array_access_node_free((CbArrayAccessNode*) node);
+            destructor_used = true;
             break;
         
         case SNT_VALARRAY_ASSIGNMENT:
@@ -261,8 +262,8 @@ CbValue* cb_syntree_eval(CbSyntree* node, CbSymtab* symtab)
         
         case SNT_VALARRAY_ACCESS:
         {
-            CbValue* value = cb_array_access_node_eval(
-                                 (CbArrayAccessNode*) node, symtab);
+            const CbValue* value = cb_array_access_node_eval(
+                                      (CbArrayAccessNode*) node, symtab);
             if (value)
                 result = cb_value_copy(value);
             else

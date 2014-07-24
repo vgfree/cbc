@@ -22,14 +22,16 @@ typedef struct
     int line_no;                    // line number
     char* sym_id;                   // array identifier
     CbSymbol* table_sym;            // reference to the instance in the symbol-table
-    int index;                      // index of the element
+    CbStrlist* indices;             // list of indices
 } CbArrayAccessNode;
 
 
 // interface functions
-CbSyntree* cb_array_access_node_create(const char* identifier, int index);
-CbValue* cb_array_access_node_eval(const CbArrayAccessNode* node,
-                                   CbSymtab* symtab);
+CbSyntree* cb_array_access_node_create(const char* identifier,
+                                       CbStrlist* indices);
+void cb_array_access_node_free(CbArrayAccessNode* node);
+const CbValue* cb_array_access_node_eval(const CbArrayAccessNode* node,
+                                         CbSymtab* symtab);
 
 
 #endif // ARRAY_ACCESS_NODE_H
